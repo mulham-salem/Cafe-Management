@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('username')->unique();
             $table->string('email')->unique();
             $table->string('password');
-            $table->string('role')->default('customer');
+            $table->enum('role', ['customer', 'employee', 'supplier'])->default('customer');
             $table->rememberToken();
             $table->timestamps();
             $table->foreign('manager_id')->references('id')->on('managers')->onDelete('cascade');

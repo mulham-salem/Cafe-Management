@@ -3,13 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
 /**
- * @method static inRandomOrder()
+ * @method static where(string $string, mixed $username)
  */
-class Manager extends Model
+class Manager extends Authenticatable
 {
     use HasFactory;
     public function users(): HasMany
@@ -41,4 +41,7 @@ class Manager extends Model
         return $this->hasMany(PurchaseBill::class, 'manager_id');
     }
 
+    protected $fillable = ['name', 'username', 'email', 'password'];
+
+    protected $hidden = ['password', 'remember_token'];
 }
