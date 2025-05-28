@@ -33,6 +33,7 @@ class DatabaseSeeder extends Seeder
             MenuInventoryItemsTableSeeder::class,
             SupplyRequestItemsTableSeeder::class,
             SupplyOfferItemsTableSeeder::class,
+            PermissionSeeder::class,
         ]);
     }
 }

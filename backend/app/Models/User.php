@@ -13,6 +13,7 @@ use Illuminate\Notifications\Notifiable;
 /**
  * @method static whereDoesntHave(string $string)
  * @method static where(string $string, mixed $username)
+ * @method static whereIn(string $string, string[] $array)
  */
 class User extends Authenticatable
 {
@@ -37,6 +38,24 @@ class User extends Authenticatable
     public function notifications(): HasMany
     {
         return $this->hasMany(Notification::class, 'user_id');
+    }
+    public function permissions(): HasMany
+    {
+        return $this->hasMany(Permission::class, 'user_id');
+    }
+
+    protected static function booted(): void
+    {
+        static::created(function ($user) {
+            if( in_array($user->role, ['employee', 'supplier']) ) {
+                if($user->permissions()->count() === 0) {
+                    Permission::create([
+                        'user_id' => $user->id,
+                        'permission' => 'Default',
+                    ]);
+                }
+            }
+        });
     }
 
     protected $fillable = ['name', 'username', 'email', 'password', 'role'];
