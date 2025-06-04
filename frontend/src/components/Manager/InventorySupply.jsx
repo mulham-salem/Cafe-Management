@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styles from '../styles/InventorySupply.module.css';
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
+import "../styles/toastStyles.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBoxes, faTruckLoading, faPlus, faEdit, faTrash, faBell, faFileInvoiceDollar, faPaperPlane, faTimes, faArrowRotateBack } from '@fortawesome/free-solid-svg-icons';
 
@@ -10,27 +11,30 @@ const InventorySupply = () => {
   useEffect(() => {
     document.title = "Cafe Delights - Inventory & Supply";
   }, []);
-  const [activeTab, setActiveTab] = useState(null); // null shows background
-  const [showAddItemModal, setShowAddItemModal] = useState(false);
-  const [inventory, setInventory] = useState([
-    {
-      id: 1,
-      name: 'Sugar',
-      quantity: 10,
-      unit: 'kg',
-      expiryDate: '2025-06-01',
-      thresholdLevel: 5,
-    },
-    {
-      id: 2,
-      name: 'Milk',
-      quantity: 10,
-      unit: 'L',
-      expiryDate: '2025-05-30',
-      thresholdLevel: 3,
-    },
-  ]);
 
+  const allowedTabs = ['inventory', 'supply', 'offers', 'null'];
+
+  const [activeTab, setActiveTab] = useState(() => {
+    const saved = localStorage.getItem('activeTab');
+    return allowedTabs.includes(saved) ? (saved === 'null' ? null : saved) : null;
+  });
+
+  const changeTab = (tab) => {
+    setActiveTab(tab);
+    localStorage.setItem('activeTab', tab === null ? 'null' : tab);
+  };
+
+  const [showAddItemModal, setShowAddItemModal] = useState(false);
+
+  const [inventory, setInventory] = useState(() => {
+    const savedInventory = localStorage.getItem("inventory");
+    return savedInventory ? JSON.parse(savedInventory) : [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem("inventory", JSON.stringify(inventory));
+  }, [inventory]);
+  
   const [itemName, setItemName] = useState('');
   const [quantity, setQuantity] = useState('');
   const [unit, setUnit] = useState('');
@@ -38,12 +42,17 @@ const InventorySupply = () => {
   const [threshold, setThreshold] = useState('');
 
 
-  // Check low stock and notify
   useEffect(() => {
     inventory.forEach((item) => {
       if (item.quantity <= item.thresholdLevel) {
         toast.warning(
-          `⚠️ Low Stock Alert: ${item.name} only ${item.quantity}${item.unit} left (threshold: ${item.thresholdLevel}${item.unit})`
+          <div className='lowStock'>
+            <span>⚠️ Low Stock Alert</span>
+            <br/>
+            <span>
+              {item.name} only {item.quantity} {item.unit} left <br/> (threshold: {item.thresholdLevel} {item.unit})
+            </span>
+          </div>
         );
       }
     });
@@ -71,7 +80,6 @@ const InventorySupply = () => {
     }
   
     if (editItem) {
-      // تعديل موجود
       const updated = inventory.map((item) =>
         item.id === editItem.id
           ? {
@@ -87,7 +95,6 @@ const InventorySupply = () => {
       setInventory(updated);
       toast.success(`✏️ ${itemName} updated`);
     } else {
-      // إضافة جديدة
       const newItem = {
         id: Date.now(),
         name: itemName,
@@ -100,7 +107,6 @@ const InventorySupply = () => {
       toast.success(`✅ ${itemName} added`);
     }
   
-    // Reset everything
     setShowAddItemModal(false);
     setItemName('');
     setQuantity('');
@@ -157,27 +163,116 @@ const InventorySupply = () => {
       return updated;
     });
   };
+  const [offers, setOffers] = useState([
+    {
+      id: 1,
+      title: 'Offer 1',
+      supplier: 'Supplier A',
+      totalPrice: 250,
+      deliveryDate: '2025-06-10',
+      note: 'Fast delivery guaranteed.',
+      status: 'Pending',
+      items: [
+        { name: 'Sugar', quantity: 10, unit: 'kilo', unitPrice: 5 },
+        { name: 'Milk', quantity: 5, unit: 'liter', unitPrice: 10 },
+      ],
+    },
+    {
+      id: 2,
+      title: 'Offer 2',
+      supplier: 'Supplier B',
+      totalPrice: 400,
+      deliveryDate: '2025-06-15',
+      note: 'Includes packaging.',
+      status: 'Pending',
+      items: [
+        { name: 'Coffee', quantity: 8, unit: 'kilo', unitPrice: 20 },
+      ],
+    },
+  ]);
+  const [rejectingOffer, setRejectingOffer] = useState(null);
+  const [rejectionReason, setRejectionReason] = useState('');
+  const handleAcceptOffer = (id) => {
+    setOffers((prev) =>
+      prev.map((offer) =>
+        offer.id === id ? { ...offer, status: 'approved' } : offer
+      )
+    );
+    toast.success('✅ Offer accepted');
+  };
+  const handleRejectOffer = (id) => {
+    setOffers((prev) =>
+      prev.map((offer) =>
+        offer.id === id ? { ...offer, status: 'Rejected', reason: rejectionReason } : offer
+      )
+    );
+    toast.info('❌ Offer rejected');
+    setRejectingOffer(null);
+    setRejectionReason('');
+  };
+  
+  const [showBillModal, setShowBillModal] = useState(false);
+  const [selectedOfferId, setSelectedOfferId] = useState('');
+  const [billDate, setBillDate] = useState('');
+  const [bills, setBills] = useState([]); 
+
+  const approvedOffers = offers.filter(o => o.status === 'approved');
+
+  const handleSubmitBill = (e) => {
+    e.preventDefault();
+  
+    const offer = approvedOffers.find(o => o.id.toString() === selectedOfferId);
+    if (!offer || !billDate) {
+      toast.error("Missing required fields");
+      return;
+    }
+  
+    const newBill = {
+      id: Date.now(),
+      offerId: offer.id,
+      supplier: offer.supplier,
+      items: offer.items,
+      total: offer.totalPrice,
+      date: billDate,
+    };
+  
+    setBills([...bills, newBill]); 
+    toast.success("🧾 Purchase Bill Saved!");
+    setShowBillModal(false);
+    setSelectedOfferId('');
+    setBillDate('');
+  };
+
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoaded(true);
+    }, 50); 
+
+    return () => clearTimeout(timer);
+  }, []);
   
   return (
     <div className={styles.pageWrapper}>
       <ToastContainer />
       {activeTab === null && (
-        <div className={styles.backgroundFull}>
+        <div className={`${styles.backgroundFull} ${loaded ? styles.visible : ''}`}>
             <div className={styles.backgroundContent}>
                 <h2>Welcome to Inventory & Supply</h2>
                 <p>Choose a section to get started</p>
                 <div className={styles.tabs}>
                     <button
-                        className={`${styles.tabBtn} ${activeTab === 'inventory' ? styles.active : ''}`}
-                        onClick={() => setActiveTab('inventory')}
+                        className={styles.tabBtn}
+                        onClick={() => changeTab('inventory')}
                         >
-                        <FontAwesomeIcon icon={faBoxes} /> Inventory Management
+                        <FontAwesomeIcon icon={faBoxes} className={styles.iconTabBtn} /> Inventory Management
                     </button>
                     <button
-                        className={`${styles.tabBtn} ${activeTab === 'supply' ? styles.active : ''}`}
-                        onClick={() => setActiveTab('supply')}
+                        className={styles.tabBtn}
+                        onClick={() => changeTab('supply')}
                         >
-                        <FontAwesomeIcon icon={faTruckLoading} /> Supply Management
+                        <FontAwesomeIcon icon={faTruckLoading}  className={styles.iconTabBtn} /> Supply Management
                     </button>
                 </div>
              </div>
@@ -186,13 +281,13 @@ const InventorySupply = () => {
 
       <main className={styles.tabContent}>
         {activeTab === 'inventory' && (
-          <section className={styles.section}>
-            <h3 className={styles.sectionTitle}>📦 Inventory Items</h3>
+          <section className={styles.inventortSection}>
+            <h3 className={styles.inventortSectionTitle}>📦 Inventory Items</h3>
             <button className={styles.addBtn} onClick={() => setShowAddItemModal(true)}>
               <FontAwesomeIcon icon={faPlus} /> Add Item
             </button>
 
-            <button className={styles.backBtn} onClick={() => setActiveTab(null)}>
+            <button className={styles.backBtn} onClick={() => changeTab(null)}>
               <FontAwesomeIcon icon={faArrowRotateBack} /> Back to Main
             </button>
 
@@ -227,10 +322,10 @@ const InventorySupply = () => {
                                 setShowAddItemModal(true);
                             }}
                         >
-                            <FontAwesomeIcon icon={faEdit} />
+                            <FontAwesomeIcon icon={faEdit} data-action="Edit" title="Edit"/>
                         </button>
                         <button className={styles.iconBtn} onClick={() => handleDelete(item.id)}>
-                            <FontAwesomeIcon icon={faTrash} />
+                            <FontAwesomeIcon icon={faTrash} data-action="Delete" title="Delete" />
                         </button>
                     </td>
                   </tr>
@@ -264,9 +359,9 @@ const InventorySupply = () => {
         )}
 
         {activeTab === 'supply' && (
-          <section className={styles.section}>
-            <h3 className={styles.sectionTitle}>📑 Supply Section</h3>
-            <button className={styles.backBtn2} onClick={() => setActiveTab(null)}>
+          <section className={styles.supplySection}>
+            <h3 className={styles.supplySectionTitle}>📑 Supply Section</h3>
+            <button className={styles.backBtn2} onClick={() => changeTab(null)}>
               <FontAwesomeIcon icon={faArrowRotateBack} /> Back to Main
             </button>
             <div className={styles.cardGrid}>
@@ -280,13 +375,17 @@ const InventorySupply = () => {
               <div className={styles.card}>
                 <h4><FontAwesomeIcon icon={faBell} /> Review Supply Offers</h4>
                 <p>Check offers from suppliers and accept or reject them.</p>
-                <button className={styles.cardBtn}>Go to Offers</button>
+                <button className={styles.cardBtn} onClick={() => changeTab('offers')}>
+                    Go to Offers
+                </button>
               </div>
 
               <div className={styles.card}>
                 <h4><FontAwesomeIcon icon={faFileInvoiceDollar} /> Create Purchase Bill</h4>
                 <p>Generate a bill for accepted supply offers.</p>
-                <button className={styles.cardBtn}>+ New Bill</button>
+                <button className={styles.cardBtn} onClick={() => setShowBillModal(true)}>
+                  + New Bill
+                </button>
               </div>
             </div>
           </section>
@@ -295,16 +394,15 @@ const InventorySupply = () => {
         {showRequestModal && (
         <div className={`${styles.overlay} ${styles.fadeInOverlay}`}>
             <div className={`${styles.modal} ${styles.slideUpModal} ${styles.requestModal}`}>
-            <h4 className={styles.modalTitle}>📝 New Supply Request</h4>
+            <h4>📝 New Supply Request</h4>
             <form onSubmit={handleSubmitSupplyRequest}>
-                <label className={styles.inputLabel}>📋 Select Items & Quantities:</label>
+                <label>📋 Select Items & Quantities:</label>
                 <div className={styles.itemList}>
                 {requestItems.map((item, idx) => (
                     <div key={item.id} className={styles.itemRow}>
                     <span className={styles.itemName}>{item.name}</span>
                     <input
                         type="number"
-                        className={styles.itemQtyInput}
                         placeholder="Qty"
                         min={0}
                         value={item.quantity}
@@ -314,7 +412,7 @@ const InventorySupply = () => {
                 ))}
                 </div>
 
-                <label className={styles.inputLabel}>👤 Select Supplier:</label>
+                <label>👤 Select Supplier:</label>
                 <select
                 className={styles.selectBox}
                 value={selectedSupplier}
@@ -327,7 +425,7 @@ const InventorySupply = () => {
                 ))}
                 </select>
 
-                <label className={styles.inputLabel}>🗒️ Note (optional):</label>
+                <label>🗒️ Note (optional):</label>
                 <textarea
                 className={styles.textArea}
                 rows="3"
@@ -337,7 +435,7 @@ const InventorySupply = () => {
                 />
 
                 <div className={styles.modalActions}>
-                <button type="submit" className={styles.saveBtn}>Send</button>
+                <button type="submit" className={styles.supplySaveBtn}>Send</button>
                 <button
                     type="button"
                     className={styles.cancelBtn}
@@ -349,6 +447,150 @@ const InventorySupply = () => {
             </form>
             </div>
         </div>
+        )}
+
+        {activeTab === 'offers' && (
+        <section>
+            <h3 className={styles.supplyOffersTitle}>📦 Supply Offers</h3>
+            <button className={styles.backBtn3} onClick={() => changeTab('supply')}>
+              <FontAwesomeIcon icon={faArrowRotateBack} /> Back to Main
+            </button>
+            <div className={`${styles.offerList} ${styles.fadeInOverlay}`}>
+            {offers.map((offer) => (
+                <div key={offer.id} className={styles.offerCard}>
+                <h4 className={styles.offerTitle}>{offer.title}</h4>
+                <p><strong>Supplier:</strong> {offer.supplier}</p>
+                <p><strong>Total Price:</strong> ${offer.totalPrice.toFixed(2)}</p>
+                <p><strong>Delivery Date:</strong> {offer.deliveryDate}</p>
+                <p><strong>Note:</strong> {offer.note}</p>
+                <div className={styles.offerItems}>
+                    {offer.items.map((item, idx) => (
+                    <div key={idx} className={styles.offerItem}>
+                        • {item.name} - {item.quantity} - {item.unit} - ${item.unitPrice}
+                    </div>
+                    ))}
+                </div>
+                <div className={styles.offerActions}>
+                    {offer.status === 'Pending' ? (
+                        <>
+                        <button className={styles.acceptBtn} onClick={() => handleAcceptOffer(offer.id)}>✅ Accept</button>
+                        <button className={styles.rejectBtn} onClick={() => setRejectingOffer(offer)}>❌ Reject</button>
+                        </>
+                    ) : (
+                        <span
+                        className={`${styles.statusBadge} ${
+                            offer.status === 'approved' ? styles.statusApproved : styles.statusRejected
+                        }`}
+                        >
+                        {offer.status === 'approved' ? '✅ Approved' : '❌ Rejected'}
+                        </span>
+                    )}
+                </div>
+
+                </div>
+            ))}
+            </div>
+        </section>
+        )}
+
+        {rejectingOffer && (
+        <div className={`${styles.overlay} ${styles.fadeInOverlay}`}>
+            <div className={`${styles.slideUpModal} ${styles.rejectModal}`}>
+            <h4 className={styles.rejectModalTitle}>❌ Reject Offer</h4>
+            <p>Optional: Add reason for rejection</p>
+            <textarea
+                className={styles.textArea}
+                value={rejectionReason}
+                onChange={(e) => setRejectionReason(e.target.value)}
+                rows="3"
+                placeholder="e.g., Price too high, delivery too late..."
+            />
+            <div className={styles.rejectModalActions}>
+                <button
+                className={styles.rejectConfirmBtn}
+                onClick={() => handleRejectOffer(rejectingOffer.id)}
+                >
+                Confirm Reject
+                </button>
+
+                <button
+                className={styles.rejectCancelBtn}
+                onClick={() => {
+                    setRejectingOffer(null);
+                    setRejectionReason('');
+                }}
+                >
+                Cancel
+                </button>
+
+            </div>
+            </div>
+        </div>
+        )}
+
+        {showBillModal && (
+          <div className={`${styles.overlay} ${styles.fadeInOverlay}`}>
+            <div className={`${styles.slideUpModal} ${styles.billModal}`}>
+              <h4 className={styles.billModalTitle}>🧾 Create Purchase Bill</h4>
+              <form onSubmit={handleSubmitBill}>
+                <label className={styles.inputLabel}>📦 Select Approved Offer:</label>
+                <select
+                  className={styles.selectBox}
+                  value={selectedOfferId}
+                  onChange={(e) => setSelectedOfferId(e.target.value)}
+                  required
+                >
+                  <option value="">-- Choose Offer --</option>
+                  {approvedOffers.map((offer) => (
+                    <option key={offer.id} value={offer.id}>
+                      {offer.title} - {offer.supplier}
+                    </option>
+                  ))}
+                </select>
+
+                <label className={styles.inputLabel}>📅 Purchase Date:</label>
+                <input
+                  type="date"
+                  className={styles.dateInput}
+                  value={billDate}
+                  onChange={(e) => setBillDate(e.target.value)}
+                  required
+                />
+
+                {selectedOfferId && (
+                  <div className={styles.billDetails}>
+                    <h5 className={styles.sectionSubTitle}>Offer Details</h5>
+                    {approvedOffers
+                      .find((o) => o.id.toString() === selectedOfferId)
+                      .items.map((item, idx) => (
+                        <div key={idx} className={styles.billItemRow}>
+                          • {item.name}: {item.quantity} {item.unit} × ${item.unitPrice} = ${item.quantity * item.unitPrice}
+                        </div>
+                      ))}
+                    <p className={styles.totalPrice}>
+                      Total: $
+                      {approvedOffers.find((o) => o.id.toString() === selectedOfferId).totalPrice.toFixed(2)}
+                    </p>
+                  </div>
+                )}
+
+                <div className={styles.modalActions}>
+                  <button type="submit" className={styles.billSaveBtn}>Save Bill</button>
+                  <button
+                    type="button"
+                    className={styles.billCancelBtn}
+                    onClick={() => {
+                      setShowBillModal(false);
+                      setSelectedOfferId('');
+                      setBillDate('');
+                    }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
         )}
       </main>
     </div>

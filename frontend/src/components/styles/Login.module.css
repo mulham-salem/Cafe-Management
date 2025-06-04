@@ -85,6 +85,8 @@ body, html {
 }
 
 .title {
+  font-family: 'Playfair Display', serif;
+  font-weight: bold;
   font-size: 1.2rem;
   color: #6e4c2e;
   margin-bottom: 15px;
@@ -145,6 +147,8 @@ a:hover {
 
 .form button {
   padding: 10px;
+  position: relative;
+  top: 15px;
   background-color: #4b2e2e;
   color: white;
   border: none;
@@ -152,6 +156,8 @@ a:hover {
   cursor: pointer;
   font-size: 15px;
   font-weight: bold;
+  display: block;
+  text-align: center;
   transition: background 0.3s ease;
 }
 

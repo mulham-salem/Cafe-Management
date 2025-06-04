@@ -1,0 +1,288 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap');
+
+.ordersPage {
+    padding: 2rem;
+    font-family: 'Poppins', sans-serif;
+    background-color: #110e0c;
+    min-height: 82vh;
+    max-height: 82vh;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+  }
+  
+  .ordersPage::-webkit-scrollbar {
+    display: none;
+  } 
+
+  .pageTitle {
+    font-family: 'Playfair Display';
+    font-size: 3rem;
+    text-align: center;
+    color: #ffb65d;
+    position: relative;
+    bottom: 10px;
+    letter-spacing: 1px;
+    padding: 10px 10px;
+    padding-left: 15px;
+    width: 20%;
+    border-radius: 10px;
+    margin: auto;
+    animation: fadeInUp 1.2s ease;
+  }
+
+  .icon {
+    position: relative;
+    right: 15px;
+    bottom: 2px;
+  }
+  
+  .ordersGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-auto-rows: 230px;
+    gap: 1.5rem;
+    margin-top: 30px;
+    animation: slideUp 1.2s ease;
+  }
+
+  .orderCard {
+    background: #fff;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    transition: transform 0.4s ease, box-shadow 0.3s ease;
+  }
+  
+  .orderCard:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+  }
+  
+  .orderHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: #ffaf4e;
+  }
+  
+  .status {
+    padding: 0.4rem 0.8rem;
+    border-radius: 2rem;
+    text-transform: capitalize;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #fff;
+  }
+  
+  .status.pending {
+    background-color: #facc15;
+    color: #000;
+  }
+  
+  .status.confirmed {
+    background-color: #005aea;
+  }
+  
+  .status.preparing {
+    background-color: rebeccapurple;
+  }
+  
+  .status.delivered {
+    background-color: #007e54;
+  }
+
+  .status.ready {
+    background-color: red;
+  }
+  
+  .orderBody p {
+    margin: 0.3rem 0;
+    font-size: 0.95rem;
+    color: #333;
+  }
+  
+  .actions {
+    display: flex;
+    flex-wrap: no-wrap;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    position: relative;
+    top: 10px;
+    right: 8px;
+  }
+  
+  button {
+    all: unset;
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background-color 0.4s ease;
+  }
+  
+  .editBtn {
+    background-color: #e0f2fe;
+    color: #0369a1;
+  }
+  
+  .editBtn:hover {
+    background-color: #bae6fd;
+  }
+  
+  .cancelBtn {
+    background-color: #fee2e2;
+    color: #b91c1c;
+  }
+  
+  .cancelBtn:hover {
+    background-color: #fecaca;
+  }
+  
+  .confirmBtn {
+    background-color: #d1fae5;
+    color: #047857;
+  }
+  
+  .confirmBtn:hover {
+    background-color: #a7f3d0;
+  }
+  
+  .invoiceBtn {
+    background-color: #ede9fe;
+    color: #6d28d9;
+    width: 30%;
+    border-radius: 12px;
+    display: block;
+    text-align: center;
+    margin: auto;
+  }
+  
+  .invoiceBtn:hover {
+    background-color: #ddd6fe;
+  }
+  
+  .invoiceOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(20, 20, 20, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+    backdrop-filter: blur(4px);
+  }
+  
+  .invoiceContent {
+    background: #fff;
+    padding: 40px;
+    width: 500px;
+    max-width: 90%;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    font-family: 'Georgia', serif;
+    color: #333;
+    position: relative;
+    animation: fadeInUp 0.4s ease;
+  }
+  
+  
+  .closeOverlay {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #999;
+    transition: color 0.2s;
+  }
+
+  .closeOverlay:hover {
+    color: #000;
+    transform: scale(1.2);
+    transition: ease 0.5s;
+  }
+  
+  .invoiceContent h2 {
+    color: rgb(196, 128, 1);
+    margin-bottom: 20px;
+    font-size: 24px;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+    text-align: center;
+  }
+  
+  .invoiceItems {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+  }
+
+  .invoiceItems li {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px dashed #ccc;
+    font-size: 16px;
+  }
+  
+  .totalAmount {
+    color: #110e0c;
+    text-align: right;
+    font-weight: bold;
+    font-size: 18px;
+    margin-top: 20px;
+    border-top: 2px solid #110e0c;
+    padding-top: 10px;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  @keyframes slideUp {
+    from {
+      transform: translateY(30px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .floatingIcon {
+    animation: float 2s ease-in-out infinite;
+  }
+  
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-12px);
+    }
+  }

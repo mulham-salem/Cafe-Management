@@ -7,8 +7,14 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const UserManagement = () => {
-  const [users, setUsers] = useState([]);
+
+  const [users, setUsers] = useState(() => {
+    const savedUsers = localStorage.getItem("users");
+    return savedUsers ? JSON.parse(savedUsers) : [];
+  });
+
   const [showInputs, setShowInputs] = useState(false);
+
   const [newUser, setNewUser] = useState({
     name: "",
     email: "",
@@ -17,6 +23,7 @@ const UserManagement = () => {
     role: "",
     permission: "Default",
   });
+
   const [showPermissionPopup, setShowPermissionPopup] = useState(false);
   const [selectedPermissions, setSelectedPermissions] = useState([]);
   const [editUserId, setEditUserId] = useState(null);
@@ -34,6 +41,10 @@ const UserManagement = () => {
   useEffect(() => {
     document.title = "Cafe Delights - User Management";
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem("users", JSON.stringify(users));
+  }, [users]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -55,7 +66,7 @@ const UserManagement = () => {
     if (selectedPermissions.includes(perm)) {
       updated = selectedPermissions.filter((p) => p !== perm);
     } else {
-      if (selectedPermissions.length >= 5) return;
+      if (selectedPermissions.length >= 3) return;
       updated = [...selectedPermissions, perm];
     }
     setSelectedPermissions(updated);
@@ -298,7 +309,8 @@ const UserManagement = () => {
                   <FontAwesomeIcon icon={faShieldAlt} className={styles.actionIcon} data-action="Assign Roles" title="Assign Roles" 
                     onClick={() => {
                       setUserToAssign(user);
-                      setSelectedPermissions(Array.isArray(user.permission) ? user.permission : [user.permission]);
+                      const initialPermissions = Array.isArray(user.permission) ? user.permission : (user.permission === "Default") ? [] : [user.permission];
+                      setSelectedPermissions(initialPermissions);
                       setShowPermissionPopup(true);
                       setIsAssigningPermissions(true); 
                     }}
@@ -321,7 +333,7 @@ const UserManagement = () => {
                   <input type="checkbox"
                     checked={selectedPermissions.includes(perm)}
                     onChange={() => handleCheckboxChange(perm)}
-                    disabled={selectedPermissions.length >= 5 && !selectedPermissions.includes(perm)}
+                    disabled={selectedPermissions.length >= 3 && !selectedPermissions.includes(perm)}
                   />
                   {perm}
                 </label>
@@ -354,7 +366,7 @@ const UserManagement = () => {
                   <input type="checkbox"
                     checked={selectedPermissions.includes(perm)}
                     onChange={() => handleCheckboxChange(perm)}
-                    disabled={selectedPermissions.length >= 5 && !selectedPermissions.includes(perm)}
+                    disabled={selectedPermissions.length >= 3 && !selectedPermissions.includes(perm)}
                   />
                   {perm}
                 </label>

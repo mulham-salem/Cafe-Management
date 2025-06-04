@@ -8,10 +8,28 @@ import "react-toastify/dist/ReactToastify.css";
 
 
 const TableManagement = () => {
-   useEffect(() => {
-    document.title = "Cafe Delights - Table Management";
-   }, []);
-  const [tables, setTables] = useState([]);
+
+  useEffect(() => {
+  document.title = "Cafe Delights - Table Management";
+  }, []);
+
+  const [tables, setTables] = useState(() => {
+  const savedTables = localStorage.getItem("tables");
+  return savedTables ? JSON.parse(savedTables) : [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem("tables", JSON.stringify(tables));
+    const existingTables = JSON.parse(localStorage.getItem('tables')) || [];
+    if (existingTables.length === 0) {
+      localStorage.setItem('lastTableId', '0'); 
+    } 
+  }, [tables]);
+
+  if (tables.length === 0) {
+    localStorage.setItem('lastTableId', '0'); 
+  } 
+  
   const [newTable, setNewTable] = useState({ number: '', capacity: '' });
   const [showForm, setShowForm] = useState(false);
   const formRef = useRef(null);
@@ -47,8 +65,12 @@ const TableManagement = () => {
       return;
     }
 
+    let lastTableId = parseInt(localStorage.getItem('lastTableId')) || 0;
+    const newId = lastTableId + 1;
+    localStorage.setItem('lastTableId', newId);
+
     const newEntry = {
-      id: Date.now(),
+      id: newId,
       number: parseInt(newTable.number),
       capacity: parseInt(newTable.capacity),
       status: 'Available',
@@ -72,7 +94,7 @@ const TableManagement = () => {
     if (currentStatus === 'Reserved') {
       toast.warn(
         <div className="custom-toast">
-          This table is currently reserved. <br/><br/> <span>Are you sure you want to update status?</span>
+          This table is currently reserved. <br/> <span>Are you sure you want to update status?</span>
           <button className= "toastConfirmBtn"
             onClick={() => {
               updateStatus(id);

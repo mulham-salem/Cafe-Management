@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import styles from './styles/ChangePassword.module.css';
 import logo from '../assets/logo_1.png'; 
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 const ChangePassword = () => {
     useEffect(() => {
         document.title = "Cafe Delights - Change Password";
     }, []);  
+
+    const location = useLocation();
+    const from = location.state?.from || '/login';
 
     const [isTextVisible, setIsTextVisible] = useState(false);
 
@@ -51,8 +54,9 @@ const ChangePassword = () => {
           <button type="submit" className={styles.saveBtn}>Save Password</button>
 
           <div className={styles.backLink}>
-            <Link to="/">{`← Back to login`}</Link>
+            <Link to={from}> {`← Back to home`} </Link>
           </div>
+          
         </form>
       </div>
     </div>

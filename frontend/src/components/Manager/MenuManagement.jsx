@@ -30,7 +30,16 @@ const MenuManagement = () => {
     };
   }, [showForm]);
   
-  const [menuItems, setMenuItems] = useState([]);
+  const [menuItems, setMenuItems] = useState(() => {
+
+  const savedMenuItems = localStorage.getItem("menuItems");
+    return savedMenuItems ? JSON.parse(savedMenuItems) : [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem("menuItems", JSON.stringify(menuItems));
+  }, [menuItems]);
+  
   const [newItem, setNewItem] = useState({
     id: Date.now(),
     name: '',
@@ -126,7 +135,10 @@ const MenuManagement = () => {
       <h3 className={styles.sectionTitle}>{title}</h3>
       <hr className={styles.sectionDivider} />
       <div className={styles.menuGrid}>
-        {menuItems
+      {menuItems.filter((item) => item.category === category).length === 0 ? (
+          <p className={styles.noItemsMessage}>No menu items available.</p>
+        ) : (
+        menuItems
           .filter((item) => item.category === category)
           .map((item) => (
             <div className={styles.card} key={item.id}>
@@ -143,7 +155,8 @@ const MenuManagement = () => {
                 <FontAwesomeIcon icon={faTrash} onClick={() => handleDelete(item.id)} data-action="Delete" title="Delete" />
               </div>
             </div>
-          ))}
+          ))
+        )}
       </div>
     </>
   );
