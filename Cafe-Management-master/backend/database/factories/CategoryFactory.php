@@ -17,8 +17,11 @@ class CategoryFactory extends Factory
      */
     public function definition(): array
     {
+   static $index = 0;
+        $names = ['drinks', 'snacks'];
+
         return [
-            'name' => $this->faker->word(),
-        ];
+            'name' => $names[$index++],
+        ];        
     }
 }

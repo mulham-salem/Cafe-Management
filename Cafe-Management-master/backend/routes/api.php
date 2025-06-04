@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ManagerAuthController;
+use App\Http\Controllers\MenuManagementController;
 use App\Http\Controllers\UserAuthController;
 use App\Http\Controllers\UserManagementController;
 use Illuminate\Support\Facades\Route;
@@ -31,5 +32,7 @@ Route::middleware(['auth:manager', 'isManager'])->group(function () {
       Route::post('/change-password', [ManagerAuthController::class, 'changePassword']);
       //molham alghali هاد الراوت بيشمل الميثودات الاربعة)(crud) وكتبنا لانو رح يكون عنا كتير راوترات 
       Route::apiResource('/users', UserManagementController::class);
+      Route::apiResource('/menuitem', MenuManagementController::class);
+
 
 });
