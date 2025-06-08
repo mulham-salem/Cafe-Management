@@ -10,12 +10,12 @@ return new class extends Migration
     {
         Schema::create('notifications', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');
+            $table->foreignid('manager_id')->nullable()->constrained('managers')->cascadeOnDelete();
+            $table->foreignid('user_id')->nullable()->constrained('users')->cascadeOnDelete();
             $table->text('message');
             $table->dateTime('createdAt');
             $table->boolean('seen')->default(false);
             $table->timestamps();
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

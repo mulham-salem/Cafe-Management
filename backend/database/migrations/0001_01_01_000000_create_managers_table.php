@@ -14,6 +14,7 @@ return new class extends Migration
             $table->string('password');
             $table->string('name')->nullable();
             $table->string('email')->unique();
+            $table->enum('role', ['Manager'])->default('Manager');
             $table->rememberToken();
             $table->timestamps();
         });

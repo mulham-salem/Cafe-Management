@@ -13,7 +13,7 @@ return new class extends Migration
             $table->unsignedBigInteger('manager_id');
             $table->unsignedBigInteger('supplyOffer_id');
             $table->unsignedBigInteger('supplier_id');
-            $table->float('unit_price');
+            $table->float('unit_price')->nullable();
             $table->float('total_amount');
             $table->dateTime('purchase_date');
             $table->timestamps();

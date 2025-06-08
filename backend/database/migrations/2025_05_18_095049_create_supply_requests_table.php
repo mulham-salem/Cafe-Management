@@ -11,12 +11,14 @@ return new class extends Migration
         Schema::create('supply_requests', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('manager_id');
-            $table->string('title');
+
+            $table->string('title')->nullable();
             $table->dateTime('request_date');
             $table->text('note')->nullable();
             $table->string('status');
             $table->timestamps();
             $table->foreign('manager_id')->references('id')->on('managers')->onDelete('cascade');
+
         });
     }
 

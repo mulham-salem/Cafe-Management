@@ -19,9 +19,15 @@ class UserAuthController extends Controller
 
         $user = User::where('username', $credentials['username'])->first();
 
-        if (! $user || ! Hash::check($credentials['password'], $user->password)) {
+        if (! $user) {
             throw ValidationException::withMessages([
-                'message' => ['Invalid credentials.'],
+                'username' => ['Username is incorrect.'],
+            ]);
+        }
+
+        if (! Hash::check($credentials['password'], $user->password)) {
+            throw ValidationException::withMessages([
+                'password' => ['Password is incorrect.'],
             ]);
         }
 
@@ -30,7 +36,7 @@ class UserAuthController extends Controller
         return response()->json([
             'message' => 'User logged in successfully.',
             'token' => $token,
-            'user' => $user->only(['id', 'name', 'email', 'role']),
+            'user' => $user->only(['role']),
         ]);
     }
 

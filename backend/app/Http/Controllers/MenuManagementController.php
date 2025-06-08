@@ -74,9 +74,9 @@ class MenuManagementController extends Controller
     {
         $menuItem = MenuItem::with('category')->find($id);
 
-        if (!$menuItem) {
+        if (! $menuItem) {
             return response()->json([
-                'message' => 'Menu item not found'
+                'message' => 'Menu item not found',
             ], 404);
         }
 
@@ -124,21 +124,21 @@ class MenuManagementController extends Controller
     public function destroy(string $id): JsonResponse
     {
         $menuItem = MenuItem::findOrFail($id);
-// .................................................................للتدفق البديل المنتاك ....................................................
-    // $activeOrders = \DB::table('order_items')
-    //     ->join('orders', 'order_items.order_id', '=', 'orders.id')
-    //     ->where('order_items.menu_item_id', $id)
-    //     ->where('orders.status', '!=', 'delivered')
-    //     ->exists();
+        // .................................................................للتدفق البديل المنتاك ....................................................
+        // $activeOrders = \DB::table('order_items')
+        //     ->join('orders', 'order_items.order_id', '=', 'orders.id')
+        //     ->where('order_items.menu_item_id', $id)
+        //     ->where('orders.status', '!=', 'delivered')
+        //     ->exists();
 
-    // if ($activeOrders) {
-    //     return response()->json([
-    //         'message' => 'لا يمكن حذف عنصر مستخدم في طلبات نشطة'
-    //     ], 403);
-    // }
+        // if ($activeOrders) {
+        //     return response()->json([
+        //         'message' => 'لا يمكن حذف عنصر مستخدم في طلبات نشطة'
+        //     ], 403);
+        // }
 
         $menuItem->delete();
+
         return response()->json(['message' => 'Menu item deleted successfully.']);
     }
 }
-

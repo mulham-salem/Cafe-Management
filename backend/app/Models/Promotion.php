@@ -23,6 +23,6 @@ class Promotion extends Model
     {
         return $this->hasMany(InventoryItem::class, 'promotion_id');
     }
-        protected $fillable = ['title', 'discount_percentage', 'start_date', 'end_date','description',  'manager_id'];
 
+    protected $fillable = ['title', 'discount_percentage', 'start_date', 'end_date', 'description',  'manager_id'];
 }

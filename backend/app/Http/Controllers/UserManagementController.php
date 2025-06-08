@@ -63,7 +63,7 @@ class UserManagementController extends Controller
 
         return response()->json([
             'user' => $user->only(['id', 'name', 'email', 'username', 'role']),
-            'permissions' => $user->permissions->pluck('permission'),
+            'permissions' => $user->permission->pluck('permission'),
         ]);
     }
     // This Is Update Method For User Data And Permissions&Roles........................................................................................

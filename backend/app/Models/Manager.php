@@ -49,6 +49,18 @@ class Manager extends Authenticatable
         return $this->hasMany(PurchaseBill::class, 'manager_id');
     }
 
+    public function notifications(): HasMany
+    {
+        return $this->hasMany(Notification::class, 'manager_id');
+    }
+
+    protected static function booted()
+    {
+        static::creating(function ($manager) {
+            $manager->role = 'Manager';
+        });
+    }
+
     protected $fillable = ['name', 'username', 'email', 'password', 'remember_token'];
 
     protected $hidden = ['password', 'remember_token'];

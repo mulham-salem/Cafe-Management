@@ -29,4 +29,13 @@ class SupplyOffer extends Model
     {
         return $this->hasMany(SupplyOfferItem::class, 'supplyOffer_id');
     }
+
+    protected function casts(): array
+    {
+        return [
+            'delivery_date' => 'datetime',
+        ];
+    }
+
+    protected $fillable = ['supplier_id', 'title', 'total_price', 'delivery_date', 'note', 'status'];
 }

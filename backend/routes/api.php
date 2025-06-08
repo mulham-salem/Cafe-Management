@@ -1,8 +1,11 @@
 <?php
 
+use App\Http\Controllers\InventoryManagementController;
 use App\Http\Controllers\ManagerAuthController;
 use App\Http\Controllers\MenuManagementController;
+use App\Http\Controllers\NotificationManagementController;
 use App\Http\Controllers\PromotionManagementController;
+use App\Http\Controllers\SupplyManagementController;
 use App\Http\Controllers\TableManagementController;
 use App\Http\Controllers\UserAuthController;
 use App\Http\Controllers\UserManagementController;
@@ -27,5 +30,11 @@ Route::middleware(['auth:manager', 'isManager'])->prefix('manager')->group(funct
     Route::apiResource('/menuitem', MenuManagementController::class);
     Route::apiResource('/table', TableManagementController::class);
     Route::apiResource('/promotion', PromotionManagementController::class);
+    Route::apiResource('/inventory', InventoryManagementController::class);
+    Route::get('/notification', [NotificationManagementController::class, 'index']);
+    Route::apiResource('/supply', SupplyManagementController::class);
+    Route::post('/supply-offers/{id}/accept', [SupplyManagementController::class, 'acceptOffer']);
+    Route::post('/supply-offers/{id}/reject', [SupplyManagementController::class, 'rejectOffer']);
+    Route::post('/supply-purchace-bill', [SupplyManagementController::class, 'storePurchaseBill']);
 
 });

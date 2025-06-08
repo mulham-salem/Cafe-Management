@@ -16,14 +16,19 @@ class ManagerAuthController extends Controller
             'username' => 'required|string',
             'password' => 'required|string',
             'remember_me' => 'boolean',
-
         ]);
 
         $manager = Manager::where('username', $credentials['username'])->first();
 
-        if (! $manager || ! Hash::check($credentials['password'], $manager->password)) {
+        if (! $manager) {
             throw ValidationException::withMessages([
-                'message' => ['Information Are Incorrect.'],
+                'username' => ['The username is incorrect.'],
+            ]);
+        }
+
+        if (! Hash::check($credentials['password'], $manager->password)) {
+            throw ValidationException::withMessages([
+                'password' => ['The password is incorrect.'],
             ]);
         }
 
@@ -32,7 +37,7 @@ class ManagerAuthController extends Controller
         return response()->json([
             'message' => 'Manager logged in successfully.',
             'token' => $token,
-            'manager' => $manager->only(['id', 'name', 'email']),
+            'manager' => $manager->only(['role']),
         ]);
     }
 

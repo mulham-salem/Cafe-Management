@@ -19,4 +19,6 @@ class SupplyOfferItem extends Model
     {
         return $this->belongsTo(InventoryItem::class, 'inventoryItem_id');
     }
+
+    protected $fillable = ['supplyOffer_id', 'inventoryItem_id', 'quantity', 'unit_price', 'total_price'];
 }
