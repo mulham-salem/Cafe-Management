@@ -34,5 +34,10 @@ class MenuItem extends Model
         return $this->hasMany(OrderItem::class, 'menuItem_id');
     }
 
+    public function promotion(): BelongsTo
+    {
+        return $this->belongsTo(Promotion::class, 'promotion_id');
+    }
+
     protected $fillable = ['name', 'description', 'price', 'category_id', 'manager_id', 'image_url', 'available'];
 }

@@ -33,6 +33,6 @@ class PurchaseBill extends Model
     {
         return $this->hasMany(InventoryItem::class, 'purchaseBill_id');
     }
-        protected $fillable = ['unit_price', 'total_amount', 'purchase_date','manager_id','supplyOffer_id','supplier_id'];
-       
+
+    protected $fillable = ['unit_price', 'total_amount', 'purchase_date', 'manager_id', 'supplyOffer_id', 'supplier_id'];
 }

@@ -19,9 +19,9 @@ class Promotion extends Model
         return $this->belongsTo(Manager::class, 'manager_id');
     }
 
-    public function inventoryItems(): HasMany
+    public function menuitems(): HasMany
     {
-        return $this->hasMany(InventoryItem::class, 'promotion_id');
+        return $this->hasMany(MenuItem::class, 'promotion_id');
     }
 
     protected $fillable = ['title', 'discount_percentage', 'start_date', 'end_date', 'description',  'manager_id'];

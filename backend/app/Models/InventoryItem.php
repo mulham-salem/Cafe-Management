@@ -39,10 +39,5 @@ class InventoryItem extends Model
         return $this->hasMany(MenuInventoryItem::class, 'inventoryItem_id');
     }
 
-    public function promotion(): BelongsTo
-    {
-        return $this->belongsTo(Promotion::class, 'promotion_id');
-    }
-
-    protected $fillable = ['name', 'quantity', 'unit', 'expiry_date', 'threshold_level', 'promotion_id', 'purchaceBill_id', 'manager_id'];
+    protected $fillable = ['name', 'quantity', 'unit','note', 'expiry_date', 'threshold_level', 'promotion_id', 'purchaceBill_id', 'manager_id'];
 }

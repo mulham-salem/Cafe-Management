@@ -12,6 +12,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('category_id');
             $table->unsignedBigInteger('manager_id');
+            $table->unsignedBigInteger('promotion_id')->nullable();
             $table->string('name');
             $table->text('description')->nullable();
             $table->float('price');
@@ -20,6 +21,8 @@ return new class extends Migration
             $table->timestamps();
             $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
             $table->foreign('manager_id')->references('id')->on('managers')->onDelete('cascade');
+            $table->foreign('promotion_id')->references('id')->on('promotions')->onDelete('cascade');
+
         });
     }
 

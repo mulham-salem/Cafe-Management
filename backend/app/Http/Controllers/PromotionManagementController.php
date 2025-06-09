@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\PromotionRequest;
-use App\Models\InventoryItem;
+use App\Models\MenuItem;
 use App\Models\Promotion;
 
 class PromotionManagementController extends Controller
@@ -12,7 +12,7 @@ class PromotionManagementController extends Controller
     {
         $managerId = auth('manager')->id();
 
-        $promotions = Promotion::with(['inventoryItems:id,name,promotion_id'])
+        $promotions = Promotion::with(['menuitems:id,name,promotion_id'])
             ->where('manager_id', $managerId)
             ->get(['id', 'title', 'discount_percentage', 'start_date', 'end_date', 'description', 'manager_id']);
 
@@ -24,7 +24,7 @@ class PromotionManagementController extends Controller
                 'start_date' => $promotion->start_date,
                 'end_date' => $promotion->end_date,
                 'description' => $promotion->description,
-                'products' => $promotion->inventoryItems->pluck('name'),
+                'products' => $promotion->menuitems->pluck('name'),
             ];
         });
 
@@ -36,7 +36,7 @@ class PromotionManagementController extends Controller
     {
         $managerId = auth('manager')->id();
 
-        $productIds = InventoryItem::where('manager_id', $managerId)
+        $productIds = MenuItem::where('manager_id', $managerId)
             ->whereIn('name', $request->product_names)
             ->pluck('id')
             ->toArray();
@@ -50,7 +50,7 @@ class PromotionManagementController extends Controller
             'description' => $request->description,
         ]);
 
-        InventoryItem::whereIn('id', $productIds)
+        MenuItem::whereIn('id', $productIds)
             ->update(['promotion_id' => $promotion->id]);
 
         return response()->json([
@@ -63,7 +63,7 @@ class PromotionManagementController extends Controller
 
     public function show(string $id)
     {
-        $promotion = Promotion::with(['inventoryItems:id,name,promotion_id'])
+        $promotion = Promotion::with(['menuitems:id,name,promotion_id'])
             ->where('id', $id)
             ->where('manager_id', auth('manager')->id())
             ->firstOrFail(['id', 'title', 'discount_percentage', 'start_date', 'end_date', 'description', 'manager_id']);
@@ -75,7 +75,7 @@ class PromotionManagementController extends Controller
             'start_date' => $promotion->start_date,
             'end_date' => $promotion->end_date,
             'description' => $promotion->description,
-            'products' => $promotion->inventoryItems->pluck('name'),
+            'products' => $promotion->menuitems->pluck('name'),
         ]);
     }
     //    ................................................................................................................................................
@@ -85,7 +85,7 @@ class PromotionManagementController extends Controller
         $promotion = Promotion::findOrFail($id);
         $managerId = auth('manager')->id();
 
-        $productIds = InventoryItem::where('manager_id', $managerId)
+        $productIds = MenuItem::where('manager_id', $managerId)
             ->whereIn('name', $request->product_names)
             ->pluck('id')
             ->toArray();
@@ -98,10 +98,10 @@ class PromotionManagementController extends Controller
             'description' => $request->description,
         ]);
 
-        InventoryItem::where('promotion_id', $promotion->id)
+        MenuItem::where('promotion_id', $promotion->id)
             ->update(['promotion_id' => null]);
 
-        InventoryItem::whereIn('id', $productIds)
+        MenuItem::whereIn('id', $productIds)
             ->update(['promotion_id' => $promotion->id]);
 
         return response()->json([
@@ -120,7 +120,7 @@ class PromotionManagementController extends Controller
             ->where('manager_id', auth('manager')->id())
             ->firstOrFail();
 
-        InventoryItem::where('promotion_id', $promotion->id)->update(['promotion_id' => null]);
+        MenuItem::where('promotion_id', $promotion->id)->update(['promotion_id' => null]);
 
         $promotion->delete();
 

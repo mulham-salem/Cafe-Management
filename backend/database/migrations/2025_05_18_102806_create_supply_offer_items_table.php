@@ -11,7 +11,8 @@ return new class extends Migration
         Schema::create('supply_offer_items', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('supplyOffer_id');
-            $table->unsignedBigInteger('inventoryItem_id');
+            $table->unsignedBigInteger('inventoryItem_id')->nullable();
+            $table->string('name')->nullable();
             $table->integer('quantity');
             $table->float('unit_price');
             $table->float('total_price');

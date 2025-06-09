@@ -45,29 +45,33 @@ class SupplyManagementController extends Controller
 
     public function acceptOffer($id)
     {
-        $offer = SupplyOffer::with('supplyOfferItems.inventoryItem')->findOrFail($id);
         $supplyOffer = SupplyOffer::with('supplier.user', 'supplyOfferItems.inventoryItem')->findOrFail($id);
 
-        if ($offer->status !== 'pending') {
+        if ($supplyOffer->status !== 'pending') {
             return response()->json(['message' => 'This offer has already been processed.'], 400);
         }
 
-        $offer->status = 'accepted';
-        $offer->save();
-        foreach ($offer->supplyOfferItems as $item) {
+        $supplyOffer->status = 'accepted';
+        $supplyOffer->save();
+        foreach ($supplyOffer->supplyOfferItems as $item) {
             $inventoryItem = $item->inventoryItem;
 
             if ($inventoryItem) {
                 $inventoryItem->quantity += $item->quantity;
                 $inventoryItem->save();
             } else {
-                InventoryItem::create([
-                    'name' => $item->name ?? 'Unnamed Item', // هذا يتطلب تعديل الـ SupplyOfferItem ليشمل الاسم والوحدة
-                    'unit' => $item->unit ?? 'unit', // تأكد أن هذه القيم متوفرة
+               $newInventoryItem= InventoryItem::create([
+                    'manager_id'=>auth('manager')->user()->id,
+                    'name' => $item->name ?? 'Unnamed Item',
                     'quantity' => $item->quantity,
-                    'note' => 'Added automatically from supply offer #'.$offer->id,
+                    'unit'=>$item->unit_price,
+                    'note' => 'Added automatically from supply offer #'.$supplyOffer->id,
+                   
                 ]);
+                $item->inventoryitem_id = $newInventoryItem->id;
+                $item->save();
             }
+
         }
         Notification::create([
             'manager_id' => auth('manager')->user()->id,
@@ -76,6 +80,7 @@ class SupplyManagementController extends Controller
             'createdAt' => now(),
             'seen' => false,
         ]);
+        
 
         return response()->json(['message' => 'Supply offer accepted and inventory updated successfully.']);
     }
@@ -159,51 +164,52 @@ class SupplyManagementController extends Controller
             'supply_request_id' => $supplyRequest->id,
         ]);
     }
+
     //    ................................................................................................................................................
-public function storePurchaseBill(Request $request)
-{
-    $request->validate([
-        'supplyOffer_id' => 'required|exists:supply_offers,id',
-        'supplier_id' => 'required|exists:suppliers,id',
-        'purchase_date' => 'required|date',
-        'items' => 'required|array|min:1',
-        'items.*.inventory_item_id' => 'required|exists:inventory_items,id',
-        'items.*.quantity' => 'required|integer|min:1',
-        'items.*.unit_price' => 'required|numeric|min:0',
-    ]);
+    public function storePurchaseBill(Request $request)
+    {
+        $request->validate([
+            'supplyOffer_id' => 'required|exists:supply_offers,id',
+            'supplier_id' => 'required|exists:suppliers,id',
+            'purchase_date' => 'required|date',
+            'items' => 'required|array|min:1',
+            'items.*.inventory_item_id' => 'required|exists:inventory_items,id',
+            'items.*.quantity' => 'required|integer|min:1',
+            'items.*.unit_price' => 'required|numeric|min:0',
+        ]);
 
-    $totalAmount = 0;
+        $totalAmount = 0;
 
-    foreach ($request->items as $item) {
-        $totalAmount += $item['quantity'] * $item['unit_price'];
+        foreach ($request->items as $item) {
+            $totalAmount += $item['quantity'] * $item['unit_price'];
+        }
+
+        $purchaseBill = PurchaseBill::create([
+            'manager_id' => auth('manager')->user()->id,
+            'supplyOffer_id' => $request->supplyOffer_id,
+            'supplier_id' => $request->supplier_id,
+            'total_amount' => $totalAmount,
+            'purchase_date' => $request->purchase_date,
+
+        ]);
+        // this is the ingriedents of the products which are storing in the inventory after we payed by purchaceBill
+        foreach ($request->items as $item) {
+            $purchaseBill->items()->create([
+                'inventory_item_id' => $item['inventory_item_id'],
+                'quantity' => $item['quantity'],
+                'unit_price' => $item['unit_price'],
+            ]);
+
+            $inventoryItem = InventoryItem::find($item['inventory_item_id']);
+            $inventoryItem->quantity += $item['quantity'];
+            $inventoryItem->save();
+        }
+
+        return response()->json([
+            'message' => 'Purchase bill created successfully',
+            'purchase_bill' => $purchaseBill,
+        ], 201);
     }
-
-    $purchaseBill = PurchaseBill::create([
-        'manager_id' => auth('manager')->user()->id,
-        'supplyOffer_id' => $request->supplyOffer_id,
-        'supplier_id' => $request->supplier_id,
-        'total_amount' => $totalAmount,
-        'purchase_date' => $request->purchase_date,
-        
-    ]);
-
-    // foreach ($request->items as $item) {
-    //     $purchaseBill->items()->create([
-    //         'inventory_item_id' => $item['inventory_item_id'],
-    //         'quantity' => $item['quantity'],
-    //         'unit_price' => $item['unit_price'],
-    //     ]);
-
-    //     $inventoryItem = InventoryItem::find($item['inventory_item_id']);
-    //     $inventoryItem->quantity += $item['quantity'];
-    //     $inventoryItem->save();
-    // }
-
-    return response()->json([
-        'message' => 'Purchase bill created successfully',
-        'purchase_bill' => $purchaseBill,
-    ], 201);
-}
 
     public function show(string $id) {}
 
