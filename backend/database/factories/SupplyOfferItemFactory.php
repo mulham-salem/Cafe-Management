@@ -17,11 +17,14 @@ class SupplyOfferItemFactory extends Factory
      */
     public function definition(): array
     {
+        $unit = $this->faker->randomElement(['Bound', 'Gram', 'Kilo']);
         $quantity = $this->faker->numberBetween(1, 50);
         $unitPrice = $this->faker->randomFloat(2, 5, 100);
 
         return [
+
             'quantity' => $quantity,
+            'unit' => $unit,
             'unit_price' => $unitPrice,
             'total_price' => $quantity * $unitPrice,
         ];

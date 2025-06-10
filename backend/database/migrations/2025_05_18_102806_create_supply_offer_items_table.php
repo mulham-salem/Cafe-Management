@@ -10,15 +10,16 @@ return new class extends Migration
     {
         Schema::create('supply_offer_items', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('supplyOffer_id');
-            $table->unsignedBigInteger('inventoryItem_id')->nullable();
+            $table->unsignedBigInteger('supply_offer_id');
+            $table->unsignedBigInteger('inventory_item_id')->nullable();
             $table->string('name')->nullable();
             $table->integer('quantity');
+            $table->string('unit');
             $table->float('unit_price');
             $table->float('total_price');
             $table->timestamps();
-            $table->foreign('supplyOffer_id')->references('id')->on('supply_offers')->onDelete('cascade');
-            $table->foreign('inventoryItem_id')->references('id')->on('inventory_items')->onDelete('cascade');
+            $table->foreign('supply_offer_id')->references('id')->on('supply_offers')->onDelete('cascade');
+            $table->foreign('inventory_item_id')->references('id')->on('inventory_items')->onDelete('cascade');
         });
     }
 

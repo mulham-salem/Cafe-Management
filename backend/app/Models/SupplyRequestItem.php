@@ -17,8 +17,8 @@ class SupplyRequestItem extends Model
 
     public function inventoryItem(): BelongsTo
     {
-        return $this->belongsTo(InventoryItem::class, 'inventoryItem_id');
+        return $this->belongsTo(InventoryItem::class, 'inventory_item_id');
     }
 
-    protected $fillable = ['supplyRequest_id', 'inventoryItem_id', 'quantity'];
+    protected $fillable = ['supplyRequest_id', 'inventory_item_id', 'quantity'];
 }

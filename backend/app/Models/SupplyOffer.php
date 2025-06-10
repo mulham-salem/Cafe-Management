@@ -17,7 +17,7 @@ class SupplyOffer extends Model
 
     public function purchaseBill(): HasOne
     {
-        return $this->hasOne(PurchaseBill::class, 'supplyOffer_id');
+        return $this->hasOne(PurchaseBill::class, 'supply_offer_id');
     }
 
     public function supplier(): BelongsTo
@@ -25,9 +25,9 @@ class SupplyOffer extends Model
         return $this->belongsTo(Supplier::class, 'supplier_id');
     }
 
-    public function supplyOfferItems(): HasMany
+    public function SupplyOfferItems(): HasMany
     {
-        return $this->hasMany(SupplyOfferItem::class, 'supplyOffer_id');
+        return $this->hasMany(SupplyOfferItem::class, 'supply_offer_id');
     }
 
     protected function casts(): array

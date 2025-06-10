@@ -26,18 +26,18 @@ class InventoryItem extends Model
 
     public function supplyRequestItems(): HasMany
     {
-        return $this->hasMany(SupplyRequestItem::class, 'inventoryItem_id');
+        return $this->hasMany(SupplyRequestItem::class, 'inventory_item_id');
     }
 
     public function supplyOfferItems(): HasMany
     {
-        return $this->hasMany(SupplyOfferItem::class, 'inventoryItem_id');
+        return $this->hasMany(SupplyOfferItem::class, 'inventory_item_id');
     }
 
     public function menuInventoryItems(): HasMany
     {
-        return $this->hasMany(MenuInventoryItem::class, 'inventoryItem_id');
+        return $this->hasMany(MenuInventoryItem::class, 'inventory_item_id');
     }
 
-    protected $fillable = ['name', 'quantity', 'unit','note', 'expiry_date', 'threshold_level', 'promotion_id', 'purchaceBill_id', 'manager_id'];
+    protected $fillable = ['name', 'quantity', 'unit', 'note', 'expiry_date', 'threshold_level', 'promotion_id', 'purchaseBill_id', 'manager_id'];
 }

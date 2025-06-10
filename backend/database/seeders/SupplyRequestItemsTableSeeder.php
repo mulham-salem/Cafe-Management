@@ -20,7 +20,7 @@ class SupplyRequestItemsTableSeeder extends Seeder
         foreach ($requests as $request) {
             SupplyRequestItem::factory(4)->create([
                 'supplyRequest_id' => $request->id,
-                'inventoryItem_id' => $inventoryItems->random()->id,
+                'inventory_item_id' => $inventoryItems->random()->id,
             ]);
         }
     }

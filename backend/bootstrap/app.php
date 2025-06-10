@@ -19,7 +19,10 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
         $middleware->alias([
             'isManager' => isManager::class,
+            'checkUserRole' => \App\Http\Middleware\CheckUserRole::class,
+
         ]);
+
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

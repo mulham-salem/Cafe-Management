@@ -12,7 +12,7 @@ class MenuInventoryItem extends Model
 
     public function inventoryItem(): BelongsTo
     {
-        return $this->belongsTo(InventoryItem::class, 'inventoryItem_id');
+        return $this->belongsTo(InventoryItem::class, 'inventory_item_id');
     }
 
     public function menuItem(): BelongsTo

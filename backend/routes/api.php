@@ -5,10 +5,12 @@ use App\Http\Controllers\ManagerAuthController;
 use App\Http\Controllers\MenuManagementController;
 use App\Http\Controllers\NotificationManagementController;
 use App\Http\Controllers\PromotionManagementController;
+use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\SupplyManagementController;
 use App\Http\Controllers\TableManagementController;
 use App\Http\Controllers\UserAuthController;
 use App\Http\Controllers\UserManagementController;
+use App\Models\Notification;
 use Illuminate\Support\Facades\Route;
 
 // .......................User Routeesا.........................................................................................ه
@@ -19,8 +21,7 @@ Route::middleware('auth:sanctum')->prefix('user')->group(function () {
     Route::post('/change-password', [UserAuthController::class, 'changePassword']);
 });
 
-// .......................Manager Access ا...............................القصص يلي ما بيوصلا غير المدير ليطبق الشغلات الخاصة فيه
-// middleware('throttle:3,1')->هاد مشان ما يمنعو يسجل دخول اذا حط كلمة السر خطا تلت مرات خطا او اليوزر نيم لمدة دقيقة
+// .......................Manager Access ...........................................................................................
 Route::post('/manager/login', [ManagerAuthController::class, 'login'])->middleware('throttle:3,1');
 Route::middleware(['auth:manager', 'isManager'])->prefix('manager')->group(function () {
     Route::post('/logout', [ManagerAuthController::class, 'logout']);
@@ -36,5 +37,20 @@ Route::middleware(['auth:manager', 'isManager'])->prefix('manager')->group(funct
     Route::post('/supply-offers/{id}/accept', [SupplyManagementController::class, 'acceptOffer']);
     Route::post('/supply-offers/{id}/reject', [SupplyManagementController::class, 'rejectOffer']);
     Route::post('/supply-purchace-bill', [SupplyManagementController::class, 'storePurchaseBill']);
+});
+// .......................Supplier Access ..........................................................................................
+
+Route::middleware(['auth:sanctum', 'checkUserRole:supplier'])->group(function () {
+    Route::post('/supplier/offers', [SupplierController::class, 'store']);
+    Route::get('/supplier/view-offers', [SupplierController::class, 'viewMyOffers']);
+    Route::get('/supplier/notificatoin', [Notification::class, '']);
 
 });
+
+// Route::middleware(['auth:sanctum', 'checkUserRole:employee'])->group(function () {
+//     Route::get('/employee/tasks', [EmployeeController::class, 'dashboard']);
+// });
+
+// Route::middleware(['auth:manager', 'isManager'])->group(function () {
+//     Route::get('/manager/dashboard', [ManagerController::class, 'dashboard']);
+// });

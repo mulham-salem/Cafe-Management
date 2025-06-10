@@ -53,26 +53,7 @@ class SupplyManagementController extends Controller
 
         $supplyOffer->status = 'accepted';
         $supplyOffer->save();
-        foreach ($supplyOffer->supplyOfferItems as $item) {
-            $inventoryItem = $item->inventoryItem;
 
-            if ($inventoryItem) {
-                $inventoryItem->quantity += $item->quantity;
-                $inventoryItem->save();
-            } else {
-               $newInventoryItem= InventoryItem::create([
-                    'manager_id'=>auth('manager')->user()->id,
-                    'name' => $item->name ?? 'Unnamed Item',
-                    'quantity' => $item->quantity,
-                    'unit'=>$item->unit_price,
-                    'note' => 'Added automatically from supply offer #'.$supplyOffer->id,
-                   
-                ]);
-                $item->inventoryitem_id = $newInventoryItem->id;
-                $item->save();
-            }
-
-        }
         Notification::create([
             'manager_id' => auth('manager')->user()->id,
             'user_id' => $supplyOffer->supplier->user->id,
@@ -80,9 +61,8 @@ class SupplyManagementController extends Controller
             'createdAt' => now(),
             'seen' => false,
         ]);
-        
 
-        return response()->json(['message' => 'Supply offer accepted and inventory updated successfully.']);
+        return response()->json(['message' => 'Supply offer accepted and waiting to pay the bill.']);
     }
     //    ................................................................................................................................................
 
@@ -122,7 +102,7 @@ class SupplyManagementController extends Controller
             'supplier_id' => 'required|exists:users,id',
             'note' => 'nullable|string',
             'items' => 'required|array',
-            'items.*.inventoryItem_id' => 'required|exists:inventory_items,id',
+            'items.*.inventory_item_id' => 'required|exists:inventory_items,id',
             'items.*.quantity' => 'required|integer|min:0',
         ]);
 
@@ -146,7 +126,7 @@ class SupplyManagementController extends Controller
         foreach ($validItems as $item) {
             SupplyRequestItem::create([
                 'supplyRequest_id' => $supplyRequest->id,
-                'inventoryItem_id' => $item['inventoryItem_id'],
+                'inventory_item_id' => $item['inventory_item_id'],
                 'quantity' => $item['quantity'],
             ]);
         }
@@ -169,44 +149,57 @@ class SupplyManagementController extends Controller
     public function storePurchaseBill(Request $request)
     {
         $request->validate([
-            'supplyOffer_id' => 'required|exists:supply_offers,id',
+            'supply_offer_id' => 'required|exists:supply_offers,id',
             'supplier_id' => 'required|exists:suppliers,id',
             'purchase_date' => 'required|date',
-            'items' => 'required|array|min:1',
-            'items.*.inventory_item_id' => 'required|exists:inventory_items,id',
-            'items.*.quantity' => 'required|integer|min:1',
-            'items.*.unit_price' => 'required|numeric|min:0',
+
         ]);
 
-        $totalAmount = 0;
+        $supplyOffer = SupplyOffer::with('supplyofferitems')->findOrFail($request->supply_offer_id);
 
-        foreach ($request->items as $item) {
-            $totalAmount += $item['quantity'] * $item['unit_price'];
-        }
+        $totalAmount = $supplyOffer->supplyofferitems->sum('total_price');
 
         $purchaseBill = PurchaseBill::create([
             'manager_id' => auth('manager')->user()->id,
-            'supplyOffer_id' => $request->supplyOffer_id,
+            'supply_offer_id' => $request->supply_offer_id,
             'supplier_id' => $request->supplier_id,
             'total_amount' => $totalAmount,
             'purchase_date' => $request->purchase_date,
-
         ]);
-        // this is the ingriedents of the products which are storing in the inventory after we payed by purchaceBill
-        foreach ($request->items as $item) {
-            $purchaseBill->items()->create([
-                'inventory_item_id' => $item['inventory_item_id'],
-                'quantity' => $item['quantity'],
-                'unit_price' => $item['unit_price'],
-            ]);
 
-            $inventoryItem = InventoryItem::find($item['inventory_item_id']);
-            $inventoryItem->quantity += $item['quantity'];
-            $inventoryItem->save();
+        foreach ($supplyOffer->SupplyOfferItems as $offerItem) {
+            $inventoryItem = null;
+
+            if ($offerItem->inventory_item_id) {
+                $inventoryItem = InventoryItem::find($offerItem->inventory_item_id);
+            }
+
+            if (! $inventoryItem) {
+                $inventoryItem = InventoryItem::where('name', $offerItem->name)
+                    ->where('unit', $offerItem->unit)
+                    ->first();
+            }
+
+            if ($inventoryItem) {
+                $inventoryItem->quantity += $offerItem->quantity;
+                $inventoryItem->save();
+            } else {
+                $inventoryItem = InventoryItem::create([
+                    'manager_id' => auth('manager')->user()->id,
+                    'name' => $offerItem->name ?? 'Unnamed Item',
+                    'quantity' => $offerItem->quantity,
+                    'unit' => $offerItem->unit,
+                    'note' => 'Added automatically from supply offer #'.$supplyOffer->id,
+                    'purchaseBill_id' => $purchaseBill->id,
+                ]);
+            }
+
+            $offerItem->inventory_item_id = $inventoryItem->id;
+            $offerItem->save();
         }
 
         return response()->json([
-            'message' => 'Purchase bill created successfully',
+            'message' => 'Purchase bill created successfully and inventory updated.',
             'purchase_bill' => $purchaseBill,
         ], 201);
     }

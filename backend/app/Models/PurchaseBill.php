@@ -16,7 +16,7 @@ class PurchaseBill extends Model
 
     public function supplyOffer(): belongsTo
     {
-        return $this->belongsTo(SupplyOffer::class, 'supplyOffer_id');
+        return $this->belongsTo(SupplyOffer::class, 'supply_offer_id');
     }
 
     public function supplier(): BelongsTo
@@ -34,5 +34,5 @@ class PurchaseBill extends Model
         return $this->hasMany(InventoryItem::class, 'purchaseBill_id');
     }
 
-    protected $fillable = ['unit_price', 'total_amount', 'purchase_date', 'manager_id', 'supplyOffer_id', 'supplier_id'];
+    protected $fillable = ['unit_price', 'total_amount', 'purchase_date', 'manager_id', 'supply_offer_id', 'supplier_id'];
 }

@@ -11,11 +11,11 @@ return new class extends Migration
         Schema::create('supply_request_items', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('supplyRequest_id');
-            $table->unsignedBigInteger('inventoryItem_id');
+            $table->unsignedBigInteger('inventory_item_id');
             $table->integer('quantity');
             $table->timestamps();
             $table->foreign('supplyRequest_id')->references('id')->on('supply_requests')->onDelete('cascade');
-            $table->foreign('inventoryItem_id')->references('id')->on('inventory_items')->onDelete('cascade');
+            $table->foreign('inventory_item_id')->references('id')->on('inventory_items')->onDelete('cascade');
         });
     }
 
