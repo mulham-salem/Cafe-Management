@@ -21,7 +21,7 @@ class InventoryItem extends Model
 
     public function purchaseBill(): BelongsTo
     {
-        return $this->belongsTo(PurchaseBill::class, 'purchaseBill_id');
+        return $this->belongsTo(PurchaseBill::class, 'purchase_bill_id');
     }
 
     public function supplyRequestItems(): HasMany

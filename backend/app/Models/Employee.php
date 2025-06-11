@@ -20,4 +20,8 @@ class Employee extends Model
     {
         return $this->hasMany(Order::class, 'employee_id');
     }
+
+    protected $fillable = [
+        'id',
+    ];
 }

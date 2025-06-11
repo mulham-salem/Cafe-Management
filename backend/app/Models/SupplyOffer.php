@@ -25,7 +25,7 @@ class SupplyOffer extends Model
         return $this->belongsTo(Supplier::class, 'supplier_id');
     }
 
-    public function SupplyOfferItems(): HasMany
+    public function supplyOfferItems(): HasMany
     {
         return $this->hasMany(SupplyOfferItem::class, 'supply_offer_id');
     }

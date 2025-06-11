@@ -10,8 +10,8 @@ return new class extends Migration
     {
         Schema::create('customers', function (Blueprint $table) {
             $table->unsignedBigInteger('id');
-            $table->string('phone_number')->unique();
-            $table->string('address');
+            $table->string('phone_number')->unique()->nullable();
+            $table->string('address')->nullable();
             $table->timestamps();
             $table->primary('id');
             $table->foreign('id')->references('id')->on('users')->onDelete('cascade');

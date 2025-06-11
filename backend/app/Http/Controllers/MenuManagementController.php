@@ -39,9 +39,27 @@ class MenuManagementController extends Controller
         'Mint Chocolate Mousse',
     ];
 
-    public function index()
+    public function index(): JsonResponse
     {
-        //
+        $managerId = auth('manager')->id();
+
+        $menuItems = MenuItem::with('category:id,name')
+        ->where('manager_id', $managerId)
+            ->get();
+
+        $formattedMenuItems = $menuItems->map(function ($item) {
+            return [
+                'id' => $item->id,
+                'name' => $item->name,
+                'description' => $item->description,
+                'price' => $item->price,
+                'category_name' => $item->category->name,
+                'image_url' => $item->image_url,
+                'available' => $item->available,
+            ];
+        });
+
+        return response()->json($formattedMenuItems);
     }
 
     public function store(Request $request): JsonResponse
@@ -51,7 +69,7 @@ class MenuManagementController extends Controller
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'category' => ['required', Rule::in(['drinks', 'snacks'])],
-            'image_url' => 'nullable|url',
+            'image_url' => 'nullable',
             'available' => 'boolean',
         ]);
 
@@ -74,9 +92,9 @@ class MenuManagementController extends Controller
     {
         $menuItem = MenuItem::with('category')->find($id);
 
-        if (! $menuItem) {
+        if (!$menuItem) {
             return response()->json([
-                'message' => 'Menu item not found',
+                'message' => 'Menu item not found'
             ], 404);
         }
 
@@ -100,7 +118,7 @@ class MenuManagementController extends Controller
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'category' => ['required', Rule::in(['drinks', 'snacks'])],
-            'image_url' => 'nullable|url',
+            'image_url' => 'nullable',
             'available' => 'boolean',
         ]);
 
@@ -124,6 +142,7 @@ class MenuManagementController extends Controller
     public function destroy(string $id): JsonResponse
     {
         $menuItem = MenuItem::findOrFail($id);
+
         // .................................................................للتدفق البديل المنتاك ....................................................
         // $activeOrders = \DB::table('order_items')
         //     ->join('orders', 'order_items.order_id', '=', 'orders.id')
@@ -142,3 +161,4 @@ class MenuManagementController extends Controller
         return response()->json(['message' => 'Menu item deleted successfully.']);
     }
 }
+

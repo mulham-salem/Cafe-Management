@@ -8,7 +8,6 @@ class PromotionRequest extends FormRequest
 {
     public function authorize(): bool
     {
-
         return auth('manager')->check();
     }
 
@@ -28,7 +27,7 @@ class PromotionRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'end_date.after' => 'End date connot be before start date',
+            'end_date.after' => 'End date cannot be before start date',
         ];
     }
 }
