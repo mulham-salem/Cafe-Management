@@ -26,4 +26,3 @@ class SupplyOfferFactory extends Factory
         ];
     }
 }
-

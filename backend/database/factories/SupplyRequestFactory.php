@@ -25,4 +25,3 @@ class SupplyRequestFactory extends Factory
         ];
     }
 }
-

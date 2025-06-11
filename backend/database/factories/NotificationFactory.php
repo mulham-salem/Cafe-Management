@@ -24,4 +24,3 @@ class NotificationFactory extends Factory
         ];
     }
 }
-

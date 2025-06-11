@@ -24,4 +24,3 @@ class TableFactory extends Factory
         ];
     }
 }
-

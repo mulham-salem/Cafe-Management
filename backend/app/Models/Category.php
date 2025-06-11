@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Category extends Model
 {
     use HasFactory;
+
     public function menuItems(): HasMany
     {
         return $this->hasMany(MenuItem::class, 'category_id');

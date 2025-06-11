@@ -6,7 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-
     public function up(): void
     {
         Schema::create('permissions', function (Blueprint $table) {
@@ -19,7 +18,7 @@ return new class extends Migration
                 'Inventory & Supply',
                 'Promotion Management',
                 "Manager\'s Notifications",
-                'Default'
+                'Default',
             ])->default('Default');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();

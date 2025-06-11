@@ -24,6 +24,3 @@ class PurchaseBillFactory extends Factory
         ];
     }
 }
-
-
-

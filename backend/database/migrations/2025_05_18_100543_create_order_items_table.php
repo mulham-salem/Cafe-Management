@@ -6,7 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-
     public function up(): void
     {
         Schema::create('order_items', function (Blueprint $table) {
@@ -20,7 +19,6 @@ return new class extends Migration
             $table->foreign('menuItem_id')->references('id')->on('menu_items')->onDelete('cascade');
         });
     }
-
 
     public function down(): void
     {

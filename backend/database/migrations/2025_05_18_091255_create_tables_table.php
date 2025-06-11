@@ -6,7 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-
     public function up(): void
     {
         Schema::create('tables', function (Blueprint $table) {
@@ -19,7 +18,6 @@ return new class extends Migration
             $table->foreign('manager_id')->references('id')->on('managers')->onDelete('cascade');
         });
     }
-
 
     public function down(): void
     {

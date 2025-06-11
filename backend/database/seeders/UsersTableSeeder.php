@@ -15,7 +15,7 @@ class UsersTableSeeder extends Seeder
     {
         $managers = Manager::all();
 
-        for($i = 0; $i < 9; $i++) {
+        for ($i = 0; $i < 9; $i++) {
             User::factory()->create([
                 'manager_id' => $managers->random()->id,
             ]);

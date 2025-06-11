@@ -13,12 +13,16 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class SupplyRequest extends Model
 {
     use HasFactory;
+
     public function manager(): BelongsTo
     {
         return $this->belongsTo(Manager::class, 'manager_id');
     }
+
     public function supplyRequestItems(): HasMany
     {
         return $this->hasMany(SupplyRequestItem::class, 'supplyRequest_id');
     }
+
+    protected $fillable = ['manager_id', 'title', 'note', 'request_date', 'status'];
 }

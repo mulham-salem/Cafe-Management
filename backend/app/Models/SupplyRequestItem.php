@@ -9,12 +9,16 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class SupplyRequestItem extends Model
 {
     use HasFactory;
-    public function supplyRequest():BelongsTo
+
+    public function supplyRequest(): BelongsTo
     {
         return $this->belongsTo(SupplyRequest::class, 'supplyRequest_id');
     }
+
     public function inventoryItem(): BelongsTo
     {
-        return $this->belongsTo(InventoryItem::class, 'inventoryItem_id');
+        return $this->belongsTo(InventoryItem::class, 'inventory_item_id');
     }
+
+    protected $fillable = ['supplyRequest_id', 'inventory_item_id', 'quantity'];
 }

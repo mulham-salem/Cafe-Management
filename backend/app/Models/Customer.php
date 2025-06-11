@@ -18,10 +18,12 @@ class Customer extends Model
     {
         return $this->belongsTo(User::class, 'id');
     }
+
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class, 'customer_id');
     }
+
     public function reservations(): HasMany
     {
         return $this->hasMany(Reservation::class, 'customer_id');

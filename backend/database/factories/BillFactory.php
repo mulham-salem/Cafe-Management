@@ -24,4 +24,3 @@ class BillFactory extends Factory
         ];
     }
 }
-

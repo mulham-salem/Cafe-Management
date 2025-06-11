@@ -6,18 +6,17 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-
     public function up(): void
     {
         Schema::create('suppliers', function (Blueprint $table) {
-            $table->id();
+            $table->unsignedBigInteger('id');
             $table->string('company_name')->unique();
             $table->string('phone_number');
             $table->timestamps();
+            $table->primary('id');
             $table->foreign('id')->references('id')->on('users')->onDelete('cascade');
         });
     }
-
 
     public function down(): void
     {

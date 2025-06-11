@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-
 use App\Models\Supplier;
 use App\Models\SupplyOffer;
 use Illuminate\Database\Seeder;

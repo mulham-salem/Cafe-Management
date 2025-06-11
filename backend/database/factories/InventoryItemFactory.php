@@ -19,7 +19,6 @@ class InventoryItemFactory extends Factory
     {
         return [
             'purchaseBill_id' => null,
-            'promotion_id' => null,
             'name' => $this->faker->word(),
             'quantity' => $this->faker->numberBetween(10, 200),
             'unit' => $this->faker->randomElement(['kg', 'liters', 'pcs']),
@@ -28,5 +27,3 @@ class InventoryItemFactory extends Factory
         ];
     }
 }
-
-

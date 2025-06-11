@@ -21,7 +21,7 @@ class PurchaseBillsTableSeeder extends Seeder
 
         foreach ($supplyOffers as $offer) {
             PurchaseBill::factory()->create([
-                'supplyOffer_id' => $offer->id,
+                'supply_offer_id' => $offer->id,
                 'manager_id' => $managers->random()->id,
                 'supplier_id' => $suppliers->random()->id,
             ]);

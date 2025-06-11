@@ -9,10 +9,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('customers', function (Blueprint $table) {
-            $table->id();
+            $table->unsignedBigInteger('id');
             $table->string('phone_number')->unique();
             $table->string('address');
             $table->timestamps();
+            $table->primary('id');
             $table->foreign('id')->references('id')->on('users')->onDelete('cascade');
         });
     }

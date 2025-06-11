@@ -25,7 +25,7 @@ class PermissionFactory extends Factory
                 'Inventory & Supply',
                 'Promotion Management',
                 "Manager's Notifications",
-                'Default'
+                'Default',
             ]),
         ];
     }

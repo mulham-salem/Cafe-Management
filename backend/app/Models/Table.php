@@ -13,12 +13,16 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Table extends Model
 {
     use HasFactory;
+
     public function manager(): BelongsTo
     {
         return $this->belongsTo(Manager::class, 'manager_id');
     }
+
     public function reservations(): HasMany
     {
         return $this->hasMany(Reservation::class, 'table_id');
     }
+
+    protected $fillable = ['number', 'capacity', 'manager_id', 'status'];
 }

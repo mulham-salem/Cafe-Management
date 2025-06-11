@@ -9,10 +9,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Reservation extends Model
 {
     use HasFactory;
+
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class, 'customer_id');
     }
+
     public function table(): BelongsTo
     {
         return $this->belongsTo(Table::class, 'table_id');

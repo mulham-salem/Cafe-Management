@@ -22,5 +22,3 @@ class SupplyRequestItemFactory extends Factory
         ];
     }
 }
-
-

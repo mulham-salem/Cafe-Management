@@ -23,5 +23,3 @@ class OrderItemFactory extends Factory
         ];
     }
 }
-
-

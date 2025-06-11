@@ -23,4 +23,3 @@ class MenuInventoryItemFactory extends Factory
         ];
     }
 }
-

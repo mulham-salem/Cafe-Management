@@ -6,7 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-
     public function up(): void
     {
         Schema::create('menu_inventory_items', function (Blueprint $table) {
@@ -20,7 +19,6 @@ return new class extends Migration
             $table->foreign('inventoryItem_id')->references('id')->on('inventory_items')->onDelete('cascade');
         });
     }
-
 
     public function down(): void
     {

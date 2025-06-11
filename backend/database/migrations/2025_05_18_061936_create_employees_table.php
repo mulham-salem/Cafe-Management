@@ -9,8 +9,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('employees', function (Blueprint $table) {
-            $table->id();
+            $table->unsignedBigInteger('id');
             $table->timestamps();
+            $table->primary('id');
             $table->foreign('id')->references('id')->on('users')->onDelete('cascade');
         });
     }

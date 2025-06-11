@@ -15,7 +15,6 @@ class EmployeeFactory extends Factory
      *
      * @return array<string, mixed>
      */
-
     public function definition(): array
     {
         return [
@@ -23,4 +22,3 @@ class EmployeeFactory extends Factory
         ];
     }
 }
-

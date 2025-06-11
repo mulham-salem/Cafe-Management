@@ -22,7 +22,7 @@ class OrdersTableSeeder extends Seeder
 
             Order::factory()->create([
                 'customer_id' => $createdByCustomer ? $customers->random()->id : null,
-                'employee_id' => !$createdByCustomer ? $employees->random()->id : null,
+                'employee_id' => ! $createdByCustomer ? $employees->random()->id : null,
             ]);
         }
     }

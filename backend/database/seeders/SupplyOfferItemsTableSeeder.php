@@ -19,8 +19,8 @@ class SupplyOfferItemsTableSeeder extends Seeder
 
         foreach ($offers as $offer) {
             SupplyOfferItem::factory(4)->create([
-                'supplyOffer_id' => $offer->id,
-                'inventoryItem_id' => $inventoryItems->random()->id,
+                'supply_offer_id' => $offer->id,
+                'inventory_item_id' => $inventoryItems->random()->id,
             ]);
         }
     }

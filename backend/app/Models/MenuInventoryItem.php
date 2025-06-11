@@ -9,10 +9,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class MenuInventoryItem extends Model
 {
     use HasFactory;
+
     public function inventoryItem(): BelongsTo
     {
-        return $this->belongsTo(InventoryItem::class, 'inventoryItem_id');
+        return $this->belongsTo(InventoryItem::class, 'inventory_item_id');
     }
+
     public function menuItem(): BelongsTo
     {
         return $this->belongsTo(MenuItem::class, 'menuItem_id');

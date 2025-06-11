@@ -9,9 +9,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Bill extends Model
 {
     use HasFactory;
+
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class, 'order_id');
     }
-
 }
