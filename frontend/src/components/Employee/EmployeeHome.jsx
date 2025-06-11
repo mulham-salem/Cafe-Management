@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import logo from '../../assets/logo_1.png';
-import { Link, Outlet, useLocation } from 'react-router-dom';
+import logo from '/logo_1.png';
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBell, faUtensils, faClipboardList, faFire, faKey, faSearch } from '@fortawesome/free-solid-svg-icons';
 import styles from '../styles/EmployeeHome.module.css';
-import { ToastContainer } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import "../styles/toastStyles.css";
 import { createContext } from 'react';
 export const OrderSearchContext = createContext('');
 import { motion } from 'framer-motion';
+import axios from 'axios';
 
 
 const cards = [
@@ -56,11 +57,65 @@ const EmployeeHome = () => {
 
   useEffect(() => {
     document.title = "Cafe Delights - Employee Home";
+    profile();
   }, []);  
 
   const location = useLocation();
   const currentPath = location.pathname;
   const [searchTerm, setSearchTerm] = useState('');
+
+  useEffect(() => {
+    if (location.state && location.state.successMessage) {
+        toast.success(location.state.successMessage);
+        window.history.replaceState({}, document.title);
+    }
+  }, [location.state])
+  
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+
+    const token = sessionStorage.getItem('authToken') || localStorage.getItem('authToken');
+
+    try {
+      const response = await axios.post('http://localhost:8000/api/user/logout', null, 
+      {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+      });
+
+      localStorage.removeItem('authToken');
+      sessionStorage.removeItem('authToken');
+      const successMessage = response.data.message || "Logged out successfully"; 
+      navigate('/login', { state: { message: successMessage } });
+
+    } catch (error) {
+        const errorMessage = error.response?.data?.message || "Logout failed. Please try again.";
+        toast.error(errorMessage);
+    }
+  };
+
+  const [userName, setUserName] = useState('User');
+
+  const profile = async () => {
+
+    const token = sessionStorage.getItem('authToken') || localStorage.getItem('authToken');
+
+    try {
+      const response = await axios.get('http://localhost:8000/api/user/profile',
+      {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setUserName(response.data.name || 'User');
+
+    } catch (error) {
+        toast.error("Failed to fetch user name");
+    }
+  };
 
   return (
     <div className={styles.container}>
@@ -75,7 +130,7 @@ const EmployeeHome = () => {
             <li><a href="#">Pages</a></li>
             <li><a href="#">Blog</a></li>
             <li><a href="#">Contact Us</a></li>
-            <li><Link to="/login" className={styles.activeLink}> Logout </Link></li>
+            <li><Link onClick={handleLogout} className={styles.activeLink}> Logout </Link></li>
           </ul>
         </div>
         <div className={styles.rightSection}>
@@ -95,7 +150,7 @@ const EmployeeHome = () => {
 
 
           <div className={styles.username}>
-            Employee Name
+          {userName}
             <div className={styles.dropdown}>
                 <Link to="/change-password" state={{from:location.pathname}} className={styles.dropdownLink}>
                     <button className={styles.dropdownButton}>

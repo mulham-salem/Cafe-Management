@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Outlet, useLocation } from "react-router-dom";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import styles from '../styles/ManagerDashboard.module.css';
-import logo from '../../assets/logo_1.png';
+import logo from '/logo_1.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBars, faUsers, faUtensils, faChair, faBoxes, faBullhorn, faBell, faSignOutAlt, faKey } from '@fortawesome/free-solid-svg-icons';
-import { Link } from 'react-router-dom';
-import { faHome } from '@fortawesome/free-solid-svg-icons';
+import { faBars, faUsers, faUtensils, faChair, faBoxes, faBullhorn, faBell, faSignOutAlt, faKey, faHome } from '@fortawesome/free-solid-svg-icons';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import axios from 'axios';
 
 const ManagerDashboard = () => {
 
@@ -14,6 +15,7 @@ const ManagerDashboard = () => {
 
     useEffect(() => {
         document.title = "Cafe Delights - Manager Dashboard";
+        profile();
     }, []);  
 
     const [isTextVisible, setIsTextVisible] = useState(false);
@@ -40,8 +42,63 @@ const ManagerDashboard = () => {
     return "";
   };
 
+  useEffect(() => {
+    if (location.state && location.state.successMessage) {
+        toast.success(location.state.successMessage);
+        window.history.replaceState({}, document.title);
+    }
+  }, [location.state])
+  
+  const navigate = useNavigate();
+
+
+  const handleLogout = async () => {
+
+    const token = sessionStorage.getItem('authToken') || localStorage.getItem('authToken');
+
+    try {
+      const response = await axios.post('http://localhost:8000/api/manager/logout', null, 
+      {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+      });
+
+      localStorage.removeItem('authToken');
+      sessionStorage.removeItem('authToken');
+      const successMessage = response.data.message || "Logged out successfully"; 
+      navigate('/login', { state: { message: successMessage } });
+
+    } catch (error) {
+        const errorMessage = error.response?.data?.message || "Logout failed. Please try again.";
+        toast.error(errorMessage);
+    }
+  };
+
+  const [managerName, setManagerName] = useState('Manager');
+
+  const profile = async () => {
+
+    const token = sessionStorage.getItem('authToken') || localStorage.getItem('authToken');
+
+    try {
+      const response = await axios.get('http://localhost:8000/api/manager/profile',
+      {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setManagerName(response.data.name || 'Manager');
+
+    } catch (error) {
+        toast.error("Failed to fetch manager name");
+    }
+  };
+  
   return (
     <div className={styles.dashboard}>
+        <ToastContainer/>
         <header className={styles.header}>
             <div className={styles.leftSection}>
                 <FontAwesomeIcon icon={faBars} className={`${styles.menuIcon} ${sidebarOpen ? styles.open : styles.close}`} onClick={toggleSidebar} />
@@ -55,13 +112,14 @@ const ManagerDashboard = () => {
 		    </div>
             <div className={styles.rightSection}>
                 <div className={styles.managerName}>
-                    Manager Name
+                    {managerName}
                     <div className={styles.dropdown}>
-                        <Link to="/login" className={styles.dropdownLink}>
-                            <button className={styles.dropdownButton}>
-                                <FontAwesomeIcon icon={faSignOutAlt} className={styles.logoutIcon}/><span className={styles.logout}>Logout</span> 
+                        <span className={styles.dropdownLink}>
+                            <button onClick={handleLogout} className={styles.dropdownButton}>
+                               <FontAwesomeIcon icon={faSignOutAlt} className={styles.logoutIcon}/>
+                               <span className={styles.logout}>Logout</span> 
                             </button>
-                        </Link>
+                        </span>
                         <Link to="/change-password" state={{from:location.pathname}} className={styles.dropdownLink}>
                             <button className={styles.dropdownButton}>
                                 <FontAwesomeIcon icon={faKey} className={styles.keyIcon}/><span className={styles.changePassword}>Change Password</span>
@@ -119,7 +177,7 @@ const ManagerDashboard = () => {
             {currentPath === "/login/manager-dashboard" && (
             <div className={ `${styles.mainText} ${isTextVisible ? styles.fadeIn : ''}`}>
                 <h2>
-                    <span className={styles.highlight}>Welcome back,</span>  John Doe!<br />
+                    <span className={styles.highlight}>Welcome back,</span> {managerName}<br />
                     <span className={styles.sub}>Your command center is brewed and ready.</span><br />
                     <span className={styles.keywords}>
                         User <strong>Roles</strong>, Menu <strong>Magic</strong>, Table <strong>Mastery</strong>,<br />

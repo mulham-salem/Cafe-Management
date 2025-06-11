@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from "react";
 import styles from "../styles/SupplierHome.module.css";
-import logo from '../../assets/logo_1.png';
-import { Link, Outlet, useLocation } from "react-router-dom";
+import logo from '/logo_1.png';
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHome, faBell, faSignOutAlt,  faKey } from "@fortawesome/free-solid-svg-icons";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import axios from 'axios';
 
 const SupplierHome = () => {
 
   useEffect(() => {
       document.title = "Cafe Delights - Supplier Home";
+      profile();
   }, []);  
 
   const location = useLocation();
@@ -107,6 +109,59 @@ const SupplierHome = () => {
     },
   ];
 
+  useEffect(() => {
+    if (location.state && location.state.successMessage) {
+        toast.success(location.state.successMessage);
+        window.history.replaceState({}, document.title);
+    }
+  }, [location.state])
+  
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+
+    const token = sessionStorage.getItem('authToken') || localStorage.getItem('authToken');
+
+    try {
+      const response = await axios.post('http://localhost:8000/api/user/logout', null, 
+      {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+      });
+
+      localStorage.removeItem('authToken');
+      sessionStorage.removeItem('authToken');
+      const successMessage = response.data.message || "Logged out successfully"; 
+      navigate('/login', { state: { message: successMessage } });
+
+    } catch (error) {
+        const errorMessage = error.response?.data?.message || "Logout failed. Please try again.";
+        toast.error(errorMessage);
+    }
+  };
+
+  const [userName, setUserName] = useState('User');
+
+  const profile = async () => {
+
+    const token = sessionStorage.getItem('authToken') || localStorage.getItem('authToken');
+
+    try {
+      const response = await axios.get('http://localhost:8000/api/user/profile',
+      {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setUserName(response.data.name || 'User');
+
+    } catch (error) {
+        toast.error("Failed to fetch user name");
+    }
+  };
+
   return (
     <div className={styles.container}>
       <ToastContainer />
@@ -120,13 +175,14 @@ const SupplierHome = () => {
         </div>
         <div className={styles.rightSection}>
             <div className={styles.userArea}>
-            Supplier Name
+            {userName}
                 <div className={styles.dropdown}>
-                    <Link to="/login" className={styles.dropdownLink}>
-                        <button className={styles.dropdownButton}>
-                            <FontAwesomeIcon icon={faSignOutAlt} className={styles.logoutIcon}/> <span className={styles.logout}>Logout</span> 
+                    <span className={styles.dropdownLink}>
+                        <button onClick={handleLogout} className={styles.dropdownButton}>
+                            <FontAwesomeIcon icon={faSignOutAlt} className={styles.logoutIcon}/>
+                            <span className={styles.logout}>Logout</span> 
                         </button>
-                    </Link>
+                    </span>
                     <Link to="/change-password" state={{from:location.pathname}} className={styles.dropdownLink}>
                         <button className={styles.dropdownButton}>
                             <FontAwesomeIcon icon={faKey} className={styles.keyIcon}/><span className={styles.changePassword}>Change Password</span>

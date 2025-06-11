@@ -135,6 +135,7 @@
     color: rgb(65, 44, 44);
     position: relative;
     bottom: 5%;
+    text-align: left;
   }
   
   .sectionDivider {

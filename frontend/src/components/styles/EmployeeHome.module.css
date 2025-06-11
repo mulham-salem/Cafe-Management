@@ -1,4 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;800&family=Poppins:wght@300;400;600&display=swap');
+@font-face {
+  font-family: 'Poppins';
+  src: url('Fonts/Poppins/Poppins-Bold.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
 
 .container {
   min-height: 100vh;
@@ -6,8 +11,8 @@
   display: flex;
   flex-direction: column;
   background-color: #f8f1e7;
-  font-family: 'Poppins', sans-serif;
-  background-image: url('../../assets/stylish-coffee-shop-with-latte-art.jpg'); 
+  font-family: 'Poppins';
+  background-image: url('/stylish-coffee-shop-with-latte-art.png'); 
   background-size: cover;
   background-position: center;
 }
@@ -32,18 +37,24 @@
   width: 60px;
   height: 60px;
   scale: 1.2;
-  margin-right: 10px;
+  margin-right: 5px;
 }
 
 .brandName {
-  font-size: 1.4rem;
-  font-weight: bold;
+  font-size: 1.3rem;
   margin-right: 2rem;
   color: #f4c063;
 }
 
+@font-face {
+  font-family: 'Poppins2';
+  src: url('Fonts/Poppins/Poppins-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 .navLinks {
-  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+  font-family: 'Poppins2';
   display: flex;
   gap: 1.5rem;
   list-style: none;
@@ -69,49 +80,52 @@
   font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
   display: flex;
   align-items: center;
-  gap: 1.2rem;
+  gap: 15px;
 }
 
 .username {
+  display: inline-flex;
+  align-items: center;
   position: relative;
   cursor: pointer;
   font-weight: bold;
   color: #f4c063;
-  padding: 8px 1px;
+  padding: 8px 8px;
   transition: all 0.4s ease;
 }
 
 .dropdown {
   position: absolute;
-  top: 2.2rem;
-  right: 0;
+  top: 100%;
+  left: 50%;
   background: #444;
   overflow: hidden;
-  border-radius: 10px;
+  border-radius: 8px;
   opacity: 0;
   visibility: hidden;
-  transform: translateY(20px);
+  transform: translateX(-50%) translateY(20px);
   transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
+  min-width: fit-content;
+  width: auto;
 }
 
 .username:hover .dropdown {
   opacity: 1;
   visibility: visible;
-  transform: translateY(0);
-}
-
-.dropdownLink {
-  text-decoration: none;
+  transform: translateX(-50%) translateY(0);
 }
 
 .dropdownButton {
-  width: 100%;
+  width: auto;
   padding: 0.5rem 1rem;
-  background: none;
   border: none;
   color: white;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
   cursor: pointer;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
@@ -136,8 +150,15 @@
   color: #f4c063;
 }
 
+@font-face {
+  font-family: 'Poppins3';
+  src: url('Fonts/Ubuntu/Ubuntu-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 .hero {
-  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+  font-family: 'Poppins3';
   position: relative;
   height: 90vh;
   display: flex;
@@ -183,6 +204,7 @@
 }
 
 .card {
+  font-family: 'Poppins2';
   background: white;
   border-radius: 20px;
   box-shadow: 0 4px 16px rgba(0,0,0,0.1);

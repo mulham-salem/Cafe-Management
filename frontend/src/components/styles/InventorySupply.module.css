@@ -34,7 +34,15 @@
     opacity: 1;
   } 
 
+  @font-face {
+    font-family: 'Jost';
+    src: url('Fonts/Jost/Jost-VariableFont_wght.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+  }
+  
   .backgroundContent {
+    font-family: 'Jost';
     max-width: 800px;
     margin: 50px auto;
     padding: 30px;
@@ -43,10 +51,17 @@
 
   .backgroundContent h2 {
     color: white;
-    font-size: 2.5rem;
+    font-size: 2.8rem;
     margin-bottom: 15px;
     position: relative;
     display: inline-block;
+  }
+
+  .backgroundContent p {
+    color: white;
+    font-size: 1.3rem;
+    margin-bottom: 40px;
+    font-weight: 300;
   }
 
   .backgroundContent h2::after {
@@ -57,13 +72,6 @@
     transform: translateX(100%);
     width: 80px;
     height: 3px;
-  }
-
-  .backgroundContent p {
-    color: white;
-    font-size: 1.4rem;
-    margin-bottom: 40px;
-    font-weight: 300;
   }
 
   .tabs {
@@ -79,7 +87,7 @@
     border: none;
     border-radius: 15px;
     font-size: 1.1rem;
-    font-weight: 600;
+    font-weight: 500;
     cursor: pointer;
     transition: all 0.3s ease;
     position: relative;
@@ -169,9 +177,10 @@
   } 
   
   .inventortSectionTitle {
-    font-size: 25px;
+    font-size: 28px;
     margin-bottom: 30px;
     color: #333;
+    text-align: left;
   }
   
   .addBtn {
@@ -269,6 +278,7 @@
     padding: 25px;
     border-radius: 15px;
     width: 350px;
+    height: 400px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
     border: 1px solid #4e2214;
   }
@@ -283,6 +293,10 @@
     animation: slideUp 0.4s ease-out;
   }
   
+  .modal input[type=date] {
+    width: 89%;
+  }
+
   .modal input {
     display: block;
     width: 90%;
@@ -303,13 +317,14 @@
   .saveBtn {
     background-color: #4e2214;
     color: white;
-    padding: 8px 28px;
+    padding: 8px 40px;
     border: none;
-    border-radius: 8px;
+    border-radius: 10px;
     cursor: pointer;
     font-weight: bold;
     position: relative;
-    right: 150px;
+    right: 110px;
+    top: 10px;
   }
   
   .saveBtn:hover {
@@ -319,13 +334,14 @@
   .cancelBtn {
     background-color: #6c757d;
     color: white;
-    padding: 8px 14px;
+    padding: 8px 25px;
     border: none;
-    border-radius: 8px;
+    border-radius: 10px;
     cursor: pointer;
     font-weight: bold;
     position: relative;
-    right: 14px;
+    right: 8px;
+    top: 10px;
   }
   
   .cancelBtn:hover {
@@ -366,9 +382,10 @@
   } 
   
   .supplySectionTitle {
-    font-size: 24px;
+    font-size: 28px;
     margin-bottom: 20px;
     color: #333;
+    text-align: left;
   }
 
   .cardGrid {
@@ -441,12 +458,91 @@
     overflow-y: auto;
     position: fixed;
     margin-top: 80px;
-    width: 400px;
+    width: 450px;
+    background-color: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    border: 1px solid #4e2214;
   }
+
   .requestModal::-webkit-scrollbar {
     display: none;
   } 
   
+  .requestModal h4 {
+    font-size: 22px;
+    padding: 8px;
+    position: relative;
+    bottom: 10px;
+    font-weight: bold;
+    color: #343a40;
+    text-align: center;
+    border-bottom: 2px solid #4e2214;
+  }
+  .requestModal label {
+    font-size: 15px;
+    font-weight: 600;
+    margin-top: 14px;
+    display: block;
+    color: #333;
+  }
+  
+  .requestModal textarea {
+    width: 96%;
+  }
+
+  .requestModal input {
+    display: block;
+    width: 90%;
+    padding: 8px;
+    margin: auto;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+  }
+
+  .requestModalActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 5px;
+    margin-top: 10px;
+  }
+
+  .supplyCancelBtn {
+    background-color: #6c757d;
+    color: white;
+    padding: 8px 25px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    position: relative;
+    right: 38px;
+    top: 6px;
+  }
+  
+  .supplyCancelBtn:hover {
+    background-color: #464b50;
+  }
+
+  .supplySaveBtn {
+    background-color: #4e2214;
+    color: white;
+    padding: 8px 39px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    position: relative;
+    top: 5px;
+    right: 180px;
+  }
+
+  .supplySaveBtn:hover {
+    background-color: #7c3621;
+  }
+
   .modal h4 {
     font-size: 22px;
     padding: 8px;
@@ -522,22 +618,6 @@
     font-size: 14px;
   }
   
-  .supplySaveBtn {
-    background-color: #4e2214;
-    color: white;
-    padding: 8px 28px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: bold;
-    position: relative;
-    bottom: 1px;
-    right: 200px;
-  }
-
-  .supplySaveBtn:hover {
-    background-color: #7c3621;
-  }
   .backBtn3 {
     background-color: #6c757d;
     color: #fff;
@@ -557,7 +637,8 @@
   }
 
   .supplyOffersTitle {
-    font-size: 25px;
+    font-size: 28px;
+    text-align: left;
   }
 
   .offerList {
@@ -754,7 +835,7 @@
   
   .selectBox,
   .dateInput {
-    width: 100%;
+    max-width: 99%;
     padding: 10px;
     font-size: 15px;
     border: 1px solid #ccc;
@@ -763,8 +844,8 @@
     transition: border-color 0.3s ease;
   }
   
-  .dateInput {
-    width: 97%;
+  .billModal input[type=date] {
+    max-width: 95.5%;
   }
   
   .selectBox:focus,
@@ -817,13 +898,13 @@
   .billSaveBtn {
     background-color: #4e2214;
     color: white;
-    padding: 12px 18px;
+    padding: 12px 30px;
     border: none;
     border-radius: 10px;
     cursor: pointer;
     font-weight: bold;
     position: relative;
-    right: 300px;
+    right: 260px;
   }
 
   .billSaveBtn:hover {
@@ -833,13 +914,13 @@
   .billCancelBtn {
     background-color: #6c757d;
     color: white;
-    padding: 12px 18px;
+    padding: 12px 35px;
     border: none;
     border-radius: 10px;
     cursor: pointer;
     font-weight: bold;
     position: relative;
-    right: 150px;
+    right: 100px;
   }
   
   .billCancelBtn:hover {

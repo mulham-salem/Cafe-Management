@@ -5,34 +5,32 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPen, faTrash, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import axios from 'axios'; 
 
 const TableManagement = () => {
 
-  useEffect(() => {
-  document.title = "Cafe Delights - Table Management";
-  }, []);
+  const token = sessionStorage.getItem('authToken') || localStorage.getItem('authToken');
 
-  const [tables, setTables] = useState(() => {
-  const savedTables = localStorage.getItem("tables");
-  return savedTables ? JSON.parse(savedTables) : [];
+  const axiosInstance = axios.create({
+    baseURL: "http://localhost:8000/api", 
+    withCredentials: true, 
+    headers: {
+      Authorization: `Bearer ${token}`, 
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
   });
 
-  useEffect(() => {
-    localStorage.setItem("tables", JSON.stringify(tables));
-    const existingTables = JSON.parse(localStorage.getItem('tables')) || [];
-    if (existingTables.length === 0) {
-      localStorage.setItem('lastTableId', '0'); 
-    } 
-  }, [tables]);
-
-  if (tables.length === 0) {
-    localStorage.setItem('lastTableId', '0'); 
-  } 
-  
+  const [tables, setTables] = useState([]); 
   const [newTable, setNewTable] = useState({ number: '', capacity: '' });
   const [showForm, setShowForm] = useState(false);
   const formRef = useRef(null);
+
+
+  useEffect(() => {
+    document.title = "Cafe Delights - Table Management";
+    fetchTables();
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -48,6 +46,15 @@ const TableManagement = () => {
     };
   }, [showForm]);
 
+  const fetchTables = async () => {
+    try {
+      const response = await axiosInstance.get('/manager/table');
+      setTables(response.data.tables); 
+    } catch (error) {
+      toast.error('Failed to load tables.');
+    }
+  };
+
   const handleAddClick = () => {
     setNewTable({ number: '', capacity: '' });
     setShowForm(true);
@@ -57,59 +64,80 @@ const TableManagement = () => {
     setNewTable({ ...newTable, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => { 
     e.preventDefault();
-    const numberExists = tables.some((t) => t.number === parseInt(newTable.number));
-    if (numberExists) {
-      toast.error('Table number already exists');
+
+    if (!newTable.number || !newTable.capacity) {
+      toast.error('Please fill in all fields.');
       return;
     }
 
-    let lastTableId = parseInt(localStorage.getItem('lastTableId')) || 0;
-    const newId = lastTableId + 1;
-    localStorage.setItem('lastTableId', newId);
-
-    const newEntry = {
-      id: newId,
-      number: parseInt(newTable.number),
-      capacity: parseInt(newTable.capacity),
-      status: 'Available',
-    };
-
-    setTables([...tables, newEntry]);
-    toast.success('Table added successfully');
-    setShowForm(false);
-  };
-
-  const nextStatus = (status) => {
-    switch (status) {
-      case 'Available': return 'Reserved';
-      case 'Reserved': return 'Cleaning';
-      case 'Cleaning': return 'Available';
-      default: return 'Available';
+    try {
+      const response = await axiosInstance.post('/manager/table', {
+        number: parseInt(newTable.number),
+        capacity: parseInt(newTable.capacity),
+        status: 'available', 
+      });
+      toast.success(response.data.message || 'Table added successfully');
+      fetchTables(); 
+      setShowForm(false);
+    } catch (error) {
+      if (error.response && error.response.data) {
+        if (error.response.status === 409 && error.response.data.message === 'Table already exists') {
+          toast.error('Table number already exists. Please choose a different number.');
+        } else if (error.response.status === 422 && error.response.data.errors) {
+          Object.values(error.response.data.errors).forEach(([msg]) => toast.error(msg));
+        } else {
+          toast.error(error.response.data.message || 'Failed to add table.');
+        }
+      } else {
+        toast.error('Failed to add table.');
+      }
     }
   };
 
-  const handleStatusUpdate = (id, currentStatus) => {
-    if (currentStatus === 'Reserved') {
-      toast.warn(
-        <div className="custom-toast">
-          This table is currently reserved. <br/> <span>Are you sure you want to update status?</span>
-          <button className= "toastConfirmBtn"
-            onClick={() => {
-              updateStatus(id);
-              toast.dismiss();
-            }}
-          >
-            Yes, update
-          </button>
-          <button className= "toastCancelBtn" onClick={() => toast.dismiss()} >
-                  Cancel
-          </button>
+ 
+  const handleStatusUpdate = async (id, currentStatus) => { 
+    const nextStatusValue = nextStatusLogic(currentStatus); 
 
-        </div>,
-        { 
-            toastId: `delete-table-${id}`, 
+    try {
+      const response = await axiosInstance.put(`/manager/table/${id}`, {
+        status: nextStatusValue,
+      });
+      toast.success(response.data.message || 'Table status updated successfully');
+      fetchTables(); 
+    } catch (error) {
+      console.error('Error updating status:', error);
+      if (error.response && error.response.status === 409 && error.response.data.message.includes('reserved')) {
+        toast.warn(
+          ({ closeToast }) => (
+          <div className="custom-toast">
+            {error.response.data.message} <br /> <span>Are you sure you want to update status?</span>
+            <button className="toastConfirmBtn"
+              onClick={async () => {
+                try {
+                  const confirmResponse = await axiosInstance.put(`/manager/table/${id}`, {
+                    status: nextStatusValue,
+                    confirm: true,
+                  });
+                  toast.success(confirmResponse.data.message || 'Table status updated successfully');
+                  fetchTables();
+                } catch (confirmError) {
+                  console.error('Error confirming status update:', confirmError);
+                  toast.error(confirmError.response?.data?.message || 'Failed to update status after confirmation.');
+                }
+                closeToast();
+              }}
+            >
+              Yes, update
+            </button>
+            <button className="toastCancelBtn" onClick={() => closeToast()} >
+              Cancel
+            </button>
+          </div>
+          ),
+          {
+            toastId: `update-status-confirm-${id}`,
             position: "top-center",
             closeButton: false,
             autoClose: false,
@@ -117,56 +145,107 @@ const TableManagement = () => {
             icon: false,
             className: "custom-toast-container",
             bodyClassName: "custom-toast-body",
-        }
-      );
-    } else {
-      updateStatus(id);
-      toast.success('Table status updated');
+          }
+        );
+      } else if (error.response && error.response.status === 422 && error.response.data.message) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error(error.response?.data?.message || 'Failed to update status.');
+      }
     }
   };
 
-  const updateStatus = (id) => {
-    const updated = tables.map((table) =>
-      table.id === id
-        ? { ...table, status: nextStatus(table.status) }
-        : table
-    );
-    setTables(updated);
+  const nextStatusLogic = (status) => {
+    switch (status) {
+      case 'available': return 'reserved';
+      case 'reserved': return 'cleaning';
+      case 'cleaning': return 'available';
+      default: return 'available';
+    }
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => { 
+    const tableToDelete = tables.find(t => t.id === id); 
+
     toast.info(
-        ({ closeToast }) => (
-          <div className="custom-toast">
-            <p>Are you sure you want to delete this table?</p>
-            <div className="toast-buttons"> 
-              <button 
-                  onClick={() => {
-                    setTables(tables.filter((table) => table.id !== id));
-                    toast.success('Table deleted successfully');
-                    closeToast();
-                  }} 
-              >
-                  Yes
-              </button>
-              <button onClick={closeToast} >
-                  Cancel
-              </button>
-            </div>
+      ({ closeToast }) => (
+        <div className="custom-toast">
+          <p>Are you sure you want to delete <br/> Table #{tableToDelete?.number}?</p> 
+          <div className="toast-buttons">
+            <button
+              onClick={async () => {
+                try {
+                  const response = await axiosInstance.delete(`/manager/table/${id}`);
+                  toast.success(response.data.message || 'Table deleted successfully');
+                  fetchTables(); 
+                } catch (error) {
+                  console.error('Error deleting table:', error);
+                  if (error.response && error.response.status === 409 && error.response.data.message.includes('reserved')) {
+                    toast.warn(
+                      ({ closeToast }) => (
+                      <div className="custom-toast">
+                        <p>{error.response.data.message} <br/> <span>Are you sure you want to proceed?</span></p>
+                        <div className="toast-buttons">
+                          <button
+                            onClick={async () => {
+                              try {
+                                const confirmResponse = await axiosInstance.delete(`/manager/table/${id}`, {
+                                  data: { confirm: true } 
+                                });
+                                toast.success(confirmResponse.data.message || 'Table deleted successfully');
+                                fetchTables();
+                              } catch (confirmError) {
+                                console.error('Error confirming table delete:', confirmError);
+                                toast.error(confirmError.response?.data?.message || 'Failed to delete table after confirmation.');
+                              }
+                              closeToast(); 
+                            }}
+                          >
+                            Yes, delete
+                          </button>
+                          <button onClick={() => toast.dismiss()}>Cancel</button>
+                        </div>
+                      </div>
+                      ),
+                      {
+                        toastId: `delete-table-confirm-${id}`,
+                        position: "top-center",
+                        closeButton: false,
+                        autoClose: false,
+                        draggable: false,
+                        icon: false,
+                        className: "custom-toast-container",
+                        bodyClassName: "custom-toast-body",
+                      }
+                    );
+                  } else {
+                    toast.error(error.response?.data?.message || 'Failed to delete table.');
+                  }
+                }
+                closeToast(); 
+              }}
+            >
+              Yes
+            </button>
+            <button onClick={closeToast} >
+              Cancel
+            </button>
           </div>
-        ),
-        {
-          toastId: `delete-item-${id}`, 
-          position: "top-center",
-          closeButton: false,
-          autoClose: false,
-          draggable: false,
-          icon: false,
-          className: "custom-toast-container",
-          bodyClassName: "custom-toast-body",
-        }
-      );
+        </div>
+      ),
+      {
+        toastId: `delete-item-${id}`,
+        position: "top-center",
+        closeButton: false,
+        autoClose: false,
+        draggable: false,
+        icon: false,
+        className: "custom-toast-container",
+        bodyClassName: "custom-toast-body",
+      }
+    );
   };
+
 
   return (
     <div className={styles.container}>
@@ -217,7 +296,9 @@ const TableManagement = () => {
             <tr key={table.id}>
               <td>{table.number}</td>
               <td>{table.capacity}</td>
-              <td>{table.status}</td>
+              <td>{
+                    table.status.charAt(0).toUpperCase() + table.status.slice(1)
+                  }</td>
               <td className={styles.actions}>
                 <button onClick={() => handleStatusUpdate(table.id, table.status)} className={styles.statusBtn}>
                   <FontAwesomeIcon icon={faPen} data-action="Update Status" title="Update Status"/>

@@ -26,12 +26,21 @@ body, html {
   z-index: 0;
 }
 
+@font-face {
+  font-family: 'Josefin_Sans';
+  src: url('Fonts/Josefin_Sans/JosefinSans-VariableFont_wght.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 .leftText {
+  font-family: 'Josefin_Sans';
+  line-height: 1.2;
   flex: 1;
+  margin-right: auto;
   z-index: 1;
   max-width: 50%;
   font-size: 1.8rem;
-  font-weight: 300;
   opacity: 0;
   transition: opacity 0.5s ease-in;
 }
@@ -84,9 +93,16 @@ body, html {
   }
 }
 
+@font-face {
+  font-family: 'Playfair-Display';
+  src: url('Fonts/Playfair_Display/static/PlayfairDisplay-Bold.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 .title {
-  font-family: 'Playfair Display', serif;
-  font-weight: bold;
+  font-family: 'Playfair-Display', serif;
+  font-weight: bolder;
   font-size: 1.2rem;
   color: #6e4c2e;
   margin-bottom: 15px;

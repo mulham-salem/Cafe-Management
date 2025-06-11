@@ -21,6 +21,7 @@ import MenuAndOrderEmp from './components/Employee/MenuAndOrderEmp';
 import UserOrderEmp from './components/Employee/UserOrderEmp';
 import KitchenOrders from './components/Employee/KitchenOrders';
 import EmployeeNotification from './components/Employee/EmployeeNotification';
+import ProtectedRoute from './components/ProtectedRoute';
 
 
 function App() {
@@ -29,9 +30,17 @@ function App() {
       <Routes>
 
         <Route path="/login" element={<Login/>}/>
-        <Route path="/change-password" element={<ChangePassword />}/>
-
-        <Route path="/login/manager-dashboard" element={<ManagerDashboard />}>
+        <Route path="/change-password" element={
+          <ProtectedRoute>
+            <ChangePassword />
+          </ProtectedRoute>
+        }/>
+        
+        <Route path="/login/manager-dashboard" element={
+          <ProtectedRoute>
+            <ManagerDashboard />
+          </ProtectedRoute>
+        }>
           <Route path="user-management" element={<UserManagement />} />
           <Route path="menu-management" element={<MenuManagement />} />
           <Route path="table-management" element={<TableManagement />} />
@@ -40,18 +49,30 @@ function App() {
           <Route path='manager-notification' element={<ManagerNotification />} />
         </Route>
 
-        <Route path="/login/supplier-home" element={<SupplierHome />}>
+        <Route path="/login/supplier-home" element={
+          <ProtectedRoute>
+            <SupplierHome />
+          </ProtectedRoute>
+        }>
           <Route path='supplier-notification' element={<SupplierNotification />} />
         </Route>
 
-        <Route path="/login/customer-home" element={<CustomerHome />}>
+        <Route path="/login/customer-home" element={
+          <ProtectedRoute>
+            <CustomerHome />
+          </ProtectedRoute>
+        }>
           <Route path="menu-order" element={<MenuAndOrder />} />
           <Route path="user-order" element={<UserOrder />} />
           <Route path="table-reservation" element={<TableReservation />} />
           <Route path="customer-notification" element={<CustomerNotification />} />
         </Route>
 
-        <Route path="/login/employee-home" element={<EmployeeHome />}>
+        <Route path="/login/employee-home" element={
+          <ProtectedRoute>
+            <EmployeeHome />
+          </ProtectedRoute> 
+        }>
           <Route path="menu-order" element={<MenuAndOrderEmp />} />
           <Route path="user-order" element={<UserOrderEmp />} />
           <Route path="kitchen-order" element={<KitchenOrders />} />    

@@ -393,7 +393,7 @@ const InventorySupply = () => {
 
         {showRequestModal && (
         <div className={`${styles.overlay} ${styles.fadeInOverlay}`}>
-            <div className={`${styles.modal} ${styles.slideUpModal} ${styles.requestModal}`}>
+            <div className={`${styles.slideUpModal} ${styles.requestModal}`}>
             <h4>📝 New Supply Request</h4>
             <form onSubmit={handleSubmitSupplyRequest}>
                 <label>📋 Select Items & Quantities:</label>
@@ -434,11 +434,11 @@ const InventorySupply = () => {
                 placeholder="Additional instructions..."
                 />
 
-                <div className={styles.modalActions}>
+                <div className={styles.requestModalActions}>
                 <button type="submit" className={styles.supplySaveBtn}>Send</button>
                 <button
                     type="button"
-                    className={styles.cancelBtn}
+                    className={styles.supplyCancelBtn}
                     onClick={() => setShowRequestModal(false)}
                 >
                     <FontAwesomeIcon icon={faTimes} /> Cancel

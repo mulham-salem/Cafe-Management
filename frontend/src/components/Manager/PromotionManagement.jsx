@@ -4,14 +4,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faTrash, faEdit, faPercentage, faCalendarAlt, faTags, faTimes, faGift } from '@fortawesome/free-solid-svg-icons';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import '../styles/toastStyles.css';
+import axios from 'axios'; 
 
 const PromotionManagement = () => {
 
-  const [promotions, setPromotions] = useState(() => {
-    const saved = localStorage.getItem('promotions');
-    return saved ? JSON.parse(saved) : [];
-  });
-
+  const [promotions, setPromotions] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [editPromo, setEditPromo] = useState(null);
 
@@ -20,20 +18,45 @@ const PromotionManagement = () => {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [description, setDescription] = useState('');
-  const [products, setProducts] = useState(''); 
+  const [products, setProducts] = useState('');
 
-  useEffect(() => {
-    localStorage.setItem('promotions', JSON.stringify(promotions));
-  }, [promotions]);
+
+  const token = sessionStorage.getItem('authToken') || localStorage.getItem('authToken');
+  const axiosInstance = axios.create({
+    baseURL: "http://localhost:8000/api", 
+    withCredentials: true, 
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+  });
+
 
   useEffect(() => {
     document.title = "Cafe Delights - Promotion Management";
+    fetchPromotions();
   }, []);
 
-  const handleSave = (e) => {
+
+  const fetchPromotions = async () => {
+    try {
+      const response = await axiosInstance.get('/manager/promotion');
+      
+      const formattedPromotions = response.data.map(promo => ({
+        ...promo,
+        products: Array.isArray(promo.products) ? promo.products.join(', ') : '', 
+      }));
+      setPromotions(formattedPromotions);
+    } catch (error) {
+      toast.error('Failed to load promotions.');
+    }
+  };
+
+  const handleSave = async (e) => { 
     e.preventDefault();
 
-    if (!title || !discount || !startDate || !endDate) {
+    if (!title || !discount || !startDate || !endDate || !products) { 
       toast.error('Please fill in all required fields.');
       return;
     }
@@ -43,44 +66,80 @@ const PromotionManagement = () => {
       return;
     }
 
+    const productNamesArray = products.split(',').map(p => p.trim()).filter(p => p !== ''); 
+
     const promoData = {
-      id: editPromo ? editPromo.id : Date.now(),
       title,
-      discountPercentage: parseFloat(discount),
-      startDate,
-      endDate,
+      discount_percentage: parseFloat(discount), 
+      start_date: startDate, 
+      end_date: endDate, 
       description,
-      products: products.split(',').map(p => p.trim()),
+      product_names: productNamesArray, 
     };
 
-    if (editPromo) {
-      setPromotions(prev =>
-        prev.map(p => (p.id === editPromo.id ? promoData : p))
-      );
-      toast.success('✅ Promotion updated');
-    } else {
-      setPromotions(prev => [...prev, promoData]);
-      toast.success('✅ Promotion added');
+    try {
+      if (editPromo) {
+        const response = await axiosInstance.put(`/manager/promotion/${editPromo.id}`, promoData);
+        toast.success(response.data.message || '✅ Promotion updated');
+      } else {
+        const response = await axiosInstance.post('/manager/promotion', promoData);
+        toast.success(response.data.message || '✅ Promotion added');
+      }
+      fetchPromotions(); 
+      clearForm();
+    } catch (error) {
+      if (error.response && error.response.data && error.response.data.errors) {
+        Object.values(error.response.data.errors).forEach(([msg]) => toast.error(msg));
+      } else {
+        toast.error('Failed to save promotion.');
+      }
     }
-
-    clearForm();
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => { 
     const promo = promotions.find(p => p.id === id);
     if (!promo) return;
-    setPromotions(prev => prev.filter(p => p.id !== id));
-    toast.info(`🗑️ Promotion "${promo.title}" deleted`);
+
+    toast.info(
+      ({ closeToast }) => (
+        <div className="custom-toast">
+          <p>Are you sure you want to delete <strong>{promo.title}</strong>?</p>
+          <div className="toast-buttons">
+            <button onClick={async () => {
+              try {
+                await axiosInstance.delete(`/manager/promotion/${id}`);
+                toast.success(`🗑️ Promotion "${promo.title}" deleted`);
+                fetchPromotions(); 
+              } catch (error) {
+                toast.error('Failed to delete promotion.');
+              }
+              closeToast();
+            }}>Yes</button>
+            <button onClick={closeToast}>Cancel</button>
+          </div>
+        </div>
+      ),
+      {
+        toastId: `delete-promo-${id}`,
+        position: "top-center",
+        closeButton: false,
+        autoClose: false,
+        draggable: false,
+        icon: false,
+        className: "custom-toast-container",
+        bodyClassName: "custom-toast-body",
+      }
+    );
   };
 
   const startEdit = (promo) => {
     setEditPromo(promo);
     setTitle(promo.title);
-    setDiscount(promo.discountPercentage);
-    setStartDate(promo.startDate);
-    setEndDate(promo.endDate);
+    setDiscount(promo.discount_percentage); 
+    setStartDate(promo.start_date); 
+    setEndDate(promo.end_date);     
     setDescription(promo.description);
-    setProducts(promo.products.join(', '));
+    setProducts(promo.products); 
     setShowModal(true);
   };
 
@@ -110,10 +169,10 @@ const PromotionManagement = () => {
             <h4 className={styles.cardTitle}>
               <FontAwesomeIcon icon={faTags} /> {promo.title}
             </h4>
-            <p><FontAwesomeIcon icon={faPercentage} /> {promo.discountPercentage}%</p>
-            <p><FontAwesomeIcon icon={faCalendarAlt} /> {promo.startDate} ➜ {promo.endDate}</p>
+            <p><FontAwesomeIcon icon={faPercentage} /> {promo.discount_percentage}%</p> {/* استخدام discount_percentage */}
+            <p><FontAwesomeIcon icon={faCalendarAlt} /> {promo.start_date} ➜ {promo.end_date}</p> {/* استخدام start_date و end_date */}
 
-            <p><strong>Products:</strong> {promo.products.join(', ')}</p>
+            <p><strong>Products:</strong> {promo.products}</p> {/* المنتجات جاهزة كسلسلة نصية */}
             <p className={styles.desc}>{promo.description}</p>
             <div className={styles.cardActions}>
               <button className={styles.editBtn} onClick={() => startEdit(promo)}>
@@ -134,8 +193,8 @@ const PromotionManagement = () => {
             <form onSubmit={handleSave}>
               <input type="text" placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} required />
               <input type="number" placeholder="Discount %" value={discount} onChange={(e) => setDiscount(e.target.value)} required />
-              <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} required />
-              <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} required />
+              <input type="datetime-local" value={startDate} onChange={(e) => setStartDate(e.target.value)} required />
+              <input type="datetime-local" value={endDate} onChange={(e) => setEndDate(e.target.value)} required />
               <input type="text" placeholder="Products (comma separated)" value={products} onChange={(e) => setProducts(e.target.value)} />
               <textarea placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} />
 

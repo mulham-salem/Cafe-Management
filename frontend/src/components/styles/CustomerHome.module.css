@@ -1,4 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;800&family=Poppins:wght@300;400;600&display=swap');
+@font-face {
+  font-family: 'Poppins';
+  src: url('Fonts/Poppins/Poppins-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
 
 .container {
   font-family: 'Poppins', sans-serif;
@@ -58,7 +63,7 @@
   text-decoration: none;
   background: none;
   border: none;
-  font-weight: 600;
+  font-weight: 550;
   cursor: pointer;
   transition: color 0.3s ease;
 }
@@ -69,7 +74,7 @@
 
 .activeLink {
   color: #d4b083;
-  font-weight: bold;
+  font-weight: 550;
 }
 
 
@@ -93,33 +98,35 @@
 .dropdown {
   position: absolute;
   top: 100%;
-  left: 4px;
-  min-width: 180px;
+  left: 50%;
+  min-width: fit-content;
+  width: auto;
   border-radius: 8px;
   opacity: 0;
   visibility: hidden;
-  transform: translateY(20px);
+  transform: translateX(-50%) translateY(20px);
   transition: all 0.3s ease;
   z-index: 1000;
   display: flex;
   flex-direction: column;
-  gap: 5px;
 }
 
 .dropdownButton {
   border: 2px solid #110e0c; 
-  padding: 8px 16px;
+  padding: 0.5rem 1rem;
   background-color: white;
   color: #110e0c;
   font-size: 13px;
+  display: flex;
+  justify-content: flex-start;
   cursor: pointer;
   border-radius: 10px;
-  position: relative;
-  width: 60%;
+  width: auto;
+  display: flex;
   align-items: center;
-  text-align: center;
-  white-space: nowrap;
+  justify-content: center;
   font-weight: 540;
+  line-height: 1.1;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
@@ -131,20 +138,20 @@
   font-weight: bold;
 }
 
-.keyIcon {
+/* .keyIcon {
   position: relative;
   right: 14px;
-}
+} */
 
-.dropdown button span {
+/* .dropdown button span {
   position: relative;
   right: 20px;
-}
+} */
 
 .username:hover .dropdown {
   opacity: 1;
   visibility: visible;
-  transform: translateY(0);
+  transform: translateX(-50%) translateY(0);
 }
 
 .bellIcon {
@@ -174,8 +181,15 @@
   border-radius: 12px;
 }
 
+@font-face {
+  font-family: 'Playfair Display';
+  src: url('Fonts/Playfair_Display/static/PlayfairDisplay-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 .title {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Playfair Display';
   font-size: 3rem;
   font-weight: 800;
   color: white;
@@ -183,7 +197,15 @@
   animation: fadeInDown 1s ease;
 }
 
+@font-face {
+  font-family: 'Poppins2';
+  src: url('Fonts/Poppins/Poppins-Light.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 .subtitle {
+  font-family: 'Poppins2';
   font-size: 1rem;
   color: white;
   line-height: 1.5;
@@ -206,6 +228,7 @@
 }
 
 .card {
+  font-family: 'Poppins2';
   background-color: #110e0c;
   border-radius: 15px;
   position: relative;
