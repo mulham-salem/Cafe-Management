@@ -36,7 +36,6 @@ Route::middleware(['auth:manager', 'isManager'])->prefix('manager')->group(funct
     Route::apiResource('/table', TableManagementController::class);
     Route::apiResource('/promotion', PromotionManagementController::class);
     Route::apiResource('/inventory', InventoryManagementController::class);
-    Route::get('/notification', [NotificationManagementController::class, 'index']);
     Route::apiResource('/supply', SupplyManagementController::class);
     Route::post('/supply-offers/{id}/accept', [SupplyManagementController::class, 'acceptOffer']);
     Route::post('/supply-offers/{id}/reject', [SupplyManagementController::class, 'rejectOffer']);
@@ -48,6 +47,22 @@ Route::middleware(['auth:sanctum', 'checkUserRole:supplier'])->group(function ()
     Route::post('/supplier/offers', [SupplierController::class, 'store']);
     Route::get('/supplier/view-offers', [SupplierController::class, 'viewMyOffers']);
     Route::get('/supplier/notification', [Notification::class, '']);
+=======
+    Route::post('/supply-purchace-bill', [SupplyManagementController::class, 'storePurchaseBill']);
+    // notification
+    Route::get('/notification', [NotificationManagementController::class, 'index']);//supplyOffersNotificatoin
+        Route::get('/notification2', [NotificationManagementController::class, 'index5']);//getResponseFromSupplierForManagerSupplyRequests
+});
+
+// .......................Supplier Access ..........................................................................................
+
+Route::middleware(['auth:sanctum', 'checkUserRole:supplier'])->group(function () {
+    Route::post('/supplier/offers', [SupplierController::class, 'store']);
+    Route::get('/supplier/view-offers', [SupplierController::class, 'viewMyOffers']);
+    // notification
+    Route::get('/supplier/notification1', [NotificationManagementController::class, 'index2']);//responseFromManagerForMyFuckingOffers!!
+    Route::get('/supplier/notification2', [NotificationManagementController::class, 'index3']);//getSupplyRequestsForSupplier
+    Route::get('/supplier/notification3/{id}', [NotificationManagementController::class, 'index4']);//respondToSupplyRequest
 });
 
 // ......................................................customer Routes.....................................................

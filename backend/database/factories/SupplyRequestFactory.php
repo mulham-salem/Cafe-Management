@@ -21,7 +21,7 @@ class SupplyRequestFactory extends Factory
             'title' => $this->faker->sentence(3),
             'request_date' => $this->faker->dateTimeBetween('-1 week', 'now'),
             'note' => $this->faker->optional()->text(),
-            'status' => $this->faker->randomElement(['pending', 'approved', 'rejected']),
+            'status' => $this->faker->randomElement(['pending', 'accepted', 'rejected']),
         ];
     }
 }
