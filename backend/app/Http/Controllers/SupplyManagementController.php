@@ -56,7 +56,9 @@ class SupplyManagementController extends Controller
 
         Notification::create([
             'manager_id' => auth('manager')->user()->id,
-            'user_id' => $supplyOffer->supplier->user->id,
+            'user_id' => $supplyOffer->supplier_id,
+            'sent_by' => 'manager',
+            'purpose' => 'responseForOffers',
             'message' => "Offer has been accepted '{$supplyOffer->title}'",
             'createdAt' => now(),
             'seen' => false,
@@ -86,7 +88,9 @@ class SupplyManagementController extends Controller
 
         Notification::create([
             'manager_id' => auth('manager')->user()->id,
-            'user_id' => $supplyOffer->supplier->user->id,
+            'user_id' => $supplyOffer->supplier_id,
+            'sent_by' => 'manager',
+            'purpose' => 'responseForOffers',
             'message' => "Offer has been rejected '{$supplyOffer->title}'. note: {$supplyOffer->note}",
             'createdAt' => now(),
             'seen' => false,
@@ -134,7 +138,10 @@ class SupplyManagementController extends Controller
         Notification::create([
             'manager_id' => auth('manager')->id(),
             'user_id' => $validated['supplier_id'],
-            'message' => 'You have received a new supply request: ',
+            'supplyRequest_id'=>$supplyRequest->id,
+            'sent_by' => 'manager',
+            'purpose' => 'supplyRequestFromManager',
+            'message' => "You have received a new supply request: '{$supplyRequest->title}'",
             'createdAt' => now(),
             'seen' => false,
         ]);

@@ -50,6 +50,8 @@ class SupplierController extends Controller
                 Notification::create([
                     'manager_id' => $managerId,
                     'user_id' => $user->id,
+                    'sent_by' => 'supplier',
+                    'purpose' => 'SupplyOffers',
                     'message' => "Supplier {$user->name} submitted a new supply offer (#{$supplyOffer->id})",
                     'createdAt' => now(),
                     'seen' => false,
