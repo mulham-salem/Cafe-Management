@@ -1,0 +1,63 @@
+### System Features:
+
+Login
+Logout 
+Change password 
+View menu 
+Manage menu 
+Create order 
+Edit order 
+Cancel order
+Confirm order
+Search order
+Track order status
+Add notes to order
+Reserve table
+Edit/Cancel Table reservation
+Manage Tables
+Send Order to Kitchen
+Update Order Status
+Notify Order Ready
+Generate Invoice
+Create User
+Edit User Info
+Delete User
+Assign User Roles
+Manage Inventory
+Low Stock Alert
+Manage Promotions
+Send Supply Request
+Send Supply Offer
+Accept Supply Offer
+Create Purchase Invoice
+
+
+### Drinks:
+
+* Espresso
+* Cappuccino
+* Iced Coffee
+* Green Tea
+* Hot Chocolate
+* Fresh Orange Juice
+* Lemon Mint Juice
+* Vanilla Milkshake
+* Chocolate Milkshake
+* Strawberry Milkshake
+* Vienna Coffee
+* Caramel Mocha Smoothie
+
+### Snacks:
+
+* Cheese Croissant,
+* Chocolate Croissant,
+* Blueberry Muffin,
+* Chocolate Chip Muffin,
+* Turkey Sandwich,
+* Cheese Sandwich,
+* Mini Pizza
+* Donut
+* French Fries
+* Nachos with Cheese
+* Chocolate & strawberry waffle
+* Minit Chocolate Mousse

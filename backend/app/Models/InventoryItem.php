@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @method static inRandomOrder()
+ * @property int $quantity
+ * @property $threshold_level
  */
 class InventoryItem extends Model
 {

@@ -13,7 +13,7 @@ class PromotionManagementController extends Controller
     {
         $managerId = auth('manager')->id();
 
-        $promotions = Promotion::with(['menuitems:id,name,promotion_id'])
+        $promotions = Promotion::with(['menuItems:id,name,promotion_id'])
             ->where('manager_id', $managerId)
             ->get(['id', 'title', 'discount_percentage', 'start_date', 'end_date', 'description', 'manager_id']);
 
@@ -25,7 +25,7 @@ class PromotionManagementController extends Controller
                 'start_date' => $promotion->start_date,
                 'end_date' => $promotion->end_date,
                 'description' => $promotion->description,
-                'products' => $promotion->menuitems->pluck('name'),
+                'products' => $promotion->menuItems->pluck('name'),
             ];
         });
 
@@ -64,7 +64,7 @@ class PromotionManagementController extends Controller
     //................................................................................................................................................
     public function show(string $id): JsonResponse
     {
-        $promotion = Promotion::with(['menuitems:id,name,promotion_id'])
+        $promotion = Promotion::with(['menuItems:id,name,promotion_id'])
             ->where('id', $id)
             ->where('manager_id', auth('manager')->id())
             ->firstOrFail(['id', 'title', 'discount_percentage', 'start_date', 'end_date', 'description', 'manager_id']);
@@ -76,7 +76,7 @@ class PromotionManagementController extends Controller
             'start_date' => $promotion->start_date,
             'end_date' => $promotion->end_date,
             'description' => $promotion->description,
-            'products' => $promotion->menuitems->pluck('name'),
+            'products' => $promotion->menuItems->pluck('name'),
         ]);
     }
 
@@ -110,7 +110,6 @@ class PromotionManagementController extends Controller
             'message' => 'Promotion updated successfully.',
             'promotion' => $promotion,
             'products' => $request->product_names,
-
         ]);
     }
 

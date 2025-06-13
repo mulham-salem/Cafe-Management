@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\InventoryItem;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use App\Models\Notification;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class InventoryManagementController extends Controller
 {
@@ -12,16 +15,49 @@ class InventoryManagementController extends Controller
     {
         $managerId = auth('manager')->id();
 
-        $items = InventoryItem::where('manager_id', $managerId)
-            ->with('menuInventoryItems')
-            ->get();
+        $items = InventoryItem::where('manager_id', $managerId)->get();
 
-        return response()->json([
-            'status' => true,
-            'inventory_items' => $items,
-        ]);
+        return response()->json(['inventory_items' => $items,]);
     }
-    //    ................................................................................................................................................
+
+    //    ..................................................................................................................
+
+    /**
+     * Checks for low stock and creates a notification if necessary.
+     * Returns the low stock message if a new notification was created, otherwise null.
+     *
+     * @param  \App\Models\InventoryItem  $item
+     * @return string|null
+     */
+    protected function checkAndCreateLowStockNotification(InventoryItem $item)
+    {
+        if ($item->quantity <= $item->threshold_level) {
+            $managerId = auth('manager')->id();
+            $message = "Low stock alert: '{$item->name}' only has {$item->quantity} {$item->unit} left (threshold: {$item->threshold_level} {$item->unit}).";
+
+            // التحقق مما إذا كان هناك إشعار غير مقروء بنفس الرسالة والهدف
+            // هذا يمنع تكرار الإشعارات لنفس حالة النقص
+            $existingNotification = Notification::where('manager_id', $managerId)
+                ->where('purpose', 'low_stock')
+                ->where('message', $message)
+                ->where('seen', false) // فقط إذا لم يُرَ الإشعار بعد
+                ->first();
+
+            if (!$existingNotification) {
+                // إنشاء إشعار جديد
+                Notification::create([
+                    'manager_id' => $managerId,
+                    'sent_by' => 'system', // تم الإرسال بواسطة النظام
+                    'purpose' => 'low_stock', // الغرض من الإشعار هو نقص المخزون
+                    'message' => $message,
+                    'createdAt' => Carbon::now(), // استخدام Carbon لضبط الوقت الحالي
+                    'seen' => false, // الإشعار غير مقروء في البداية
+                ]);
+                return $message; // إرجاع رسالة التنبيه لعرضها في الفرونت إند
+            }
+        }
+        return null; // لا يوجد تنبيه جديد
+    }
 
     public function show($id)
     {
@@ -38,7 +74,6 @@ class InventoryManagementController extends Controller
             ]);
         } catch (ModelNotFoundException $e) {
             return response()->json([
-                'status' => false,
                 'message' => 'Inventory item not found.',
             ], 404);
         }
@@ -59,11 +94,19 @@ class InventoryManagementController extends Controller
 
         $item = InventoryItem::create($data);
 
-        return response()->json([
-            'status' => true,
+        // استدعاء دالة التنبيه بعد إنشاء العنصر
+        $lowStockMessage = $this->checkAndCreateLowStockNotification($item);
+
+        $response = [
             'message' => 'Inventory item created successfully.',
             'item' => $item,
-        ], 201);
+        ];
+
+        if ($lowStockMessage) {
+            $response['low_stock_alert'] = $lowStockMessage; // إضافة رسالة التنبيه إلى الاستجابة
+        }
+
+        return response()->json($response, 201);
     }
     //    ................................................................................................................................................
 
@@ -81,11 +124,19 @@ class InventoryManagementController extends Controller
 
         $item->update($data);
 
-        return response()->json([
-            'status' => true,
+        // استدعاء دالة التنبيه بعد تحديث العنصر
+        $lowStockMessage = $this->checkAndCreateLowStockNotification($item);
+
+        $response = [
             'message' => 'Inventory item updated successfully.',
             'item' => $item,
-        ]);
+        ];
+
+        if ($lowStockMessage) {
+            $response['low_stock_alert'] = $lowStockMessage; // إضافة رسالة التنبيه إلى الاستجابة
+        }
+
+        return response()->json($response);
     }
     //    ................................................................................................................................................
 
@@ -93,12 +144,12 @@ class InventoryManagementController extends Controller
     {
         $item = InventoryItem::where('manager_id', auth('manager')->id())->findOrFail($id);
 
-        if ($item->menuInventoryItems()->count() > 0) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Cannot delete this item because it is linked to active menu items.',
-            ], 403);
-        }
+//        if ($item->menuInventoryItems()->count() > 0) {
+//            return response()->json([
+//                'status' => false,
+//                'message' => 'Cannot delete this item because it is linked to active menu items.',
+//            ], 403);
+//        }
 
         $item->delete();
 

@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\InventoryItem;
 use App\Models\Notification;
 use App\Models\PurchaseBill;
+use App\Models\Supplier;
 use App\Models\SupplyOffer;
 use App\Models\SupplyRequest;
 use App\Models\SupplyRequestItem;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -18,7 +20,7 @@ class SupplyManagementController extends Controller
         $offers = SupplyOffer::with([
             'supplier.user',
             'supplyOfferItems.inventoryItem',
-        ])->where('status', 'pending')->orderByDesc('created_at')->get();
+        ])->orderByDesc('created_at')->get();
 
         $data = $offers->map(function ($offer) {
             return [
@@ -28,11 +30,14 @@ class SupplyManagementController extends Controller
                 'total_price' => $offer->total_price,
                 'delivery_date' => $offer->delivery_date->toDateTimeString(),
                 'note' => $offer->note,
+                'status' => $offer->status,
                 'items' => $offer->supplyOfferItems->map(function ($item) {
+                    $itemName = $item->inventoryItem->name ?? $item->name;
+                    $itemUnit = $item->inventoryItem->unit ?? $item->unit;
                     return [
-                        'item_name' => $item->inventoryItem->name,
+                        'item_name' => $itemName,
                         'quantity' => $item->quantity,
-                        'unit' => $item->inventoryItem->unit,
+                        'unit' => $itemUnit,
                         'unit_price' => $item->unit_price,
                     ];
                 }),
@@ -41,6 +46,22 @@ class SupplyManagementController extends Controller
 
         return response()->json($data);
     }
+
+    //    ................................................................................................................................................
+
+    public function getSuppliers(): JsonResponse
+    {
+        $managerId = auth('manager')->id();
+
+        // جلب الموردين الذين أنشأهم هذا المدير والمرتبطين بجدول users
+        $suppliers = User::where('role', 'supplier')
+            ->where('manager_id', $managerId)
+            ->select('id', 'name')
+            ->get();
+
+        return response()->json($suppliers);
+    }
+
     //    ................................................................................................................................................
 
     public function acceptOffer($id)
@@ -83,9 +104,10 @@ class SupplyManagementController extends Controller
         }
 
         $offer->status = 'rejected';
-        $offer->note = $request->note ?? 'Rejected without reason';
+        $offer->note = $request->reason ?? 'Rejected without reason';
         $offer->save();
 
+        $supplyOffer->note = $offer->note;
         Notification::create([
             'manager_id' => auth('manager')->user()->id,
             'user_id' => $supplyOffer->supplier_id,
@@ -104,6 +126,7 @@ class SupplyManagementController extends Controller
     {
         $validated = $request->validate([
             'supplier_id' => 'required|exists:users,id',
+            'title' => 'required|string',
             'note' => 'nullable|string',
             'items' => 'required|array',
             'items.*.inventory_item_id' => 'required|exists:inventory_items,id',
@@ -122,6 +145,7 @@ class SupplyManagementController extends Controller
 
         $supplyRequest = SupplyRequest::create([
             'manager_id' => auth('manager')->id(),
+            'title' => $validated['title'],
             'note' => $validated['note'],
             'request_date' => now(),
             'status' => 'pending',
@@ -159,12 +183,18 @@ class SupplyManagementController extends Controller
             'supply_offer_id' => 'required|exists:supply_offers,id',
             'supplier_id' => 'required|exists:suppliers,id',
             'purchase_date' => 'required|date',
-
+            'unit_price' => 'nullable|string',
         ]);
 
-        $supplyOffer = SupplyOffer::with('supplyofferitems')->findOrFail($request->supply_offer_id);
+        $supplyOffer = SupplyOffer::with('supplyOfferItems.inventoryItem')->findOrFail($request->supply_offer_id);
 
-        $totalAmount = $supplyOffer->supplyofferitems->sum('total_price');
+        // التحقق الجديد: هل توجد فاتورة شراء لهذا العرض بالفعل؟
+        $existingPurchaseBill = PurchaseBill::where('supply_offer_id', $request->supply_offer_id)->first();
+        if ($existingPurchaseBill) {
+            return response()->json(['message' => 'A purchase bill already exists for this supply offer.'], 409); // 409 Conflict
+        }
+
+        $totalAmount = $supplyOffer->supplyOfferItems->sum('total_price');
 
         $purchaseBill = PurchaseBill::create([
             'manager_id' => auth('manager')->user()->id,
@@ -172,6 +202,7 @@ class SupplyManagementController extends Controller
             'supplier_id' => $request->supplier_id,
             'total_amount' => $totalAmount,
             'purchase_date' => $request->purchase_date,
+            'unit_price' => $request->item_calculated_prices,
         ]);
 
         foreach ($supplyOffer->SupplyOfferItems as $offerItem) {
@@ -193,12 +224,13 @@ class SupplyManagementController extends Controller
             } else {
                 $inventoryItem = InventoryItem::create([
                     'manager_id' => auth('manager')->user()->id,
-                    'name' => $offerItem->name ?? 'Unnamed Item',
+                    'name' => $offerItem->name,
                     'quantity' => $offerItem->quantity,
                     'unit' => $offerItem->unit,
                     'note' => 'Added automatically from supply offer #'.$supplyOffer->id,
                     'purchaseBill_id' => $purchaseBill->id,
                 ]);
+
             }
 
             $offerItem->inventory_item_id = $inventoryItem->id;
@@ -206,7 +238,8 @@ class SupplyManagementController extends Controller
         }
 
         return response()->json([
-            'message' => 'Purchase bill created successfully and inventory updated.',
+            'message' => 'Purchase Bill Saved and Inventory Updated!.',
+            'purchase_bill_id' => $purchaseBill->id,
             'purchase_bill' => $purchaseBill,
         ], 201);
     }

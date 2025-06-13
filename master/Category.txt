@@ -1,0 +1,8 @@
+$category1 = new \App\Models\category;
+$category1->name = 'drinks';
+$category1->save();
+
+
+$category2 = new \App\Models\category;
+$category2->name = 'snacks';
+$category2->save();

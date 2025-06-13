@@ -8,7 +8,20 @@ use Illuminate\Http\Request;
 
 class NotificationManagementController extends Controller
 {
-    public function index()
+    public function getAllManagerNotifications(): JsonResponse
+    {
+        $managerId = auth('manager')->id();
+
+        $notifications = Notification::where('manager_id', $managerId)
+            ->orderByDesc('createdAt')
+            ->get(['message', 'seen', 'createdAt']);
+
+        return response()->json([
+            'notifications' => $notifications,
+        ]);
+    }
+
+    public function getSupplierOfferNotifications(): JsonResponse
     {
         auth('manager')->user();
 
@@ -33,7 +46,7 @@ class NotificationManagementController extends Controller
     }
     //    ................................................................................................................................................
 
-    public function index2()
+    public function getManagerResponseToSupplierOffers()
     {
         $supplier = auth('user')->user();
         $notifications = Notification::where('user_id', $supplier->id)
@@ -56,14 +69,14 @@ class NotificationManagementController extends Controller
     }
     //    ................................................................................................................................................
 
-    public function index3()
+    public function getSupplyRequestSentToSupplier()
     {
         $supplier = auth('user')->user();
 
         $notifications = Notification::where('user_id', $supplier->id)
             ->where('sent_by', 'manager')
             ->where('purpose', 'supplyRequestFromManager')
-            ->with(['supplyRequest.supplyRequestItems.inventoryItem', 'supplyRequest.manager']) 
+            ->with(['supplyRequest.supplyRequestItems.inventoryItem', 'supplyRequest.manager'])
             ->orderByDesc('createdAt')
             ->get();
 
@@ -89,7 +102,7 @@ class NotificationManagementController extends Controller
     }
     //    ................................................................................................................................................
 
-    public function index4(Request $request, $notificationId): JsonResponse
+    public function respondToSupplyRequestNotification(Request $request, $notificationId): JsonResponse
     {
         $request->validate([
             'response' => 'required|in:accepted,rejected',
@@ -139,7 +152,7 @@ class NotificationManagementController extends Controller
     }
     //    ................................................................................................................................................
 
-    public function index5()
+    public function getSupplierResponseToRequests()
     {
         $manager = auth('manager')->user();
 
