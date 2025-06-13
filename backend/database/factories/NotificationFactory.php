@@ -18,6 +18,8 @@ class NotificationFactory extends Factory
     public function definition(): array
     {
         return [
+            'purpose' => $this->faker->randomElement(['supply_offer', 'reservation_request', 'inventory_alert']),
+            'sent_by' => $this->faker->randomElement(['supplier', 'employee']),
             'message' => $this->faker->sentence(),
             'createdAt' => $this->faker->dateTime(),
             'seen' => $this->faker->boolean(),

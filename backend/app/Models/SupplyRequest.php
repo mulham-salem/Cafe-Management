@@ -24,5 +24,6 @@ class SupplyRequest extends Model
         return $this->hasMany(SupplyRequestItem::class, 'supplyRequest_id');
     }
 
+    
     protected $fillable = ['manager_id', 'title', 'note', 'request_date', 'status'];
 }

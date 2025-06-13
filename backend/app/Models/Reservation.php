@@ -19,4 +19,12 @@ class Reservation extends Model
     {
         return $this->belongsTo(Table::class, 'table_id');
     }
+    protected $fillable = [
+        'customer_id',
+        'table_id',
+        'reservation_time',
+        'numberOfGuests',
+        'status',
+    ];
+
 }

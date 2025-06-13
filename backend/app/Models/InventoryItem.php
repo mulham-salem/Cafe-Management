@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @method static inRandomOrder()
+ * @property int $quantity
+ * @property $threshold_level
  */
 class InventoryItem extends Model
 {
@@ -21,7 +23,7 @@ class InventoryItem extends Model
 
     public function purchaseBill(): BelongsTo
     {
-        return $this->belongsTo(PurchaseBill::class, 'purchaseBill_id');
+        return $this->belongsTo(PurchaseBill::class, 'purchase_bill_id');
     }
 
     public function supplyRequestItems(): HasMany

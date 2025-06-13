@@ -28,4 +28,10 @@ class Supplier extends Model
     {
         return $this->hasMany(PurchaseBill::class, 'supplier_id');
     }
+
+    protected $fillable = [
+        'id',
+        'company_name',
+        'phone_number',
+    ];
 }

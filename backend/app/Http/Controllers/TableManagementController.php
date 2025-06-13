@@ -20,7 +20,6 @@ class TableManagementController extends Controller
 
     public function store(Request $request): JsonResponse
     {
-
         $validator = Validator::make($request->all(), [
             'number' => 'required|integer|unique:tables,number',
             'capacity' => 'required|integer|min:1',
@@ -79,7 +78,7 @@ class TableManagementController extends Controller
             'cleaning' => ['available'],
         ];
 
-        if (! in_array($newStatus, $allowedTransitions[$currentStatus] ?? [])) {
+        if ( ! in_array($newStatus, $allowedTransitions[$currentStatus] ?? []) ) {
             return response()->json([
                 'message' => 'Invalid status transition.',
             ], 422);
@@ -87,7 +86,7 @@ class TableManagementController extends Controller
 
         if ($currentStatus === 'reserved' && $newStatus === 'cleaning' && ! $request->boolean('confirm')) {
             return response()->json([
-                'message' => 'This table is currently reserved . Are you sure you want to update status?',
+                'message' => 'This table is currently reserved.' //'Are you sure you want to update status?',
             ], 409);
         }
 
@@ -111,13 +110,13 @@ class TableManagementController extends Controller
         // this is if the manager tried to delete table in status = > reserved ..this method showing message could be passed by enter confirm =1
         if ($table->status === 'reserved' && ! $request->boolean('confirm')) {
             return response()->json([
-                'message' => 'This table is currently reserved . Are you sure you want to update status?',
+                'message' => 'This table is currently reserved.',
             ], 409);
         }
 
         if ($hasActiveReservations && ! $request->boolean('confirm')) {
             return response()->json([
-                'message' => 'This table is currently reserved . Are you sure you want to update status',
+                'message' => 'This table is currently reserved.',
             ], 409);
         }
 

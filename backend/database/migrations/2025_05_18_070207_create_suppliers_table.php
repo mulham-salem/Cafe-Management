@@ -8,10 +8,10 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('customers', function (Blueprint $table) {
+        Schema::create('suppliers', function (Blueprint $table) {
             $table->unsignedBigInteger('id');
-            $table->string('phone_number')->unique()->nullable();
-            $table->string('address')->nullable();
+            $table->string('company_name')->unique()->nullable();
+            $table->string('phone_number')->nullable();
             $table->timestamps();
             $table->primary('id');
             $table->foreign('id')->references('id')->on('users')->onDelete('cascade');
@@ -20,6 +20,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('customers');
+        Schema::dropIfExists('suppliers');
     }
 };
