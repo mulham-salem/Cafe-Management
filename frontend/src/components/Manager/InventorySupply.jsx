@@ -5,7 +5,17 @@ import 'react-toastify/dist/ReactToastify.css';
 import "../styles/toastStyles.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBoxes, faTruckLoading, faPlus, faEdit, faTrash, faBell, faFileInvoiceDollar, faPaperPlane, faTimes, faArrowRotateBack } from '@fortawesome/free-solid-svg-icons';
+import axios from 'axios';
 
+// Get the token from sessionStorage or localStorage
+const token = sessionStorage.getItem('authToken') || localStorage.getItem('authToken');
+
+// Configure Axios defaults
+axios.defaults.withCredentials = true;
+axios.defaults.baseURL = 'http://localhost:8000/api'; // Adjust your API base URL if different
+axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+axios.defaults.headers.post['Content-Type'] = 'application/json';
+axios.defaults.headers.put['Content-Type'] = 'application/json';
 
 const InventorySupply = () => {
   useEffect(() => {
@@ -26,14 +36,8 @@ const InventorySupply = () => {
 
   const [showAddItemModal, setShowAddItemModal] = useState(false);
 
-  const [inventory, setInventory] = useState(() => {
-    const savedInventory = localStorage.getItem("inventory");
-    return savedInventory ? JSON.parse(savedInventory) : [];
-  });
-
-  useEffect(() => {
-    localStorage.setItem("inventory", JSON.stringify(inventory));
-  }, [inventory]);
+  // حالة المخزون ستُجلب من الباك إند
+  const [inventory, setInventory] = useState([]);
   
   const [itemName, setItemName] = useState('');
   const [quantity, setQuantity] = useState('');
@@ -41,174 +45,261 @@ const InventorySupply = () => {
   const [expiryDate, setExpiryDate] = useState('');
   const [threshold, setThreshold] = useState('');
 
-
-  useEffect(() => {
-    inventory.forEach((item) => {
-      if (item.quantity <= item.thresholdLevel) {
-        toast.warning(
-          <div className='lowStock'>
-            <span>⚠️ Low Stock Alert</span>
-            <br/>
-            <span>
-              {item.name} only {item.quantity} {item.unit} left <br/> (threshold: {item.thresholdLevel} {item.unit})
-            </span>
-          </div>
-        );
-      }
-    });
-  }, [inventory]);
-
-  const handleDelete = (id) => {
-    const item = inventory.find((item) => item.id === id);
-    toast.info(`🗑️ ${item.name} deleted`);
-    setInventory(inventory.filter((i) => i.id !== id));
-  };
-
   const [editItem, setEditItem] = useState(null);
 
-  const handleAddItem = (e) => {
-    e.preventDefault();
+    // دالة لجلب المخزون من الـ API
+    const fetchInventory = async () => {
+      try {
+        const response = await axios.get('/manager/inventory');
+        setInventory(response.data.inventory_items);
+      } catch (error) {
+        console.error('Error fetching inventory:', error);
+        toast.error('Failed to load inventory items.');
+      }
+    };
   
+    // useEffect لجلب المخزون عند تحميل المكون لأول مرة أو عند تغيير التاب إلى 'inventory'
+    useEffect(() => {
+      if (activeTab === 'inventory') {
+        fetchInventory();
+      }
+    }, [activeTab]);
+
+  // useEffect(() => {
+  //   inventory.forEach((item) => {
+  //     if (item.quantity <= item.thresholdLevel) {
+  //       toast.warning(
+  //         <div className='lowStock'>
+  //           <span>⚠️ Low Stock Alert</span>
+  //           <br/>
+  //           <span>
+  //             {item.name} only {item.quantity} {item.unit} left <br/> (threshold: {item.thresholdLevel} {item.unit})
+  //           </span>
+  //         </div>
+  //       );
+  //     }
+  //   });
+  // }, [inventory]);
+
+  const handleDelete = async (id) => { // أضف `async` هنا
+    const item = inventory.find((item) => item.id === id);
+    if (!item) return;
+
+    try {
+      // التحقق مما إذا كان العنصر مرتبطًا بعناصر القائمة
+      // هذه الخطوة تتم على الباك إند، لذا لا تحتاج لـ `if` هنا
+      await axios.delete(`/manager/inventory/${id}`); // إرسال طلب الحذف
+      toast.info(`🗑️ ${item.name} deleted`);
+      fetchInventory(); // أعد جلب المخزون بعد الحذف لتحديث الواجهة
+    } catch (error) {
+      console.error('Error deleting item:', error);
+      if (error.response && error.response.data && error.response.data.message) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error('Failed to delete item. Please try again.');
+      }
+    }
+  };
+
+  const handleAddItem = async (e) => { // أضف `async` هنا
+    e.preventDefault();
+
     if (!itemName || !quantity || !unit || !expiryDate || !threshold) {
       toast.error('Please fill in all fields');
       return;
     }
-  
+
     if (quantity <= 0 || threshold < 0) {
       toast.error('Quantity must be > 0 and Threshold ≥ 0');
       return;
     }
-  
-    if (editItem) {
-      const updated = inventory.map((item) =>
-        item.id === editItem.id
-          ? {
-              ...item,
-              name: itemName,
-              quantity: parseFloat(quantity),
-              unit,
-              expiryDate,
-              thresholdLevel: parseFloat(threshold),
-            }
-          : item
-      );
-      setInventory(updated);
-      toast.success(`✏️ ${itemName} updated`);
-    } else {
-      const newItem = {
-        id: Date.now(),
-        name: itemName,
-        quantity: parseFloat(quantity),
-        unit,
-        expiryDate,
-        thresholdLevel: parseFloat(threshold),
-      };
-      setInventory([...inventory, newItem]);
-      toast.success(`✅ ${itemName} added`);
+
+    const itemData = {
+      name: itemName,
+      quantity: parseFloat(quantity),
+      unit: unit,
+      expiry_date: expiryDate, // تطابق مع اسم العمود في الباك إند
+      threshold_level: parseFloat(threshold), // تطابق مع اسم العمود في الباك إند
+    };
+
+    try {
+      if (editItem) {
+        // تحديث عنصر موجود (PUT request)
+        const response = await axios.put(`/manager/inventory/${editItem.id}`, itemData);
+        toast.success(`✏️ ${itemName} updated`);
+
+        if (response.data.low_stock_alert) {
+          toast.warning(response.data.low_stock_alert, { icon: "⚠️" });
+        }
+      } else {
+        // إضافة عنصر جديد (POST request)
+        const response = await axios.post('/manager/inventory', itemData);
+        toast.success(`✅ ${itemName} added`);
+
+        if (response.data.low_stock_alert) {
+          toast.warning(response.data.low_stock_alert, { icon: "⚠️" });
+        }
+      }
+      setShowAddItemModal(false);
+      setItemName('');
+      setQuantity('');
+      setUnit('');
+      setExpiryDate('');
+      setThreshold('');
+      setEditItem(null);
+      fetchInventory(); // أعد جلب المخزون بعد الإضافة أو التعديل لتحديث الواجهة
+
+    } catch (error) {
+      console.error('Error adding/updating item:', error);
+      if (error.response && error.response.data && error.response.data.message) {
+        toast.error(error.response.data.message);
+      } else if (error.response && error.response.data && error.response.data.errors) {
+         // Handle validation errors from Laravel
+         const errors = error.response.data.errors;
+         for (const key in errors) {
+             toast.error(errors[key][0]);
+         }
+      }
+       else {
+        toast.error('Failed to save item. Please try again.');
+      }
     }
-  
-    setShowAddItemModal(false);
-    setItemName('');
-    setQuantity('');
-    setUnit('');
-    setExpiryDate('');
-    setThreshold('');
-    setEditItem(null);
   };
   const [showRequestModal, setShowRequestModal] = useState(false);
-  const [suppliers, setSuppliers] = useState([
-    { id: 1, name: 'Supplier A' },
-    { id: 2, name: 'Supplier B' },
-  ]);
+  const [suppliers, setSuppliers] = useState([]);
 
   const [selectedSupplier, setSelectedSupplier] = useState('');
   const [note, setNote] = useState('');
+  const [title, setTitle] = useState('');
   const [requestItems, setRequestItems] = useState([]);
 
+  // Fetch initial data (suppliers, offers)
   useEffect(() => {
-    if (showRequestModal) {
+    const fetchInitialData = async () => {
+      try {
+        // Fetch suppliers
+        const suppliersResponse = await axios.get('/manager/suppliers');
+        setSuppliers(suppliersResponse.data);
+
+        // Fetch offers
+        const offersResponse = await axios.get('/manager/supply'); // Assumes 'index' method on backend fetches pending offers
+        setOffers(offersResponse.data.map(offer => ({
+          id: offer.id,
+          title: offer.title,
+          supplier: offer.supplier_name,
+          totalPrice: offer.total_price,
+          deliveryDate: offer.delivery_date.split(' ')[0], // Format date for display
+          note: offer.note,
+          status: offer.status, // All fetched offers are pending
+          items: offer.items.map(item => ({
+            name: item.item_name,
+            quantity: item.quantity,
+            unit: item.unit,
+            unitPrice: item.unit_price,
+          })),
+        })));
+      } catch (error) {
+        toast.error("Failed to fetch initial data.");
+        console.error("Error fetching initial data:", error);
+      }
+    };
+    fetchInitialData();
+  }, []);
+
+
+  // Initialize request items when the modal is shown, using the provided 'inventory' state 
+  useEffect(() => {
+    if (showRequestModal && inventory.length > 0) { // Only initialize if inventory is loaded
       const initial = inventory.map((item) => ({
         id: item.id,
         name: item.name,
         quantity: 0,
       }));
-      setRequestItems(initial);
+      setRequestItems(initial); // 
     }
-  }, [showRequestModal]);
+  }, [showRequestModal, inventory]); // 
 
-  const handleSubmitSupplyRequest = (e) => {
-    e.preventDefault();
-    if (!selectedSupplier) {
-      toast.error("Please select a supplier");
-      return;
+  const handleSubmitSupplyRequest = async (e) => { // 
+    e.preventDefault(); // 
+
+    if (!selectedSupplier) { // 
+      toast.error("Please select a supplier"); // 
+      return; // 
     }
-  
-    const validItems = requestItems.filter((i) => i.quantity > 0);
-    if (validItems.length === 0) {
-      toast.error("Please enter quantity for at least one item");
-      return;
+
+    const validItems = requestItems.filter((i) => i.quantity > 0); // 
+
+    if (validItems.length === 0) { // 
+      toast.error("Please enter quantity for at least one item"); // 
+      return; // 
     }
-  
-    toast.success("📦 Supply request sent!");
-    setShowRequestModal(false);
-    setSelectedSupplier('');
-    setNote('');
+
+    try {
+      const payload = {
+        supplier_id: selectedSupplier,
+        note: note,
+        title: title,
+        items: validItems.map(item => ({
+          inventory_item_id: item.id,
+          quantity: item.quantity
+        }))
+      };
+      await axios.post('/manager/supply', payload); // Connects to store method
+      toast.success("📦 Supply request sent!"); // 
+      setShowRequestModal(false); // 
+      setSelectedSupplier(''); // 
+      setNote(''); // 
+      setTitle('');
+      // Optionally re-fetch offers or update state if needed immediately
+    } catch (error) {
+      toast.error("Failed to send supply request.");
+      console.error("Error sending supply request:", error);
+    }
   };
   
   const handleQuantityChange = (e, idx) => {
-    const qty = parseInt(e.target.value) || 0;
-    setRequestItems((prev) => {
-      const updated = [...prev];
-      updated[idx].quantity = qty;
-      return updated;
+    const qty = parseInt(e.target.value) || 0; // 
+    setRequestItems((prev) => { // 
+      const updated = [...prev]; // 
+      updated[idx].quantity = qty; // 
+      return updated; // 
     });
   };
-  const [offers, setOffers] = useState([
-    {
-      id: 1,
-      title: 'Offer 1',
-      supplier: 'Supplier A',
-      totalPrice: 250,
-      deliveryDate: '2025-06-10',
-      note: 'Fast delivery guaranteed.',
-      status: 'Pending',
-      items: [
-        { name: 'Sugar', quantity: 10, unit: 'kilo', unitPrice: 5 },
-        { name: 'Milk', quantity: 5, unit: 'liter', unitPrice: 10 },
-      ],
-    },
-    {
-      id: 2,
-      title: 'Offer 2',
-      supplier: 'Supplier B',
-      totalPrice: 400,
-      deliveryDate: '2025-06-15',
-      note: 'Includes packaging.',
-      status: 'Pending',
-      items: [
-        { name: 'Coffee', quantity: 8, unit: 'kilo', unitPrice: 20 },
-      ],
-    },
-  ]);
-  const [rejectingOffer, setRejectingOffer] = useState(null);
-  const [rejectionReason, setRejectionReason] = useState('');
-  const handleAcceptOffer = (id) => {
-    setOffers((prev) =>
-      prev.map((offer) =>
-        offer.id === id ? { ...offer, status: 'approved' } : offer
-      )
-    );
-    toast.success('✅ Offer accepted');
+
+  const [offers, setOffers] = useState([]); //  Will be fetched from API
+  const [rejectingOffer, setRejectingOffer] = useState(null); // 
+  const [rejectionReason, setRejectionReason] = useState(''); // 
+
+  const handleAcceptOffer = async (id) => { // 
+    try {
+      await axios.post(`/manager/supply-offers/${id}/accept`); // Connects to acceptOffer method
+      setOffers((prev) => // 
+        prev.map((offer) => // 
+          offer.id === id ? { ...offer, status: 'accepted' } : offer // 
+        )
+      );
+      toast.success('✅ Offer accepted'); // 
+    } catch (error) {
+      toast.error("Failed to accept offer.");
+      console.error("Error accepting offer:", error);
+    }
   };
-  const handleRejectOffer = (id) => {
-    setOffers((prev) =>
-      prev.map((offer) =>
-        offer.id === id ? { ...offer, status: 'Rejected', reason: rejectionReason } : offer
-      )
-    );
-    toast.info('❌ Offer rejected');
-    setRejectingOffer(null);
-    setRejectionReason('');
+
+  const handleRejectOffer = async (id) => { // 
+    try {
+      await axios.post(`/manager/supply-offers/${id}/reject`, { reason: rejectionReason }); // Connects to rejectOffer method
+      setOffers((prev) => // 
+        prev.map((offer) => // 
+          offer.id === id ? { ...offer, status: 'Rejected', reason: rejectionReason } : offer // 
+        )
+      );
+      toast.info('❌ Offer rejected'); // 
+      setRejectingOffer(null); // 
+      setRejectionReason(''); // 
+    } catch (error) {
+      toast.error("Failed to reject offer.");
+      console.error("Error rejecting offer:", error);
+    }
   };
   
   const [showBillModal, setShowBillModal] = useState(false);
@@ -216,31 +307,54 @@ const InventorySupply = () => {
   const [billDate, setBillDate] = useState('');
   const [bills, setBills] = useState([]); 
 
-  const approvedOffers = offers.filter(o => o.status === 'approved');
+  const approvedOffers = offers.filter(o => o.status === 'accepted'); // 
 
-  const handleSubmitBill = (e) => {
-    e.preventDefault();
-  
-    const offer = approvedOffers.find(o => o.id.toString() === selectedOfferId);
-    if (!offer || !billDate) {
-      toast.error("Missing required fields");
-      return;
+  const handleSubmitBill = async (e) => { // 
+    e.preventDefault(); // 
+
+    const offer = approvedOffers.find(o => o.id.toString() === selectedOfferId); // 
+
+    if (!offer || !billDate) { // 
+      toast.error("Missing required fields"); // 
+      return; // 
     }
-  
-    const newBill = {
-      id: Date.now(),
-      offerId: offer.id,
-      supplier: offer.supplier,
-      items: offer.items,
-      total: offer.totalPrice,
-      date: billDate,
-    };
-  
-    setBills([...bills, newBill]); 
-    toast.success("🧾 Purchase Bill Saved!");
-    setShowBillModal(false);
-    setSelectedOfferId('');
-    setBillDate('');
+    const itemCalculatedPricesArray = offer.items.map(item =>
+      (item.quantity * item.unitPrice).toFixed(2) // ???????? ???? ?????????????? ???? 2 ????????
+    );
+    const itemCalculatedPricesString = itemCalculatedPricesArray.join(', '); // ?????????? ???????????? ????????????
+
+    try {
+      const payload = {
+        supply_offer_id: offer.id,
+        supplier_id: suppliers.find(s => s.name === offer.supplier)?.id, // Find supplier ID from state
+        purchase_date: billDate,
+        item_calculated_prices: itemCalculatedPricesString,
+      };
+      const response = await axios.post('/manager/supply-purchase-bill', payload); // Connects to storePurchaseBill method
+      const newBillId = response.data.purchase_bill_id; 
+
+      const newBill = { // 
+        id: newBillId, // 
+        offerId: offer.id, // 
+        supplier: offer.supplier, // 
+        items: offer.items, // 
+        total: offer.totalPrice, // 
+        date: billDate, // 
+        itemCalculatedPrices: itemCalculatedPricesString,
+      };
+      setBills([...bills, newBill]); // 
+      toast.success("🧾 Purchase Bill Saved! and Inventory Updated"); // 
+      setShowBillModal(false); // 
+      setSelectedOfferId(''); // 
+      setBillDate(''); // 
+    } catch (error) {
+      if (error.response && error.response.data && error.response.data.message) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error("Failed to save purchase bill.");
+        console.error("Error saving purchase bill:", error);
+      }
+    }
   };
 
   const [loaded, setLoaded] = useState(false);
@@ -308,8 +422,8 @@ const InventorySupply = () => {
                     <td>{item.name}</td>
                     <td>{item.quantity}</td>
                     <td>{item.unit}</td>
-                    <td>{item.expiryDate}</td>
-                    <td>{item.thresholdLevel}</td>
+                    <td>{item.expiry_date}</td>
+                    <td>{item.threshold_level}</td>
                     <td>
                         <button className={styles.iconBtn}
                             onClick={() => {
@@ -317,8 +431,8 @@ const InventorySupply = () => {
                                 setItemName(item.name);
                                 setQuantity(item.quantity);
                                 setUnit(item.unit);
-                                setExpiryDate(item.expiryDate);
-                                setThreshold(item.thresholdLevel);
+                                setExpiryDate(item.expiry_date);
+                                setThreshold(item.threshold_level);
                                 setShowAddItemModal(true);
                             }}
                         >
@@ -396,6 +510,15 @@ const InventorySupply = () => {
             <div className={`${styles.slideUpModal} ${styles.requestModal}`}>
             <h4>📝 New Supply Request</h4>
             <form onSubmit={handleSubmitSupplyRequest}>
+                <label>🏷️ Request Title:</label>
+                  <input
+                    type="text"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    className={styles.titleInput}
+                    placeholder="e.g. Weekly Ingredient Request"
+                    required
+                />
                 <label>📋 Select Items & Quantities:</label>
                 <div className={styles.itemList}>
                 {requestItems.map((item, idx) => (
@@ -471,7 +594,7 @@ const InventorySupply = () => {
                     ))}
                 </div>
                 <div className={styles.offerActions}>
-                    {offer.status === 'Pending' ? (
+                    {offer.status === 'pending' ? (
                         <>
                         <button className={styles.acceptBtn} onClick={() => handleAcceptOffer(offer.id)}>✅ Accept</button>
                         <button className={styles.rejectBtn} onClick={() => setRejectingOffer(offer)}>❌ Reject</button>
@@ -479,10 +602,10 @@ const InventorySupply = () => {
                     ) : (
                         <span
                         className={`${styles.statusBadge} ${
-                            offer.status === 'approved' ? styles.statusApproved : styles.statusRejected
+                            offer.status === 'accepted' ? styles.statusApproved : styles.statusRejected
                         }`}
                         >
-                        {offer.status === 'approved' ? '✅ Approved' : '❌ Rejected'}
+                        {offer.status === 'accepted' ? '✅ Accepted' : '❌ Rejected'}
                         </span>
                     )}
                 </div>
@@ -550,7 +673,7 @@ const InventorySupply = () => {
 
                 <label className={styles.inputLabel}>📅 Purchase Date:</label>
                 <input
-                  type="date"
+                  type="datetime-local"
                   className={styles.dateInput}
                   value={billDate}
                   onChange={(e) => setBillDate(e.target.value)}
