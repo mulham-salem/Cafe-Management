@@ -37,7 +37,7 @@ Route::middleware(['auth:manager', 'isManager'])->prefix('manager')->group(funct
     Route::apiResource('/table', TableManagementController::class);
     Route::apiResource('/promotion', PromotionManagementController::class);
     Route::apiResource('/inventory', InventoryManagementController::class);
-    //I'm here now
+
     Route::apiResource('/supply', SupplyManagementController::class);
     Route::get('/suppliers', [SupplyManagementController::class, 'getSuppliers']);
     Route::post('/supply-offers/{id}/accept', [SupplyManagementController::class, 'acceptOffer']);
@@ -45,9 +45,8 @@ Route::middleware(['auth:manager', 'isManager'])->prefix('manager')->group(funct
     Route::post('/supply-purchase-bill', [SupplyManagementController::class, 'storePurchaseBill']);
 
     //** manager notification **//
-    Route::get('/notifications/all', [NotificationManagementController::class, 'getAllManagerNotifications']);
-    Route::get('/notifications/supplier-offers', [NotificationManagementController::class, 'getSupplierOfferNotifications']);
-    Route::get('/notifications/supplier-responses', [NotificationManagementController::class, 'getSupplierResponseToRequests']);
+    Route::get('/notifications', [NotificationManagementController::class, 'getAllManagerNotifications']);
+    Route::patch('/notifications/{id}/seen', [NotificationManagementController::class, 'markAsSeen']);
 });
 
 // ......................................................Supplier Routes ......................................................
@@ -57,9 +56,9 @@ Route::middleware(['auth:sanctum', 'checkUserRole:supplier'])->group(function ()
     Route::get('/supplier/view-offers', [SupplierController::class, 'viewMyOffers']);
 
     //** supplier notification **//
-    Route::get('/supplier/notifications/offer-responses', [NotificationManagementController::class, 'getManagerResponseToSupplierOffers']);
-    Route::get('/supplier/notifications/supplier-requests', [NotificationManagementController::class, 'getSupplyRequestSentToSupplier']);
-    Route::get('/supplier/notifications/supply-requests/{id}/respond', [NotificationManagementController::class, 'respondToSupplyRequestNotification']);
+    Route::get('/supplier/notifications', [NotificationManagementController::class, 'getAllSupplierNotifications']);
+    Route::patch('/supplier/notifications/{id}/seen', [NotificationManagementController::class, 'markAsSeen']);
+    Route::patch('/supplier/notifications/supply-requests/{id}/respond', [NotificationManagementController::class, 'respondToSupplyRequestNotification']);
 });
 
 // ....................................................customer Routes.....................................................
