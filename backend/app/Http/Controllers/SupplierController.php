@@ -7,6 +7,7 @@ use App\Models\Notification;
 use App\Models\Supplier;
 use App\Models\SupplyOffer;
 use App\Models\SupplyOfferItem;
+use Exception;
 
 class SupplierController extends Controller
 {
@@ -41,7 +42,7 @@ class SupplierController extends Controller
                         'unit_price' => $item['unit_price'],
                         'total_price' => $item['quantity'] * $item['unit_price'],
                     ]);
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     return response()->json("Error inserting item #$index: ".$e->getMessage());
                 }
             }
@@ -60,7 +61,7 @@ class SupplierController extends Controller
 
             return response()->json(['message' => 'Supply offer submitted successfully.'], 201);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
 
             return response()->json(['message' => 'Failed to submit offer.', 'error' => $e->getMessage()], 500);
         }

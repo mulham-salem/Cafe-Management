@@ -44,9 +44,8 @@ const SupplierHome = () => {
     setItems(newItems);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!title.trim() || !deliveryDate.trim()) {
       toast.error("Please fill in all required fields.");
       return;
@@ -59,55 +58,57 @@ const SupplierHome = () => {
       }
     }
 
-    toast.success("Supply offer sent successfully!");
+    const token = sessionStorage.getItem('authToken') || localStorage.getItem('authToken');
 
-    setTitle("");
-    setDeliveryDate("");
-    setNote("");
-    setItems([{ name: "", quantity: "", unit: "", unitPrice: "" }]);
+    try {
+      const response = await axios.post('http://localhost:8000/api/supplier/offers', {
+        title,
+        delivery_date: deliveryDate,
+        note,
+        items: items.map(item => ({
+          name: item.name,
+          quantity: parseFloat(item.quantity),
+          unit: item.unit,
+          unit_price: parseFloat(item.unitPrice)
+        }))
+      }, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+      });
+      toast.success(response.data.message);
+      setTitle("");
+      setDeliveryDate("");
+      setNote("");
+      setItems([{ name: "", quantity: "", unit: "", unitPrice: "" }]);
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || "Failed to submit offer. Please try again.";
+      toast.error(errorMessage);
+    }
   };
 
-  const mockOffers = [
-    {
-      id: 1,
-      title: "Monthly Beverage Offer",
-      deliveryDate: "2025-06-10",
-      totalPrice: 400,
-      note: "Includes discount on bulk orders",
-      status: "Rejected",
-      rejectionReason: "Prices are too high compared to market rate.",
-      items: [
-        {
-          name: "Coffee Beans",
-          quantity: 10,
-          unit: "kg",
-          unitPrice: 20,
+  const [myOffers, setMyOffers] = useState([]);
+
+  useEffect(() => {
+    if (activeTab === 'view') {
+      fetchMyOffers();
+    }
+  }, [activeTab]);
+
+  const fetchMyOffers = async () => {
+    const token = sessionStorage.getItem('authToken') || localStorage.getItem('authToken');
+    try {
+      const response = await axios.get('http://localhost:8000/api/supplier/view-offers', {
+        headers: {
+            Authorization: `Bearer ${token}`,
         },
-        {
-          name: "Sugar",
-          quantity: 5,
-          unit: "kg",
-          unitPrice: 10,
-        },
-      ],
-    },
-    {
-      id: 2,
-      title: "Snack Ingredients Offer",
-      deliveryDate: "2025-06-15",
-      totalPrice: 250,
-      note: "",
-      status: "Pending",
-      items: [
-        {
-          name: "Cheese",
-          quantity: 5,
-          unit: "kg",
-          unitPrice: 15,
-        },
-      ],
-    },
-  ];
+      });
+      setMyOffers(response.data.offers);
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || "Failed to fetch offers.";
+      toast.error(errorMessage);
+    }
+  };
 
   useEffect(() => {
     if (location.state && location.state.successMessage) {
@@ -223,104 +224,125 @@ const SupplierHome = () => {
 
       <main className={styles.mainContent}>
       {currentPath === "/login/supplier-home" && activeTab === "send" && (
-          <form className={styles.offerForm} onSubmit={handleSubmit}>
-            <input type="text" placeholder="Offer Title" value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              required
-            />
-            <input type="date" value={deliveryDate}
-              onChange={(e) => setDeliveryDate(e.target.value)}
-              required
-            />
-            <textarea placeholder="Additional Notes (Optional)" value={note}
-              onChange={(e) => setNote(e.target.value)}
-            />
-            <h4>Items</h4>
-            {items.map((item, index) => (
-              <div key={index} className={styles.itemRow}>
-                <input type="text" placeholder="Item Name" value={item.name}
-                  onChange={(e) =>
-                    handleItemChange(index, "name", e.target.value)
-                  }
-                />
-                <input type="number" placeholder="Quantity" value={item.quantity}
-                  onChange={(e) =>
-                    handleItemChange(index, "quantity", e.target.value)
-                  }
-                />
-                <input type="text" placeholder="Unit" value={item.unit}
-                  onChange={(e) =>
-                    handleItemChange(index, "unit", e.target.value)
-                  }
-                />
-                <input type="number" placeholder="Unit Price" value={item.unitPrice}
-                  onChange={(e) =>
-                    handleItemChange(index, "unitPrice", e.target.value)
-                  }
-                />
-              </div>
-            ))}
-            <button
-              type="button"
-              className={styles.addItemBtn}
-              onClick={handleAddItem}
-            >
-              + Add Item
-            </button>
-            <button type="submit" className={styles.submitBtn}>
-              Submit Offer
-            </button>
-          </form>
-        )}
+        
+        <form className={styles.offerForm} onSubmit={handleSubmit}>
+          <input type="text" placeholder="Offer Title" value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            required
+          />
+          <input type="datetime-local" value={deliveryDate}
+            onChange={(e) => setDeliveryDate(e.target.value)}
+      
+            required
+          />
+          <textarea placeholder="Additional Notes (Optional)" value={note}
+            onChange={(e) => setNote(e.target.value)}
+          />
+          <h4>Items</h4>
+          {items.map((item, index) => (
+         
+            <div key={index} className={styles.itemRow}>
+              <input type="text" placeholder="Item Name" value={item.name}
+                onChange={(e) =>
+                  handleItemChange(index, "name", e.target.value)
+                }
+              
+              />
+              <input type="number" placeholder="Quantity" value={item.quantity}
+                onChange={(e) =>
+                  handleItemChange(index, "quantity", e.target.value)
+                }
+              />
+    
+              <input type="text" placeholder="Unit" value={item.unit}
+                onChange={(e) =>
+                  handleItemChange(index, "unit", e.target.value)
+                }
+              />
+          
+              <input type="number" placeholder="Unit Price" value={item.unitPrice}
+                onChange={(e) =>
+                  handleItemChange(index, "unitPrice", e.target.value)
+                }
+              />
+            </div>
+ 
+          ))}
+          <button
+            type="button"
+            className={styles.addItemBtn}
+            onClick={handleAddItem}
+          >
+            + Add Item
+       
+          </button>
+          <button type="submit" className={styles.submitBtn}>
+            Submit Offer
+          </button>
+        </form>
+      )}
 
       {currentPath === "/login/supplier-home"  && activeTab === "view" && (
           <div className={styles.offersList}>
-            {mockOffers.map((offer) => (
-              <div key={offer.id} className={styles.offerCard}>
-                <h3>{offer.title}</h3>
-                <p>
-                  <strong>Delivery:</strong> {offer.deliveryDate}
-                </p>
-                <p>
-                  <strong>Total Price:</strong> ${offer.totalPrice}
-                </p>
-                {offer.note && (
-                  <p>
-                    <strong>Note:</strong> {offer.note}
-                  </p>
-                )}
-                <p>
-                  <strong>Status:</strong> {offer.status}
-                </p>
-                {offer.status === "Rejected" && offer.rejectionReason && (
-                  <p className={styles.rejection}>
-                    <strong>Reason for Rejection:</strong>{" "}
-                    {offer.rejectionReason}
-                  </p>
-                )}
-                <h4>Items:</h4>
-                <table className={styles.itemsTable}>
-                  <thead>
-                    <tr>
-                      <th>Name</th>
-                      <th>Qty</th>
-                      <th>Unit</th>
-                      <th>Unit Price</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {offer.items.map((item, i) => (
-                      <tr key={i}>
-                        <td>{item.name}</td>
-                        <td>{item.quantity}</td>
-                        <td>{item.unit}</td>
-                        <td>${item.unitPrice}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ))}
+            
+            {myOffers.length > 0 ? (
+                myOffers.map((offer) => (
+                <div key={offer.id} className={styles.offerCard}>
+                    <h3>{offer.title}</h3>
+                    <p>
+                    <strong>Delivery:</strong> {new Date(offer.delivery_date).toLocaleString()}
+                    </p>
+               
+                    <p>
+                    <strong>Total Price:</strong> ${offer.total_price}
+                    </p>
+                    {offer.note && (
+                    <p>
+                        <strong>Note:</strong> {offer.note}
+      
+                    </p>
+                    )}
+                    <p>
+                    <strong>Status:</strong> {offer.status}
+                    </p>
+                    {offer.status === "rejected" && offer.note 
+                    && (
+                    <p className={styles.rejection}>
+                        <strong>Reason for Rejection:</strong>{" "}
+                        {offer.note}
+                    </p>
+                    )}
+   
+                    <h4>Items:</h4>
+                    <table className={styles.itemsTable}>
+                    <thead>
+                        <tr>
+                        <th>Name</th>
+          
+                        <th>Qty</th>
+                        <th>Unit</th>
+                        <th>Unit Price</th>
+                        </tr>
+                    </thead>
+     
+                    <tbody>
+                        {offer.items.map((item, i) => (
+                        <tr key={i}>
+                            <td>{item.name}</td>
+                 
+                            <td>{item.quantity}</td>
+                            <td>{item.unit}</td>
+                            <td>${item.unit_price}</td>
+                        </tr>
+                        ))}
+   
+                    </tbody>
+                    </table>
+                </div>
+                ))
+            ) : (
+                <p className={styles.emptyText}>No offers to display.</p>
+            )}
           </div>
         )}
         <Outlet />

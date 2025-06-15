@@ -1,6 +1,6 @@
 .container {
     font-family: "Segoe UI", sans-serif;
-    min-height: 100%;
+    min-height: 100vh;
     max-height: 100vh;
     background: linear-gradient(to bottom right, #fdfdfd, #f4f9ff);
     padding-bottom: 40px;
@@ -227,7 +227,7 @@
     transition: border-color 0.5s ease;
   }
   
-  .offerForm input[type=date] {
+  .offerForm input[type=datetime-local] {
     position: relative;
     top: 8px;
     max-width: 97%;
@@ -326,6 +326,14 @@
   .itemsTable th {
     background-color: #f4f4f4;
     color: #1f2d3d;
+  }
+
+  .emptyText {
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 18px;
+    text-align: center;
+    color: #888;
+    margin-top: 100px;
   }
   
   @keyframes fadeIn {

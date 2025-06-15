@@ -34,7 +34,8 @@
   }
 
   .emptyText {
-    font-size: 20px;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 18px;
     text-align: center;
     color: #888;
     margin-top: 100px;
@@ -54,11 +55,12 @@
     background-color: #fff;
     border-radius: 12px;
     padding: 18px 22px;
+    cursor: pointer;
     box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
     border-left: 6px solid #6c63ff;
     align-items: flex-start;
     animation: fadeIn 0.8s ease;
-    transition: background 0.8s ease;
+    transition: background-color 0.4s ease, transform 0.2s ease;
   }
 
   .card:hover {
@@ -90,8 +92,16 @@
     flex: 1;
   }
   
+  @font-face {
+    font-family: 'Jost';
+    src: url('Fonts/Jost/static/Jost-Light.ttf') format('truetype');
+    font-weight: 510;
+    font-style: normal;
+  }
+
   .message {
-    font-size: 15px;
+    font-family: 'Jost';
+    font-size: 17px;
     font-weight: 500;
     color: #333;
     margin-bottom: 6px;
@@ -103,6 +113,20 @@
     font-style: italic;
   }
   
+  @font-face {
+    font-family: 'Titillium_Web';
+    src: url('Fonts/Titillium_Web/TitilliumWeb-Italic.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+  }
+
+  .sender {
+    font-family: 'Titillium_Web';
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 4px;
+    text-align: right;
+  }
 
   @keyframes fadeIn {
     from {
