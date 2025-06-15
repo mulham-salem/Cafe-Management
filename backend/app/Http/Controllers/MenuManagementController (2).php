@@ -44,7 +44,8 @@ class MenuManagementController extends Controller
         $managerId = auth('manager')->id();
 
         $menuItems = MenuItem::with('category:id,name')
-            ->where('manager_id', $managerId)
+
+        ->where('manager_id', $managerId)
             ->get();
 
         $formattedMenuItems = $menuItems->map(function ($item) {
@@ -92,9 +93,9 @@ class MenuManagementController extends Controller
     {
         $menuItem = MenuItem::with('category')->find($id);
 
-        if (! $menuItem) {
+        if (!$menuItem) {
             return response()->json([
-                'message' => 'Menu item not found',
+                'message' => 'Menu item not found'
             ], 404);
         }
 
@@ -161,3 +162,4 @@ class MenuManagementController extends Controller
         return response()->json(['message' => 'Menu item deleted successfully.']);
     }
 }
+

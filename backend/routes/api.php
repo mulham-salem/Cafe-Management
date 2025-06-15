@@ -44,9 +44,9 @@ Route::middleware(['auth:manager', 'isManager'])->prefix('manager')->group(funct
     Route::post('/supply-offers/{id}/reject', [SupplyManagementController::class, 'rejectOffer']);
     Route::post('/supply-purchase-bill', [SupplyManagementController::class, 'storePurchaseBill']);
 
-    // ** notification **//
-    Route::get('/notification', [NotificationManagementController::class, 'index']); // supplyOffersNotification
-    Route::get('/notification2', [NotificationManagementController::class, 'index5']); // getResponseFromSupplierForManagerSupplyRequests
+    //** notification **//
+    Route::get('/notification', [NotificationManagementController::class, 'index']);//supplyOffersNotification
+    Route::get('/notification2', [NotificationManagementController::class, 'index5']);//getResponseFromSupplierForManagerSupplyRequests
 });
 
 // ......................................................Supplier Access ......................................................

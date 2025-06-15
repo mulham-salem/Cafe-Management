@@ -36,7 +36,7 @@ class UserAuthController extends Controller
         return response()->json([
             'token' => $token,
             'role' => $user->role,
-            'message' => 'Welcome back '.$user->name,
+            'message' => 'Welcome back '.$user->name
         ]);
     }
 
@@ -69,7 +69,6 @@ class UserAuthController extends Controller
     public function profile(Request $request): JsonResponse
     {
         $user = $request->user();
-
         return response()->json([
             'name' => $user->name,
         ]);

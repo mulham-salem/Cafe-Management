@@ -54,13 +54,12 @@ class Manager extends Authenticatable
         return $this->hasMany(Notification::class, 'manager_id');
     }
 
-    protected static function booted()
+    protected static function booted(): void
     {
         static::creating(function ($manager) {
             $manager->role = 'Manager';
         });
     }
-
     protected $fillable = ['name', 'username', 'email', 'password', 'remember_token'];
 
     protected $hidden = ['password', 'remember_token'];

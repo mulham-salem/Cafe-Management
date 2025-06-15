@@ -17,6 +17,9 @@ class TableReservationController extends Controller
      * Display a listing of available tables.
      * This method corresponds to the filtering and display of available tables in the React component.
      *
+
+     * @param Request $request
+     * @return JsonResponse
      **/
     public function indexAvailableTables(Request $request): JsonResponse
     {
@@ -35,6 +38,7 @@ class TableReservationController extends Controller
      * Display a listing of the user's reservations.
      * This corresponds to the 'My Reservations' tab in the React component.
      *
+     * @return JsonResponse
      **/
     public function index(): JsonResponse
     {
@@ -42,7 +46,8 @@ class TableReservationController extends Controller
         // For now, let's assume customer_id is passed or hardcoded for demonstration
         $customerId = auth('api')->id(); // Or however you retrieve the authenticated customer's ID
 
-        if (! $customerId) {
+
+        if (!$customerId) {
             return response()->json(['message' => 'Customer not authenticated.'], Response::HTTP_UNAUTHORIZED);
         }
 
@@ -57,6 +62,8 @@ class TableReservationController extends Controller
      * Store a newly created reservation in storage.
      * This method handles the 'Confirm Reservation' functionality.
      *
+     * @param Request $request
+     * @return JsonResponse
      * @throws Exception
      **/
     public function store(Request $request): JsonResponse
@@ -87,7 +94,7 @@ class TableReservationController extends Controller
         // Check if the selected table is 'available' in the tables table
         $table = Table::find($validatedData['table_id']);
 
-        if (! $table || $table->status !== 'available' || $table->capacity < $validatedData['numberOfGuests']) {
+        if (!$table || $table->status !== 'available' || $table->capacity < $validatedData['numberOfGuests']) {
             return response()->json(['message' => 'Selected table is not suitable or available.'], Response::HTTP_BAD_REQUEST);
         }
 
@@ -116,10 +123,14 @@ class TableReservationController extends Controller
         //
     }
 
+
     /**
      * Update the specified reservation in storage.
      * This method handles the 'Save Changes' functionality after editing.
      *
+     * @param Request $request
+     * @param string $id
+     * @return JsonResponse
      * @throws Exception
      **/
     public function update(Request $request, string $id): JsonResponse
@@ -136,7 +147,7 @@ class TableReservationController extends Controller
 
         $reservation = Reservation::find($id);
 
-        if (! $reservation) {
+        if (!$reservation) {
             return response()->json(['message' => 'Reservation not found.'], Response::HTTP_NOT_FOUND);
         }
 
@@ -162,7 +173,7 @@ class TableReservationController extends Controller
 
                 // Check suitability of the new table
                 $newTable = Table::find($validatedData['table_id']);
-                if (! $newTable || $newTable->status !== 'available' && $newTable->id !== $reservation->table_id || $newTable->capacity < $validatedData['numberOfGuests']) {
+                if (!$newTable || $newTable->status !== 'available' && $newTable->id !== $reservation->table_id || $newTable->capacity < $validatedData['numberOfGuests']) {
                     return response()->json(['message' => 'New selected table is not suitable or available.'], Response::HTTP_BAD_REQUEST);
                 }
                 // Update new table status to reserved
@@ -184,12 +195,15 @@ class TableReservationController extends Controller
      * Remove the specified reservation from storage.
      * This method handles the 'Cancel Reservation' functionality.
      *
+
+     * @param string $id
+     * @return JsonResponse
      **/
     public function destroy(string $id): JsonResponse
     {
         $reservation = Reservation::find($id);
 
-        if (! $reservation) {
+        if (!$reservation) {
             return response()->json(['message' => 'Reservation not found.'], Response::HTTP_NOT_FOUND);
         }
 

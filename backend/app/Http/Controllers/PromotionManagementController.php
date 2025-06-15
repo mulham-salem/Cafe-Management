@@ -5,10 +5,11 @@ namespace App\Http\Controllers;
 use App\Http\Requests\PromotionRequest;
 use App\Models\MenuItem;
 use App\Models\Promotion;
+use Illuminate\Http\JsonResponse;
 
 class PromotionManagementController extends Controller
 {
-    public function index()
+    public function index(): JsonResponse
     {
         $managerId = auth('manager')->id();
 
@@ -30,9 +31,10 @@ class PromotionManagementController extends Controller
 
         return response()->json($formatted);
     }
-    //    ................................................................................................................................................
 
-    public function store(PromotionRequest $request)
+    //................................................................................................................................................
+
+    public function store(PromotionRequest $request): JsonResponse
     {
         $managerId = auth('manager')->id();
 
@@ -59,9 +61,8 @@ class PromotionManagementController extends Controller
             'products' => $request->product_names,
         ], 201);
     }
-    //    ................................................................................................................................................
-
-    public function show(string $id)
+    //................................................................................................................................................
+    public function show(string $id): JsonResponse
     {
         $promotion = Promotion::with(['menuitems:id,name,promotion_id'])
             ->where('id', $id)
@@ -78,9 +79,10 @@ class PromotionManagementController extends Controller
             'products' => $promotion->menuitems->pluck('name'),
         ]);
     }
+
     //    ................................................................................................................................................
 
-    public function update(PromotionRequest $request, $id)
+    public function update(PromotionRequest $request, $id): JsonResponse
     {
         $promotion = Promotion::findOrFail($id);
         $managerId = auth('manager')->id();
@@ -114,7 +116,7 @@ class PromotionManagementController extends Controller
 
     //    ................................................................................................................................................
 
-    public function destroy(string $id)
+    public function destroy(string $id): JsonResponse
     {
         $promotion = Promotion::where('id', $id)
             ->where('manager_id', auth('manager')->id())

@@ -78,7 +78,7 @@ class TableManagementController extends Controller
             'cleaning' => ['available'],
         ];
 
-        if (! in_array($newStatus, $allowedTransitions[$currentStatus] ?? [])) {
+        if ( ! in_array($newStatus, $allowedTransitions[$currentStatus] ?? []) ) {
             return response()->json([
                 'message' => 'Invalid status transition.',
             ], 422);
@@ -86,7 +86,7 @@ class TableManagementController extends Controller
 
         if ($currentStatus === 'reserved' && $newStatus === 'cleaning' && ! $request->boolean('confirm')) {
             return response()->json([
-                'message' => 'This table is currently reserved.', // 'Are you sure you want to update status?',
+                'message' => 'This table is currently reserved.' //'Are you sure you want to update status?',
             ], 409);
         }
 

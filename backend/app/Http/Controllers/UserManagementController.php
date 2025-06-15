@@ -70,8 +70,8 @@ class UserManagementController extends Controller
             case UserRole::Customer->value:
                 DB::table('customers')->insert([
                     'id' => $user->id,
-                    'phone_number' => 'null',
-                    'address' => 'null',
+                    'phone_number' => null,
+                    'address' => null,
                 ]);
                 break;
 
@@ -84,8 +84,8 @@ class UserManagementController extends Controller
             case UserRole::Supplier->value:
                 DB::table('suppliers')->insert([
                     'id' => $user->id,
-                    'company_name' => 'null',
-                    'phone_number' => 'null',
+                    'company_name' => null,
+                    'phone_number' => null,
                 ]);
                 break;
         }

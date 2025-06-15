@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\CheckUserRole;
 use App\Http\Middleware\IsManager;
 use App\Http\Middleware\RoleMiddleware;
 use Illuminate\Foundation\Application;
@@ -15,14 +16,10 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
+            'isManager' => isManager::class,
+            'checkUserRole' => CheckUserRole::class,
             'role' => RoleMiddleware::class,
         ]);
-        $middleware->alias([
-            'isManager' => isManager::class,
-            'checkUserRole' => \App\Http\Middleware\CheckUserRole::class,
-
-        ]);
-
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
