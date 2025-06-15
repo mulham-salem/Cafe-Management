@@ -162,7 +162,7 @@ class SupplyManagementController extends Controller
         Notification::create([
             'manager_id' => auth('manager')->id(),
             'user_id' => $validated['supplier_id'],
-            'supplyRequest_id'=>$supplyRequest->id,
+            'supplyRequest_id' => $supplyRequest->id,
             'sent_by' => 'manager',
             'purpose' => 'supplyRequestFromManager',
             'message' => "You have received a new supply request: '{$supplyRequest->title}'",

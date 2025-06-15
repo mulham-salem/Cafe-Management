@@ -22,7 +22,7 @@ class OrderFactory extends Factory
             'employee_id' => null,
             'createdAt' => $this->faker->dateTimeBetween('-1 week', 'now'),
             'confirmedAt' => $this->faker->dateTimeBetween('now', '+1 day'),
-            'status' => $this->faker->randomElement(['In Preparation', 'Ready', 'Delivered']),
+            'status' => $this->faker->randomElement(['pending', 'confirmed', 'Preparing', 'Ready', 'Delivered']),
             'note' => $this->faker->optional()->text(),
         ];
     }

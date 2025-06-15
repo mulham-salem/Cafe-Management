@@ -170,7 +170,7 @@ class NotificationManagementController extends Controller
     {
         $request->validate([
             'response' => 'required|in:accepted,rejected',
-            "rejection_reason" => 'nullable|string|max:500',
+            'rejection_reason' => 'nullable|string|max:500',
         ]);
 
         $supplier = auth('user')->user();

@@ -35,7 +35,8 @@ class ManagerAuthController extends Controller
 
         return response()->json([
             'token' => $token,
-            'message' => 'Welcome back '.$manager->name
+            'message' => 'Welcome back '.$manager->name,
+
         ]);
     }
 
@@ -66,6 +67,7 @@ class ManagerAuthController extends Controller
 
         return response()->json(['message' => 'Password updated successfully.']);
     }
+
     public function profile(Request $request): JsonResponse
     {
         $manager = $request->user('manager');

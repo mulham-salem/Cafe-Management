@@ -17,6 +17,7 @@ class TableReservationController extends Controller
      * Display a listing of available tables.
      * This method corresponds to the filtering and display of available tables in the React component.
      *
+
      * @param Request $request
      * @return JsonResponse
      **/
@@ -44,6 +45,7 @@ class TableReservationController extends Controller
         // Assuming you have authentication and can get the customer_id of the logged-in user
         // For now, let's assume customer_id is passed or hardcoded for demonstration
         $customerId = auth('api')->id(); // Or however you retrieve the authenticated customer's ID
+
 
         if (!$customerId) {
             return response()->json(['message' => 'Customer not authenticated.'], Response::HTTP_UNAUTHORIZED);
@@ -193,6 +195,7 @@ class TableReservationController extends Controller
      * Remove the specified reservation from storage.
      * This method handles the 'Cancel Reservation' functionality.
      *
+
      * @param string $id
      * @return JsonResponse
      **/

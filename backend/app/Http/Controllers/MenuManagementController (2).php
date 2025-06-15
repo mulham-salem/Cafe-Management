@@ -44,6 +44,7 @@ class MenuManagementController extends Controller
         $managerId = auth('manager')->id();
 
         $menuItems = MenuItem::with('category:id,name')
+
         ->where('manager_id', $managerId)
             ->get();
 
