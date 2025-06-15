@@ -15,29 +15,27 @@ class ManagerAuthController extends Controller
         $credentials = $request->validate([
             'username' => 'required|string',
             'password' => 'required|string',
-            'remember_me' => 'boolean',
         ]);
 
         $manager = Manager::where('username', $credentials['username'])->first();
 
         if (! $manager) {
             throw ValidationException::withMessages([
-                'username' => ['The username is incorrect.'],
+                'message' => ['Invalid username.'],
             ]);
         }
 
         if (! Hash::check($credentials['password'], $manager->password)) {
             throw ValidationException::withMessages([
-                'password' => ['The password is incorrect.'],
+                'message' => ['Incorrect password.'],
             ]);
         }
 
         $token = $manager->createToken('manager_token')->plainTextToken;
 
         return response()->json([
-            'message' => 'Manager logged in successfully.',
             'token' => $token,
-            'manager' => $manager->only(['role']),
+            'message' => 'Welcome back '.$manager->name,
         ]);
     }
 
@@ -45,7 +43,9 @@ class ManagerAuthController extends Controller
     {
         $request->user('manager')->currentAccessToken()->delete();
 
-        return response()->json(['message' => 'Manager logged out.']);
+        return response()->json([
+            'message' => 'Logged out successfully',
+        ]);
     }
 
     public function changePassword(Request $request): JsonResponse
@@ -65,5 +65,14 @@ class ManagerAuthController extends Controller
         $manager->save();
 
         return response()->json(['message' => 'Password updated successfully.']);
+    }
+
+    public function profile(Request $request): JsonResponse
+    {
+        $manager = $request->user('manager');
+
+        return response()->json([
+            'name' => $manager->name,
+        ]);
     }
 }

@@ -63,7 +63,7 @@ class NotificationManagementController extends Controller
         $notifications = Notification::where('user_id', $supplier->id)
             ->where('sent_by', 'manager')
             ->where('purpose', 'supplyRequestFromManager')
-            ->with(['supplyRequest.supplyRequestItems.inventoryItem', 'supplyRequest.manager']) 
+            ->with(['supplyRequest.supplyRequestItems.inventoryItem', 'supplyRequest.manager'])
             ->orderByDesc('createdAt')
             ->get();
 
@@ -93,7 +93,7 @@ class NotificationManagementController extends Controller
     {
         $request->validate([
             'response' => 'required|in:accepted,rejected',
-            "rejection_reason" => 'nullable|string|max:500',
+            'rejection_reason' => 'nullable|string|max:500',
         ]);
 
         $supplier = auth('user')->user();

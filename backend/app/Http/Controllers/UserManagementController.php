@@ -9,12 +9,32 @@ use App\UserRole;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 
 class UserManagementController extends Controller
 {
-    public function index() {}
+    public function index(): JsonResponse
+    {
+        $manager = Auth::guard('manager')->user();
+
+        $users = User::with('permissions')
+            ->where('manager_id', $manager->id)
+            ->get()
+            ->map(function ($user) {
+                return [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'username' => $user->username,
+                    'role' => $user->role,
+                    'permissions' => $user->permissions->pluck('permission'),
+                ];
+            });
+
+        return response()->json($users);
+    }
 
     public function store(Request $request): JsonResponse
     {
@@ -28,7 +48,6 @@ class UserManagementController extends Controller
             'permissions' => 'array',
             'permissions.*' => [Rule::in(UserPermission::values())],
         ]);
-        $validated['manager_id'] = $manager->id;
 
         $user = User::create([
             'name' => $validated['name'],
@@ -47,6 +66,29 @@ class UserManagementController extends Controller
                 ]);
             }
         }
+        switch ($user->role) {
+            case UserRole::Customer->value:
+                DB::table('customers')->insert([
+                    'id' => $user->id,
+                    'phone_number' => 'null',
+                    'address' => 'null',
+                ]);
+                break;
+
+            case UserRole::Employee->value:
+                DB::table('employees')->insert([
+                    'id' => $user->id,
+                ]);
+                break;
+
+            case UserRole::Supplier->value:
+                DB::table('suppliers')->insert([
+                    'id' => $user->id,
+                    'company_name' => 'null',
+                    'phone_number' => 'null',
+                ]);
+                break;
+        }
 
         return response()->json([
             'message' => 'User created successfully.',
@@ -63,7 +105,6 @@ class UserManagementController extends Controller
 
         return response()->json([
             'user' => $user->only(['id', 'name', 'email', 'username', 'role']),
-            'permissions' => $user->permission->pluck('permission'),
         ]);
     }
     // This Is Update Method For User Data And Permissions&Roles........................................................................................
@@ -111,7 +152,7 @@ class UserManagementController extends Controller
         ]);
 
     }
-    // This Is Destoy Method For Deleting User Data And Permissions&Roles........................................................................................
+    // This Is Destroy Method For Deleting User Data And Permissions&Roles........................................................................................
 
     public function destroy(string $id): JsonResponse
     {

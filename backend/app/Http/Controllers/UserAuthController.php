@@ -21,22 +21,22 @@ class UserAuthController extends Controller
 
         if (! $user) {
             throw ValidationException::withMessages([
-                'username' => ['Username is incorrect.'],
+                'message' => ['Invalid username.'],
             ]);
         }
 
         if (! Hash::check($credentials['password'], $user->password)) {
             throw ValidationException::withMessages([
-                'password' => ['Password is incorrect.'],
+                'message' => ['Incorrect password.'],
             ]);
         }
 
         $token = $user->createToken('user_token')->plainTextToken;
 
         return response()->json([
-            'message' => 'User logged in successfully.',
             'token' => $token,
-            'user' => $user->only(['role']),
+            'role' => $user->role,
+            'message' => 'Welcome back '.$user->name,
         ]);
     }
 
@@ -44,7 +44,7 @@ class UserAuthController extends Controller
     {
         $request->user()->currentAccessToken()->delete();
 
-        return response()->json(['message' => 'User logged out.']);
+        return response()->json(['message' => 'Logged out successfully']);
     }
 
     public function changePassword(Request $request): JsonResponse
@@ -64,5 +64,14 @@ class UserAuthController extends Controller
         $user->save();
 
         return response()->json(['message' => 'Password updated successfully.']);
+    }
+
+    public function profile(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        return response()->json([
+            'name' => $user->name,
+        ]);
     }
 }

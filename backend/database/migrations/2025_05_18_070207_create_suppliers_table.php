@@ -10,8 +10,8 @@ return new class extends Migration
     {
         Schema::create('suppliers', function (Blueprint $table) {
             $table->unsignedBigInteger('id');
-            $table->string('company_name')->unique();
-            $table->string('phone_number');
+            $table->string('company_name')->unique()->nullable();
+            $table->string('phone_number')->nullable();
             $table->timestamps();
             $table->primary('id');
             $table->foreign('id')->references('id')->on('users')->onDelete('cascade');
