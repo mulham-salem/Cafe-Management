@@ -19,7 +19,7 @@ const SupplierNotification = () => {
 
     const fetchNotifications = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/supplier/notifications', {
+        const response = await axios.get('http://localhost:8000/api/user/supplier/notifications', {
           headers: {
             Authorization: `Bearer ${token}`,
             Accept: 'application/json',
@@ -41,7 +41,7 @@ const SupplierNotification = () => {
 
   const markAsSeen = async (id) => {
     try {
-      await axios.patch(`http://localhost:8000/api/supplier/notifications/${id}/seen`, {}, {
+      await axios.patch(`http://localhost:8000/api/user/supplier/notifications/${id}/seen`, {}, {
         headers: {
           Authorization: `Bearer ${token}`,
           Accept: 'application/json',
@@ -60,7 +60,7 @@ const SupplierNotification = () => {
 
   const respond = async (id, response, rejection_reason = '') => {
     try {
-      await axios.patch(`http://localhost:8000/api/supplier/notifications/supply-requests/${id}/respond`, {
+      await axios.patch(`http://localhost:8000/api/user/supplier/notifications/supply-requests/${id}/respond`, {
         response,
         rejection_reason,
       }, {
@@ -112,6 +112,7 @@ const SupplierNotification = () => {
                 <FontAwesomeIcon icon={notif.seen ? faCheckCircle : faClock} />
               </div>
               <div className={styles.content}>
+              <strong className={styles.title}>{notif.purpose}</strong>
                 <p className={styles.message}>{notif.message}</p>
                 <p className={styles.time}>
                   {new Date(notif.createdAt).toLocaleString()}

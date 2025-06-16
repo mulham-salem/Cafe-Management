@@ -33,12 +33,12 @@ class InventoryManagementController extends Controller
     {
         if ($item->quantity <= $item->threshold_level) {
             $managerId = auth('manager')->id();
-            $message = "Low stock alert: '{$item->name}' only has {$item->quantity} {$item->unit} left (threshold: {$item->threshold_level} {$item->unit}).";
+            $message = "{$item->name} only has {$item->quantity} {$item->unit} left (threshold: {$item->threshold_level} {$item->unit}).";
 
             // التحقق مما إذا كان هناك إشعار غير مقروء بنفس الرسالة والهدف
             // هذا يمنع تكرار الإشعارات لنفس حالة النقص
             $existingNotification = Notification::where('manager_id', $managerId)
-                ->where('purpose', 'low_stock')
+                ->where('purpose', 'Low Stock Alert')
                 ->where('message', $message)
                 ->where('seen', false) // فقط إذا لم يُرَ الإشعار بعد
                 ->first();
@@ -48,7 +48,7 @@ class InventoryManagementController extends Controller
                 Notification::create([
                     'manager_id' => $managerId,
                     'sent_by' => 'system', // تم الإرسال بواسطة النظام
-                    'purpose' => 'low_stock', // الغرض من الإشعار هو نقص المخزون
+                    'purpose' => 'Low Stock Alert', // الغرض من الإشعار هو نقص المخزون
                     'message' => $message,
                     'createdAt' => Carbon::now(), // استخدام Carbon لضبط الوقت الحالي
                     'seen' => false, // الإشعار غير مقروء في البداية

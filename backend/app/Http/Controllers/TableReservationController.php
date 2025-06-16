@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Notification;
 use App\Models\Reservation;
 use App\Models\Table;
 use DateTime;
@@ -17,6 +18,7 @@ class TableReservationController extends Controller
      * Display a listing of available tables.
      * This method corresponds to the filtering and display of available tables in the React component.
      *
+
      * @param Request $request
      * @return JsonResponse
      **/
@@ -44,6 +46,7 @@ class TableReservationController extends Controller
         // Assuming you have authentication and can get the customer_id of the logged-in user
         // For now, let's assume customer_id is passed or hardcoded for demonstration
         $customerId = auth('api')->id(); // Or however you retrieve the authenticated customer's ID
+
 
         if (!$customerId) {
             return response()->json(['message' => 'Customer not authenticated.'], Response::HTTP_UNAUTHORIZED);
@@ -110,6 +113,22 @@ class TableReservationController extends Controller
         $table->status = 'reserved';
         $table->save();
 
+        // جلب اسم الطاولة للرسالة
+        $tableNumber = $table->number;
+
+        $notificationMessage = "Your reservation #{$reservation->id} has been confirmed.\n";
+        $notificationMessage .= "Table: No#{$tableNumber}\n";
+        $notificationMessage .= "Time: " . $reservation->reservation_time->format('Y-m-d H:i') . "\n";
+        $notificationMessage .= "Guests: {$reservation->numberOfGuests}";
+
+        Notification::create([
+            'user_id' => $userId, // <--- اربطه بـ ID العميل الذي قام بالحجز
+            'sent_by' => 'System',
+            'purpose' => 'Reservation Confirmation',
+            'message' => $notificationMessage,
+            'createdAt' => now(), // وقت إنشاء الإشعار
+            'seen' => false,
+        ]);
         return response()->json($reservation, Response::HTTP_CREATED);
     }
 
@@ -193,6 +212,7 @@ class TableReservationController extends Controller
      * Remove the specified reservation from storage.
      * This method handles the 'Cancel Reservation' functionality.
      *
+
      * @param string $id
      * @return JsonResponse
      **/

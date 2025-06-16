@@ -25,5 +25,16 @@ class Notification extends Model
         return $this->belongsTo(SupplyRequest::class, 'supplyRequest_id');
     }
 
-    protected $fillable = ['manager_id', 'supplyRequest_id', 'sent_by', 'purpose', 'user_id', 'message', 'seen', 'createdAt', 'manager_id'];
+    protected $fillable = ['manager_id', 'supplyRequest_id', 'sent_by', 'purpose', 'user_id', 'message', 'seen', 'createdAt'];
+
+    // إذا كنت لا تريد استخدام 'updated_at' و 'created_at' الافتراضيين لـ Laravel
+    public $timestamps = false;
+
+    // لتحديد اسم عمود التاريخ الذي تستخدمه
+    protected $dates = ['createdAt'];
+
+    // لضمان أن createdAt يتم تخزينه كتاريخ
+    protected $casts = [
+        'createdAt' => 'datetime',
+    ];
 }

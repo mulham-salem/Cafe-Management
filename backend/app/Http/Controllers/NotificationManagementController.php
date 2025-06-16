@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 
 class NotificationManagementController extends Controller
 {
+    //    ....................................................manager notification.......................................................................
     public function getAllManagerNotifications(): JsonResponse
     {
         $managerId = auth('manager')->id();
@@ -15,7 +16,7 @@ class NotificationManagementController extends Controller
                    // النوع 1: عروض الموردين
         $offerNotifications = Notification::where('manager_id', $managerId)
             ->where('sent_by', 'supplier')
-            ->where('purpose', 'SupplyOffers')
+            ->where('purpose', 'Supply Offer')
             ->with('user')
             ->orderByDesc('createdAt')
             ->get();
@@ -23,7 +24,7 @@ class NotificationManagementController extends Controller
         // النوع 2: ردود الموردين على الطلبات
         $responseNotifications = Notification::where('manager_id', $managerId)
             ->where('sent_by', 'supplier')
-            ->where('purpose', 'supplierResponseToRequest')
+            ->where('purpose', 'Response For Supply Request')
             ->with('user') // منشان نجيب اسم المورد
             ->orderByDesc('createdAt')
             ->get();
@@ -70,19 +71,7 @@ class NotificationManagementController extends Controller
         ]);
     }
 
-    //    ................................................................................................................................................
-
-    public function markAsSeen($id): JsonResponse
-    {
-        $notification = Notification::findOrFail($id);
-
-        $notification->seen = true;
-        $notification->save();
-
-        return response()->json(['message' => 'Notification marked as seen']);
-    }
-
-    //    ....................................................supplier notification............................................................................................
+    //    ....................................................supplier notification.......................................................................
 
     public function getAllSupplierNotifications(): JsonResponse
     {
@@ -91,7 +80,7 @@ class NotificationManagementController extends Controller
         $offerResponses = Notification::where('user_id', $supplier->id)
             ->with('manager', 'user')
             ->where('sent_by', 'manager')
-            ->where('purpose', 'responseForOffers')
+            ->where('purpose', 'Supply Offer Response')
             ->whereIn('manager_id', [3, 4])
             ->orderByDesc('createdAt')
             ->get()
@@ -119,7 +108,7 @@ class NotificationManagementController extends Controller
 
         $supplyRequests = Notification::where('user_id', $supplier->id)
             ->where('sent_by', 'manager')
-            ->where('purpose', 'supplyRequestFromManager')
+            ->where('purpose', 'Supply Request')
             ->with(['supplyRequest.supplyRequestItems.inventoryItem', 'supplyRequest.manager', 'manager', 'user'])
             ->orderByDesc('createdAt')
             ->get()
@@ -164,13 +153,11 @@ class NotificationManagementController extends Controller
         ]);
     }
 
-    //    ................................................................................................................................................
-
     public function respondToSupplyRequestNotification(Request $request, $notificationId): JsonResponse
     {
         $request->validate([
             'response' => 'required|in:accepted,rejected',
-            "rejection_reason" => 'nullable|string|max:500',
+            'rejection_reason' => 'nullable|string|max:500',
         ]);
 
         $supplier = auth('user')->user();
@@ -178,7 +165,7 @@ class NotificationManagementController extends Controller
 
         if (
             $notification->user_id !== $supplier->id ||
-            $notification->purpose !== 'supplyRequestFromManager'
+            $notification->purpose !== 'Supply Request'
         ) {
             return response()->json(['message' => 'Unauthorized or invalid notification'], 403);
         }
@@ -202,7 +189,7 @@ class NotificationManagementController extends Controller
             'user_id' => $supplier->id,
             'supply_request_id' => $supplyRequest->id,
             'sent_by' => 'supplier',
-            'purpose' => 'supplierResponseToRequest',
+            'purpose' => 'Response For Supply Request',
             'message' => "Supplier responded to your supply request #{$supplyRequest->id} with: {$request->response}".
                         ($request->response === 'rejected' && $request->rejection_reason ? " - Reason: {$request->rejection_reason}" : ''),
             'createdAt' => now(),
@@ -214,4 +201,52 @@ class NotificationManagementController extends Controller
             'status' => $supplyRequest->status,
         ]);
     }
+
+    //    ....................................................customer && employee notifications.......................................................................
+
+    public function getAllCustomerNotifications(): JsonResponse
+    {
+        // التحقق من أن المستخدم موثق
+        $user = auth('user')->user();
+
+        if (!$user) {
+            return response()->json(['message' => 'Unauthorized.'], 401);
+        }
+
+        // جلب الإشعارات حيث user_id يطابق id المستخدم الحالي
+        // يمكنك أيضاً جلب الإشعارات التي ليس لها user_id (عامة للنظام) إذا كنت تريد ذلك
+        $notifications = Notification::where('user_id', $user->id)
+            ->orderBy('createdAt', 'desc') // ترتيب من الأحدث للأقدم
+            ->get();
+
+        // يمكنك تحويل البيانات إذا أردت تنسيقاً معيناً
+        $formattedNotifications = $notifications->map(function ($notification) {
+            return [
+                'id' => $notification->id,
+                'sent_by' => $notification->sent_by,
+                'purpose' => $notification->purpose,
+                'message' => $notification->message,
+                'createdAt' => $notification->createdAt,
+                'seen' => (bool) $notification->seen,
+            ];
+        });
+
+        return response()->json([
+            'message' => 'Notifications fetched successfully.',
+            'notifications' => $formattedNotifications,
+        ], 200);
+    }
+
+    //    ...........................................................................................................................
+    public function markAsSeen($id): JsonResponse
+    {
+        $notification = Notification::findOrFail($id);
+
+        $notification->seen = true;
+        $notification->save();
+
+        return response()->json(['message' => 'Notification marked as seen']);
+    }
 }
+
+

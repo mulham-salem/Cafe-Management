@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBell, faCheckCircle, faClock } from '@fortawesome/free-solid-svg-icons';
 
 const ManagerNotification = () => {
+
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true); // Optional: Show loading state
   const [error, setError] = useState(null);
@@ -80,6 +81,7 @@ const ManagerNotification = () => {
                 <FontAwesomeIcon icon={notif.seen ? faCheckCircle : faClock} />
               </div>
               <div className={styles.content}>
+              <strong className={styles.title}>{notif.purpose}</strong>
                 <p className={styles.message}>{notif.message}</p>
                 <p className={styles.time}>
                   {new Date(notif.createdAt).toLocaleString()}

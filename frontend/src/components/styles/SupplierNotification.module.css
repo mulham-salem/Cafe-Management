@@ -89,6 +89,7 @@
   
   .content {
     flex: 1;
+    margin-top: 8px;
   }
   
   @font-face {
@@ -106,6 +107,16 @@
     margin-bottom: 6px;
   }
   
+  .title {
+    font-size: 1em; /* حجم خط كبير نسبياً */
+    font-weight: bold; /* خط عريض */
+    color:  rgb(15, 7, 2);      /* لون نص داكن */
+    margin-bottom: 15px; /* مسافة تحت العنوان */
+    text-align: center; /* توسيط العنوان (اختياري) */
+    /* يمكنك إضافة المزيد من التنسيقات حسب الحاجة */
+    text-transform: uppercase;  
+  }
+
   .time {
     font-size: 13px;
     color: #777;

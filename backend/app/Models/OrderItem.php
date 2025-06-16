@@ -19,4 +19,10 @@ class OrderItem extends Model
     {
         return $this->belongsTo(Order::class, 'order_id');
     }
+    protected $fillable = [
+        'order_id',
+        'menuItem_id',
+        'quantity',
+        'price',
+    ];
 }

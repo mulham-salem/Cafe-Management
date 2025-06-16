@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\MenuItem;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 class MenuManagementController extends Controller
@@ -143,18 +144,17 @@ class MenuManagementController extends Controller
     {
         $menuItem = MenuItem::findOrFail($id);
 
-        // .................................................................للتدفق البديل المنتاك ....................................................
-        // $activeOrders = \DB::table('order_items')
-        //     ->join('orders', 'order_items.order_id', '=', 'orders.id')
-        //     ->where('order_items.menu_item_id', $id)
-        //     ->where('orders.status', '!=', 'delivered')
-        //     ->exists();
+         $activeOrders = DB::table('order_items')
+             ->join('orders', 'order_items.order_id', '=', 'orders.id')
+             ->where('order_items.menuItem_id', $id)
+             ->where('orders.status', '!=', 'delivered')
+             ->exists();
 
-        // if ($activeOrders) {
-        //     return response()->json([
-        //         'message' => 'لا يمكن حذف عنصر مستخدم في طلبات نشطة'
-        //     ], 403);
-        // }
+         if ($activeOrders) {
+             return response()->json([
+                 'message' => 'Failed to remove item. Because this item used in an active order',
+             ], 403);
+         }
 
         $menuItem->delete();
 

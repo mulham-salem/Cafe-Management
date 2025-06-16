@@ -61,7 +61,7 @@ const SupplierHome = () => {
     const token = sessionStorage.getItem('authToken') || localStorage.getItem('authToken');
 
     try {
-      const response = await axios.post('http://localhost:8000/api/supplier/offers', {
+      const response = await axios.post('http://localhost:8000/api/user/supplier/offers', {
         title,
         delivery_date: deliveryDate,
         note,
@@ -76,6 +76,7 @@ const SupplierHome = () => {
             Authorization: `Bearer ${token}`,
         },
       });
+
       toast.success(response.data.message);
       setTitle("");
       setDeliveryDate("");
@@ -98,7 +99,7 @@ const SupplierHome = () => {
   const fetchMyOffers = async () => {
     const token = sessionStorage.getItem('authToken') || localStorage.getItem('authToken');
     try {
-      const response = await axios.get('http://localhost:8000/api/supplier/view-offers', {
+      const response = await axios.get('http://localhost:8000/api/user/supplier/view-offers', {
         headers: {
             Authorization: `Bearer ${token}`,
         },

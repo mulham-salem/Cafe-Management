@@ -52,7 +52,7 @@ class SupplierController extends Controller
                     'manager_id' => $managerId,
                     'user_id' => $user->id,
                     'sent_by' => 'supplier',
-                    'purpose' => 'SupplyOffers',
+                    'purpose' => 'Supply Offer',
                     'message' => "Supplier {$user->name} submitted a new supply offer (#{$supplyOffer->id})",
                     'createdAt' => now(),
                     'seen' => false,
