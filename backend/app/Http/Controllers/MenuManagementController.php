@@ -36,7 +36,7 @@ class MenuManagementController extends Controller
         'Donut',
         'French Fries',
         'Nachos with Cheese',
-        'Chocolate & strawberry waffle',
+        'Chocolate & Strawberry Waffle',
         'Mint Chocolate Mousse',
     ];
 

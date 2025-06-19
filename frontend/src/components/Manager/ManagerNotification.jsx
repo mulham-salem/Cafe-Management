@@ -86,7 +86,7 @@ const ManagerNotification = () => {
                 <p className={styles.time}>
                   {new Date(notif.createdAt).toLocaleString()}
                 </p>
-                <p className={styles.sender}>From: {notif.sent_by}</p>
+                <p className={styles.sender}>from: {notif.sent_by}</p>
               </div>
             </div>
           ))}

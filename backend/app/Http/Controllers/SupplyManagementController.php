@@ -104,7 +104,7 @@ class SupplyManagementController extends Controller
         }
 
         $offer->status = 'rejected';
-        $offer->note = $request->reason ?? 'Rejected without reason';
+        $offer->rejection_reason = $request->reason ?? 'Rejected without reason';
         $offer->save();
 
         $supplyOffer->note = $offer->note;
@@ -113,7 +113,7 @@ class SupplyManagementController extends Controller
             'user_id' => $supplyOffer->supplier_id,
             'sent_by' => 'manager',
             'purpose' => 'Supply Offer Response',
-            'message' => "Offer has been rejected '{$supplyOffer->title}'. note: {$supplyOffer->note}",
+            'message' => "Offer '{$supplyOffer->title}' has been rejected\nReason: {$offer->rejection_reason}",
             'createdAt' => now(),
             'seen' => false,
         ]);

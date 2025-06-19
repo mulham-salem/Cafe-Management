@@ -28,6 +28,7 @@ const MenuManagement = () => {
   const [editingId, setEditingId] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const formRef = useRef(null);
+  const [loading, setLoading] = useState(true); 
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -67,6 +68,8 @@ const MenuManagement = () => {
       setMenuItems(formattedItems);
     } catch (error) {
       toast.error('Failed to load menu items. Please ensure you are logged in.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -196,7 +199,10 @@ const MenuManagement = () => {
       <h3 className={styles.sectionTitle}>{title}</h3>
       <hr className={styles.sectionDivider} />
       <div className={styles.menuGrid}>
-        {menuItems.filter((item) => item.category === category).length === 0 ? (
+        {loading ? (
+          <p className={styles.emptyText}>Loading...</p>
+        ) :
+        menuItems.filter((item) => item.category === category).length === 0 ? (
           <p className={styles.noItemsMessage}>No menu items available in this category.</p>
         ) : (
           menuItems

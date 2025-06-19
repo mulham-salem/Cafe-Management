@@ -17,14 +17,15 @@ const SupplierHome = () => {
 
   const location = useLocation();
   const currentPath = location.pathname;
-  
+  const [loading, setLoading] = useState(true);
+
   const [activeTab, setActiveTab] = useState(() => {
-    return localStorage.getItem('activeTab') || 'send';
+    return localStorage.getItem('supplier_activeTab') || 'send';
   });
 
   const changeTab = (tab) => {
     setActiveTab(tab);
-    localStorage.setItem('activeTab', tab);
+    localStorage.setItem('supplier_activeTab', tab);
   };
 
   const [title, setTitle] = useState("");
@@ -38,10 +39,11 @@ const SupplierHome = () => {
     setItems([...items, { name: "", quantity: "", unit: "", unitPrice: "" }]);
   };
 
-  const handleItemChange = (index, field, value) => {
-    const newItems = [...items];
-    newItems[index][field] = value;
-    setItems(newItems);
+  const handleItemChange = (id, field, value) => {
+    const updatedItems = items.map(item =>
+      item.id === id ? { ...item, [field]: value } : item
+    );
+    setItems(updatedItems);
   };
 
   const handleSubmit = async (e) => {
@@ -77,7 +79,7 @@ const SupplierHome = () => {
         },
       });
 
-      toast.success(response.data.message);
+      toast.success("Supply offer submitted successfully.");
       setTitle("");
       setDeliveryDate("");
       setNote("");
@@ -108,6 +110,8 @@ const SupplierHome = () => {
     } catch (error) {
       const errorMessage = error.response?.data?.message || "Failed to fetch offers.";
       toast.error(errorMessage);
+    } finally {
+        setLoading(false);
     }
   };
 
@@ -163,6 +167,67 @@ const SupplierHome = () => {
         toast.error("Failed to fetch user name");
     }
   };
+
+  useEffect(() => {
+    const checkNewNotifications = async () => {
+      try {
+        const token = localStorage.getItem("authToken") || sessionStorage.getItem("authToken");
+  
+        const response = await axios.get("http://localhost:8000/api/user/supplier/notifications", {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+  
+        const allNotifications = response.data.notifications;
+  
+        const unseenSupplyOfferResponses = allNotifications.filter(n =>
+          n.seen === 0 && n.purpose === 'Supply Offer Response'
+        );
+  
+        const unseenSupplyRequests = allNotifications.filter(n =>
+          n.seen === 0 && n.purpose === 'Supply Request'
+        );
+  
+        // توست منفصل لكل نوع لو وجد
+        if (unseenSupplyOfferResponses.length > 0) {
+
+          toast.info(`You received ${unseenSupplyOfferResponses.length} response${unseenSupplyOfferResponses.length > 1 ? 's' : ''} for your supply offer.`);
+  
+          // تعليم كمقروءة
+          const ids = unseenSupplyOfferResponses.map(n => n.id);
+          await Promise.all(
+            ids.map(id =>
+              axios.patch(`http://localhost:8000/api/user/supplier/notifications/${id}/seen`, {}, {
+                headers: { Authorization: `Bearer ${token}` }
+              })
+            )
+          );
+        }
+  
+        if (unseenSupplyRequests.length > 0) {
+
+          toast.info(`You received ${unseenSupplyRequests.length} new supply request${unseenSupplyRequests.length > 1 ? 's' : ''}.`);
+  
+          // تعليم كمقروءة
+          const ids = unseenSupplyRequests.map(n => n.id);
+          await Promise.all(
+            ids.map(id =>
+              axios.patch(`http://localhost:8000/api/user/supplier/notifications/${id}/seen`, {}, {
+                headers: { Authorization: `Bearer ${token}` }
+              })
+            )
+          );
+        }
+  
+      } catch (err) {
+        console.error("Failed to load notifications: ", err);
+      }
+    };
+  
+    checkNewNotifications();
+  
+    const interval = setInterval(checkNewNotifications, 10000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className={styles.container}>
@@ -233,37 +298,36 @@ const SupplierHome = () => {
           />
           <input type="datetime-local" value={deliveryDate}
             onChange={(e) => setDeliveryDate(e.target.value)}
-      
             required
           />
           <textarea placeholder="Additional Notes (Optional)" value={note}
             onChange={(e) => setNote(e.target.value)}
           />
           <h4>Items</h4>
-          {items.map((item, index) => (
+          {items.map((item) => (
          
-            <div key={index} className={styles.itemRow}>
+            <div key={item.id} className={styles.itemRow}>
               <input type="text" placeholder="Item Name" value={item.name}
                 onChange={(e) =>
-                  handleItemChange(index, "name", e.target.value)
+                  handleItemChange(item.id, "name", e.target.value)
                 }
               
               />
               <input type="number" placeholder="Quantity" value={item.quantity}
                 onChange={(e) =>
-                  handleItemChange(index, "quantity", e.target.value)
+                  handleItemChange(item.id, "quantity", e.target.value)
                 }
               />
     
               <input type="text" placeholder="Unit" value={item.unit}
                 onChange={(e) =>
-                  handleItemChange(index, "unit", e.target.value)
+                  handleItemChange(item.id, "unit", e.target.value)
                 }
               />
           
               <input type="number" placeholder="Unit Price" value={item.unitPrice}
                 onChange={(e) =>
-                  handleItemChange(index, "unitPrice", e.target.value)
+                  handleItemChange(item.id, "unitPrice", e.target.value)
                 }
               />
             </div>
@@ -285,8 +349,9 @@ const SupplierHome = () => {
 
       {currentPath === "/login/supplier-home"  && activeTab === "view" && (
           <div className={styles.offersList}>
-            
-            {myOffers.length > 0 ? (
+            {loading ? (
+              <p className={styles.emptyText}>Loading...</p>
+            ) : myOffers.length > 0 ? (
                 myOffers.map((offer) => (
                 <div key={offer.id} className={styles.offerCard}>
                     <h3>{offer.title}</h3>
@@ -306,11 +371,11 @@ const SupplierHome = () => {
                     <p>
                     <strong>Status:</strong> {offer.status}
                     </p>
-                    {offer.status === "rejected" && offer.note 
+                    {offer.status === "rejected" && offer.rejection_reason
                     && (
                     <p className={styles.rejection}>
                         <strong>Reason for Rejection:</strong>{" "}
-                        {offer.note}
+                        {offer.rejection_reason}
                     </p>
                     )}
    

@@ -1,7 +1,7 @@
 .pageWrapper {
     width: 100%;
     position: relative;
-    max-height: 80vh;
+    max-height: 85vh;
     overflow-y: auto;
     overflow-x: hidden;
     padding: 30px;
@@ -15,11 +15,11 @@
 
   .pageTitle {
     font-size: 28px;
-    margin: auto;
     font-weight: bold;
     color: #333;
     padding-bottom: 12px;
     border-bottom: 2px solid #333;
+    margin: auto auto 400px auto;
   }
   
   .addBtn {
@@ -35,7 +35,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    bottom: 50px;
+    bottom: 445px;
     left: 88%;
     transition: background 0.3s ease;
   }
@@ -54,12 +54,13 @@
   .card {
     background-color: #fff;
     position: relative;
-    top: 10px;
+    bottom: 420px;
     padding: 18px;
     border-radius: 15px;
     box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
     border-left: 6px solid #4e2214;
     transition: transform 0.3s ease;
+    animation: slideUp 0.8s ease;
   }
   
   .card:hover {
@@ -218,6 +219,15 @@
     transition: ease 0.4s;
   }
   
+  .emptyText {
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 18px;
+    text-align: center;
+    color: #888;
+    position: relative;
+    bottom: 250px;
+  }
+
   @keyframes fadeIn {
     from {
       opacity: 0;

@@ -297,3 +297,20 @@
     border-radius: 8px;
     background-color: #f9f9f9;
   }
+
+  .emptyText {
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 18px;
+    position: relative;
+    left: 380px;
+    color: #888;
+    margin-top: 150px;
+  }
+
+  .emptyText2 {
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 18px;
+    text-align: center;
+    color: #888;
+    margin-top: 150px;
+  }

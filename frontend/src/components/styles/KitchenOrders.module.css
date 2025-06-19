@@ -50,13 +50,23 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    opacity: 0;
     background: #222;
     border-radius: 14px;
     padding: 25px 20px;
     box-shadow: 0 4px 20px rgba(255, 126, 95, 0.2);
+    transform: translateY(40px);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    animation: slideUp 1.0s cubic-bezier(.22,1,.36,1) forwards;
   }
   
+  @keyframes slideUp {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
   .orderCard:hover {
     transform: translateY(-5px);
     box-shadow: 0 6px 25px rgba(255, 126, 95, 0.35);
@@ -64,6 +74,7 @@
   
   .orderHeader {
     display: flex;
+    justify-content: space-between;
     align-items: center;
     gap: 10px;
     font-size: 1.4rem;
@@ -113,6 +124,7 @@
   }
   
   .statusSelect {
+    width: 250px;
     background: #111;
     color: #fff;
     padding: 6px 12px;
@@ -121,8 +133,7 @@
     border: 1px solid #444;
     transition: all 0.4s ease;
     cursor: pointer;
-    position: relative;
-    left: 5px;
+    text-align: center;
   }
   
   .statusSelect:hover {
@@ -136,3 +147,56 @@
     box-shadow: 0 0 8px #ff7e5f99;
   }
   
+  .status {
+    padding: 0.4rem 0.8rem;
+    border-radius: 2rem;
+    text-transform: capitalize;
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #fff;
+  }
+  
+  .status.confirmed {
+    background-color: white;
+    color: black;
+    border: 2px solid black;
+  }
+  
+  .status.preparing {
+    background-color: rgb(255, 255, 0);
+    color: black;
+    border: 2px solid black;
+  }
+  
+  .status.delivered {
+    background-color: blue;
+    color: white;
+    border: 1px solid black;
+  }
+
+  .status.ready {
+    background-color: brown;
+    color: white;
+    border: 1px solid black;
+  }
+
+  .noResults {
+    color: #555;
+    font-size: 1.2rem;
+    position: relative;
+    left: 38rem;
+    top: 6rem;
+    font-weight: bold;
+    font-family: 'Courier New', Courier, monospace;
+  }
+
+  .emptyText {
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 20px;
+    text-align: center;
+    /* position: relative;
+    left: 700px; */
+    color: #888;
+    margin-top: 150px;
+  }
+

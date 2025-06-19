@@ -24,6 +24,7 @@ const UserManagement = () => {
   const [editedUser, setEditedUser] = useState({});
   const [isAssigningPermissions, setIsAssigningPermissions] = useState(false);
   const [userToAssign, setUserToAssign] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const allPermissions = [
     "User Management",
@@ -60,6 +61,8 @@ const UserManagement = () => {
       setUsers(formattedUsers);
     } catch (error) {
       toast.error("Failed to load users.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -307,97 +310,101 @@ const UserManagement = () => {
   return (
     <div className={styles.container}>
       <ToastContainer />
-      {!showInputs && (
-        <button className={styles.createButton} onClick={() => setShowInputs(true)}>
-          <FontAwesomeIcon icon={faPlus} className={styles.icon} />
-          Create New User
-        </button>
-      )}
-  
-      <table className={styles.table}>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Username</th>
-            <th>Password</th>
-            <th>Role</th>
-            <th>Permission</th>
-            <th>Operations</th>
-          </tr>
-        </thead>
-        <tbody>
-          {showInputs && (
+      {loading ? (
+        <p className={styles.emptyText}>Loading...</p>
+      ) : (
+      <>
+        {!showInputs && (
+          <button className={styles.createButton} onClick={() => setShowInputs(true)}>
+            <FontAwesomeIcon icon={faPlus} className={styles.icon} />
+            Create New User
+          </button>
+        )}
+        <table className={styles.table}>
+          <thead>
             <tr>
-              <td className={styles.dash}>—</td>
-              <td><input type="text" name="name" value={newUser.name} onChange={handleInputChange} className={styles.input} /></td>
-              <td><input type="email" name="email" value={newUser.email} onChange={handleInputChange} className={styles.input} /></td>
-              <td><input type="text" name="username" value={newUser.username} onChange={handleInputChange} className={styles.input} /></td>
-              <td><input type="password" name="password" value={newUser.password} onChange={handleInputChange} className={styles.input} /></td>
-              <td className={styles.selectCell}>
-                <select name="role" value={newUser.role} onChange={handleInputChange} className={styles.selectBox}>
-                  <option value="">Select Role</option>
-                  <option value="customer">Customer</option>
-                  <option value="employee">Employee</option>
-                  <option value="supplier">Supplier</option>
-                </select>
-              </td>
-              <td className={styles.dash}>—</td>
-              <td className={styles.actions}>
-                <div className={styles.actionWrapper}>
-                  <FontAwesomeIcon icon={faCheck} className={styles.actionIcon} onClick={handleAddUser} data-action="Add" title="Add" />
-                  <FontAwesomeIcon icon={faTimes} className={styles.actionIcon} onClick={handleCancelEdit} data-action="Cancel" title="Cancel" />
-                </div>
-              </td>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Username</th>
+              <th>Password</th>
+              <th>Role</th>
+              <th>Permission</th>
+              <th>Operations</th>
             </tr>
-          )}
-  
-          {users.map((user) =>
-            editUserId === user.id ? (
-              <tr key={user.id}>
-                <td>{user.id}</td>
-                <td><input name="name" value={editedUser.name} onChange={handleInputEditChange} className={styles.input} /></td>
-                <td><input name="email" value={editedUser.email} onChange={handleInputEditChange} className={styles.input} /></td>
-                <td><input name="username" value={editedUser.username} onChange={handleInputEditChange} className={styles.input} /></td>
-                <td><input type="password" name="password" value={editedUser.password || ""} onChange={handleInputEditChange} className={styles.input} placeholder="Leave blank to keep current" /></td>
-                <td>
-                  <select name="role" value={editedUser.role} onChange={handleInputEditChange} className={styles.selectBox}>
+          </thead>
+          <tbody>
+            {showInputs && (
+              <tr>
+                <td className={styles.dash}>—</td>
+                <td><input type="text" name="name" value={newUser.name} onChange={handleInputChange} className={styles.input} /></td>
+                <td><input type="email" name="email" value={newUser.email} onChange={handleInputChange} className={styles.input} /></td>
+                <td><input type="text" name="username" value={newUser.username} onChange={handleInputChange} className={styles.input} /></td>
+                <td><input type="password" name="password" value={newUser.password} onChange={handleInputChange} className={styles.input} /></td>
+                <td className={styles.selectCell}>
+                  <select name="role" value={newUser.role} onChange={handleInputChange} className={styles.selectBox}>
+                    <option value="">Select Role</option>
                     <option value="customer">Customer</option>
                     <option value="employee">Employee</option>
                     <option value="supplier">Supplier</option>
                   </select>
                 </td>
-                <td>{Array.isArray(editedUser.permission) ? editedUser.permission.join(", ") : editedUser.permission || "—"}</td>
+                <td className={styles.dash}>—</td>
                 <td className={styles.actions}>
                   <div className={styles.actionWrapper}>
-                    <FontAwesomeIcon icon={faCheck} className={styles.actionIcon} onClick={handleSaveEdit} data-action="Save" title="Save" />
+                    <FontAwesomeIcon icon={faCheck} className={styles.actionIcon} onClick={handleAddUser} data-action="Add" title="Add" />
                     <FontAwesomeIcon icon={faTimes} className={styles.actionIcon} onClick={handleCancelEdit} data-action="Cancel" title="Cancel" />
                   </div>
                 </td>
               </tr>
-            ) : (
-              <tr key={user.id}>
-                <td>{user.id}</td>
-                <td>{user.name}</td>
-                <td>{user.email}</td>
-                <td>{user.username}</td>
-                <td>••••••••</td>
-                <td>{user.role}</td>
-                <td>{Array.isArray(user.permission) ? user.permission.join(", ") : user.permission || "—"}</td>
-                <td className={styles.actions}>
-                  <FontAwesomeIcon icon={faEdit} className={styles.actionIcon} onClick={() => handleEditClick(user)} data-action="Edit" title="Edit" />
-                  <FontAwesomeIcon icon={faTrash} className={styles.actionIcon} onClick={() => showDeleteConfirmation(user)} data-action="Delete" title="Delete" />
-                  <FontAwesomeIcon icon={faShieldAlt} className={styles.actionIcon} data-action="Assign Roles" title="Assign Roles"
-                    onClick={() => handleAssignPermissionsClick(user)}
-                  />
-                </td>
-              </tr>
-            )
-          )}
-        </tbody>
-      </table>
-  
+            )}
+        
+            {users.map((user) =>
+              editUserId === user.id ? (
+                <tr key={user.id}>
+                  <td>{user.id}</td>
+                  <td><input name="name" value={editedUser.name} onChange={handleInputEditChange} className={styles.input} /></td>
+                  <td><input name="email" value={editedUser.email} onChange={handleInputEditChange} className={styles.input} /></td>
+                  <td><input name="username" value={editedUser.username} onChange={handleInputEditChange} className={styles.input} /></td>
+                  <td><input type="password" name="password" value={editedUser.password || ""} onChange={handleInputEditChange} className={styles.input} placeholder="Leave blank to keep current" /></td>
+                  <td>
+                    <select name="role" value={editedUser.role} onChange={handleInputEditChange} className={styles.selectBox}>
+                      <option value="customer">Customer</option>
+                      <option value="employee">Employee</option>
+                      <option value="supplier">Supplier</option>
+                    </select>
+                  </td>
+                  <td>{Array.isArray(editedUser.permission) ? editedUser.permission.join(", ") : editedUser.permission || "—"}</td>
+                  <td className={styles.actions}>
+                    <div className={styles.actionWrapper}>
+                      <FontAwesomeIcon icon={faCheck} className={styles.actionIcon} onClick={handleSaveEdit} data-action="Save" title="Save" />
+                      <FontAwesomeIcon icon={faTimes} className={styles.actionIcon} onClick={handleCancelEdit} data-action="Cancel" title="Cancel" />
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+                <tr key={user.id}>
+                  <td>{user.id}</td>
+                  <td>{user.name}</td>
+                  <td>{user.email}</td>
+                  <td>{user.username}</td>
+                  <td>••••••••</td>
+                  <td>{user.role}</td>
+                  <td>{Array.isArray(user.permission) ? user.permission.join(", ") : user.permission || "—"}</td>
+                  <td className={styles.actions}>
+                    <FontAwesomeIcon icon={faEdit} className={styles.actionIcon} onClick={() => handleEditClick(user)} data-action="Edit" title="Edit" />
+                    <FontAwesomeIcon icon={faTrash} className={styles.actionIcon} onClick={() => showDeleteConfirmation(user)} data-action="Delete" title="Delete" />
+                    <FontAwesomeIcon icon={faShieldAlt} className={styles.actionIcon} data-action="Assign Roles" title="Assign Roles"
+                      onClick={() => handleAssignPermissionsClick(user)}
+                    />
+                  </td>
+                </tr>
+              )
+            )}
+          </tbody>
+        </table>
+      </>
+      )}
       {showPermissionPopup && <div className={styles.overlay}></div>}
       {showPermissionPopup && (
         <div className={styles.permissionPopup}>

@@ -51,6 +51,7 @@
     padding: 1.5rem;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     transition: transform 0.4s ease, box-shadow 0.3s ease;
+    animation: slideUp 1.2s ease;
   }
   
   .orderCard:hover {
@@ -195,6 +196,23 @@
     animation: fadeInUp 0.4s ease;
   }
   
+  .emptyOrderList {
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    position: relative;
+    left: 640px;
+    font-size: 1.3rem;
+    color: #666;
+    margin-top: 150px;
+  }
+  
+  .emptyText {
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 20px;
+    position: relative;
+    left: 700px;
+    color: #888;
+    margin-top: 150px;
+  }
   
   .closeOverlay {
     position: absolute;

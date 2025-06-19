@@ -25,6 +25,7 @@ const TableManagement = () => {
   const [newTable, setNewTable] = useState({ number: '', capacity: '' });
   const [showForm, setShowForm] = useState(false);
   const formRef = useRef(null);
+  const [loading, setLoading] = useState(true); 
 
 
   useEffect(() => {
@@ -52,6 +53,8 @@ const TableManagement = () => {
       setTables(response.data.tables); 
     } catch (error) {
       toast.error('Failed to load tables.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -250,6 +253,10 @@ const TableManagement = () => {
   return (
     <div className={styles.container}>
       <ToastContainer />
+      {loading ? (
+        <p className={styles.emptyText}>Loading...</p>
+      ) : (
+      <>
       <div className={styles.headerRow}>
         <button className={styles.addButton} onClick={handleAddClick}>
          <FontAwesomeIcon icon={faPlus} /> Add Table
@@ -311,6 +318,8 @@ const TableManagement = () => {
           ))}
         </tbody>
       </table>
+      </>
+      )}
     </div>
   );
 };

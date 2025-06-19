@@ -99,14 +99,56 @@
     font-style: normal;
   }
 
+  .responseSection {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+  }
+
   .message {
     font-family: 'Jost';
     font-size: 17px;
     font-weight: 500;
     color: #333;
     margin-bottom: 6px;
+    white-space: pre-wrap;
   }
   
+  .status {
+    font-weight: bold;
+    color: #6c63ff;
+  }
+  
+  .rejectionNote {
+    margin-top: 12px;
+    color: #c0392b;
+    font-style: italic;
+    font-weight: 500;
+  }
+  
+  .note {
+    position: relative;
+    bottom: 10px;
+  }
+
+  .itemsSection {
+    position: relative;
+    bottom: 10px;
+    padding: 12px;
+    border-radius: 8px;
+  }
+
+  .itemsSection h4 {
+    margin: auto;
+    position: relative;
+    right: 12px;
+  }
+
+  .itemsSection ul {
+    margin: 5px auto auto auto;
+    padding-left: 0px;
+  }
+
   .title {
     font-size: 1em; /* حجم خط كبير نسبياً */
     font-weight: bold; /* خط عريض */

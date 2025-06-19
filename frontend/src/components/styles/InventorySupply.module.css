@@ -163,6 +163,14 @@
     max-height: 80vh;
   }
   
+  .emptyText {
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 18px;
+    text-align: center;
+    color: #888;
+    margin-top: 100px;
+  }
+  
   .inventortSection {
     background: #fff;
     padding: 25px;
@@ -659,13 +667,14 @@
   .supplyOffersTitle {
     font-size: 28px;
     text-align: left;
+    max-height: 0;
   }
 
   .offerList {
     display: flex;
     flex-direction: column;
     gap: 20px;
-    max-height: 70vh;
+    max-height: 76vh;
     overflow-y: auto;
     scroll-behavior: smooth;
   }

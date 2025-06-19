@@ -5,7 +5,7 @@
     color: #222;
     background-color: #f9f9f9;
     padding-bottom: 60px;
-    max-height: 80vh;
+    max-height: 82vh;
     overflow-y: auto;
     overflow-x: hidden;
   }
@@ -84,12 +84,17 @@
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: 25px;
     margin-top: 20px;
+    max-width: 100%;
+    align-items:stretch;
   }
   
   .menuCard {
     background-color: white;
     border-radius: 12px;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
     box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     transition: transform 0.3s ease;
     position: relative;
@@ -107,13 +112,13 @@
   }
   
   .menuCard h3 {
-    margin: 15px 15px 5px;
+    margin: 20px 15px 5px;
     font-size: 1.1rem;
     text-align: left;
   }
   
   .menuCard p {
-    margin: 0 15px 0px;
+    margin: 15px 15px 0px;
     font-size: 0.9rem;
     color: #555;
     min-height: 40px;
@@ -125,6 +130,7 @@
     padding: 0px 15px 0px;
     font-weight: 600;
     color: #4b2c20;
+    margin-top: auto;
   }
   
   .notAvailable {
@@ -162,9 +168,18 @@
   }
   
   .emptyMenu {
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
     text-align: center;
     font-size: 1.3rem;
     color: #666;
+    margin-top: 40px;
+  }
+
+  .emptyText {
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 18px;
+    text-align: center;
+    color: #888;
     margin-top: 40px;
   }
   

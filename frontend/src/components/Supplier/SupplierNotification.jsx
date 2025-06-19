@@ -117,23 +117,62 @@ const SupplierNotification = () => {
                 <p className={styles.time}>
                   {new Date(notif.createdAt).toLocaleString()}
                 </p>
-                {notif.purpose === 'supplyRequestFromManager' && !notif.seen && (
-                  <div className={styles.responseSection}>
-                    <button className={styles.acceptButton} onClick={() => respond(notif.id, 'accepted')}>
-                      Accept
-                    </button>
-                    <button
-                      className={styles.rejectButton}
-                      onClick={() => {
-                        const reason = prompt('Enter rejection reason (optional):');
-                        respond(notif.id, 'rejected', reason);
-                      }}
-                    >
-                      Reject
-                    </button>
-                  </div>
+                {notif.purpose === 'Supply Request' && (
+                  <>
+                    {/* تفاصيل حالة الطلب دائمًا تظهر تحت الأزرار */}
+                    <div className={styles.detailsSection}>
+
+                      {notif.items && notif.items.length > 0 && (
+                        <div className={styles.itemsSection}>
+                          <h4>Requested Items:</h4>
+                          <ul>
+                            {notif.items.map((item, i) => (
+                              <li key={i}>
+                                <strong>{item.name}</strong> - {item.quantity}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+
+                      {notif.note && (
+                        <div className={styles.note}>
+                          <b>Note: </b><em>{notif.note}</em>
+                        </div>
+                      )}
+
+                      <div className={styles.status}>
+                        Status: <strong>{notif.status}</strong>
+                      </div>
+
+                      {notif.status === 'rejected' && notif.rejection_reason && (
+                        <div className={styles.rejectionNote}>
+                          Rejection Reason: <em>{notif.rejection_reason}</em>
+                        </div>
+                      )}
+
+                    </div>
+
+                      {/* أزرار الرد تظهر فقط إذا الحالة pending */}
+                      {notif.status === 'pending' && (
+                      <div className={styles.responseSection}>
+                        <button className={styles.acceptButton} onClick={() => respond(notif.id, 'accepted')}>
+                          Accept
+                        </button>
+                        <button
+                          className={styles.rejectButton}
+                          onClick={() => {
+                            const reason = prompt('Enter rejection reason (optional):');
+                            respond(notif.id, 'rejected', reason);
+                          }}
+                        >
+                          Reject
+                        </button>
+                      </div>
+                    )}
+                  </>
                 )}
-                <p className={styles.sender}>From: {notif.sent_by }</p>
+                <p className={styles.sender}>from: {notif.sent_by}</p>
               </div>
             </div>
           ))}

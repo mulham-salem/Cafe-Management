@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import useOrderNotifications from '../../hooks/useOrderNotifications';
 import logo from '/logo_1.png';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -38,8 +37,6 @@ const cards = [
 ];
 
 const CustomerHome = () => {
-
-  useOrderNotifications();  
 
   useEffect(() => {
    document.title = "Cafe Delights - Customer Home";

@@ -268,6 +268,13 @@
     grid-column: 1 / -1; 
   }
 
+  .emptyText {
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 18px;
+    margin-left: 700px;
+    color: #888;
+  }
+
   @keyframes fadeInDown {
     from {
       opacity: 0;

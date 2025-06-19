@@ -17,7 +17,7 @@ class Notification extends Model
 
     public function manager(): BelongsTo
     {
-        return $this->belongsTo(Manager::class, 'user_id');
+        return $this->belongsTo(Manager::class, 'manager_id');
     }
 
     public function supplyRequest()

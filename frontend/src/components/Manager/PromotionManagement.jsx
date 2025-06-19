@@ -19,7 +19,7 @@ const PromotionManagement = () => {
   const [endDate, setEndDate] = useState('');
   const [description, setDescription] = useState('');
   const [products, setProducts] = useState('');
-
+  const [loading, setLoading] = useState(true);
 
   const token = sessionStorage.getItem('authToken') || localStorage.getItem('authToken');
   const axiosInstance = axios.create({
@@ -50,6 +50,8 @@ const PromotionManagement = () => {
       setPromotions(formattedPromotions);
     } catch (error) {
       toast.error('Failed to load promotions.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -163,6 +165,9 @@ const PromotionManagement = () => {
         <FontAwesomeIcon icon={faPlus} /> Add Promotion
       </button>
 
+      {loading ? (
+        <p className={styles.emptyText}>Loading...</p>
+      ) : (
       <div className={styles.cardGrid}>
         {promotions.map((promo) => (
           <div key={promo.id} className={styles.card}>
@@ -185,7 +190,7 @@ const PromotionManagement = () => {
           </div>
         ))}
       </div>
-
+      )}
       {showModal && (
         <div className={`${styles.overlay} ${styles.fadeInOverlay}`}>
           <div className={`${styles.modal} ${styles.slideUpModal}`}>

@@ -192,6 +192,7 @@
   font-family: 'Poppins', sans-serif !important;
   display: block !important;
   text-align: center !important;
+  white-space: nowrap !important;
 }
 
 .ready-custom-toast-body {

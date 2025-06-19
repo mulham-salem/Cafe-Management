@@ -33,7 +33,7 @@ class InventoryManagementController extends Controller
     {
         if ($item->quantity <= $item->threshold_level) {
             $managerId = auth('manager')->id();
-            $message = "{$item->name} only has {$item->quantity} {$item->unit} left (threshold: {$item->threshold_level} {$item->unit}).";
+            $message = "{$item->name} only has {$item->quantity} {$item->unit} left.\n(threshold: {$item->threshold_level} {$item->unit}).";
 
             // التحقق مما إذا كان هناك إشعار غير مقروء بنفس الرسالة والهدف
             // هذا يمنع تكرار الإشعارات لنفس حالة النقص

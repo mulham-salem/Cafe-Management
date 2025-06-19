@@ -135,7 +135,7 @@ const EmployeeHome = () => {
         </div>
         <div className={styles.rightSection}>
 
-        {location.pathname.includes('/user-order') && (
+        {(location.pathname.includes('/user-order') || location.pathname.includes('/kitchen-order')) && (
             <div className={styles.searchContainer}>
             <FontAwesomeIcon icon={faSearch} className={styles.searchIcon} />
             <input

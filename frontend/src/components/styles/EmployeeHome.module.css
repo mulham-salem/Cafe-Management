@@ -238,7 +238,7 @@
 }
 
 .searchContainer {
-  display: flex;
+  display:flex;
   align-items: center;
   background-color: white;
   padding: 8px 10px;

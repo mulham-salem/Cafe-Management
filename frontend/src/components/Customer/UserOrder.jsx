@@ -29,6 +29,7 @@ const UserOrder = () => {
   const [showInvoiceOverlay, setShowInvoiceOverlay] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [loading, setLoading] = useState(true);
+
   // Function to fetch orders from the backend
   const fetchOrders = async () => {
     try {
@@ -152,7 +153,7 @@ const UserOrder = () => {
       // Map backend invoice data to frontend structure
       const mappedInvoice = {
         id: order.id, // Use order ID from the card
-        customerName: invoiceData.customer,
+        customerName: invoiceData.username,
         items: invoiceData.items.map(item => ({
           name: item.menu_item,
           quantity: item.quantity,

@@ -80,6 +80,7 @@ Route::middleware(['auth:sanctum', 'checkUserRole:customer'])->prefix('user/cust
 
     Route::delete('/orders/cancel/{id}', [OrderManagementController::class, 'cancelOrder']);
     Route::post('/orders/confirm/{id}', [OrderManagementController::class, 'confirmOrder']);
+    Route::get('/orders/short', [OrderManagementController::class, 'getCustomerOrdersShort']);
 
     //** customer notification **//
     Route::get('/notifications', [NotificationManagementController::class, 'getAllCustomerNotifications']);
@@ -88,14 +89,14 @@ Route::middleware(['auth:sanctum', 'checkUserRole:customer'])->prefix('user/cust
 
 // ......................................................Employee Routes ......................................................
 
-Route::middleware(['auth:sanctum', 'checkUserRole:Employee'])->prefix('user/employee')->group(function () {
+Route::middleware(['auth:sanctum', 'checkUserRole:employee'])->prefix('user/employee')->group(function () {
 
-    Route::get('/menuitem', [OrderManagementController::class, 'fetchMenuItems']);
-    Route::post('/orders/create', [OrderManagementController::class, 'createOrder']);
-    Route::match(['get', 'put'], '/orders/{order}/edit', [OrderManagementController::class, 'editOrder']);
+    Route::get('/menuitem', [OrderManagementController::class, 'fetchMenuItems']);//Done
+    Route::post('/orders/create', [OrderManagementController::class, 'createOrder']);//Done
+    Route::match(['get', 'put'], '/orders/{order}/edit', [OrderManagementController::class, 'editOrder']);//Done
 
-    Route::get('/myOrders', [OrderManagementController::class, 'getCustomerOrders']);
-    Route::get('/myOrders/invoice/{id}', [OrderManagementController::class, 'viewOrderBill']);
+    Route::get('/myOrders', [OrderManagementController::class, 'getCustomerOrders']);//Done
+    Route::get('/myOrders/invoice/{id}', [OrderManagementController::class, 'viewOrderBill']);//Done
 
     Route::get('/kitchen/orders', [OrderManagementController::class, 'getKitchenOrders']);
     Route::put('/kitchen/orders/{orderId}/status', [OrderManagementController::class, 'updateOrderStatus']);

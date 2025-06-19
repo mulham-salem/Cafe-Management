@@ -8,9 +8,20 @@ import "react-toastify/dist/ReactToastify.css";
 import "../styles/toastStyles.css";
 import { useContext } from 'react';
 import { OrderSearchContext } from './EmployeeHome';
+import axios from 'axios'; // Import Axios
 
 
 const UserOrderEmp = () => {
+
+  // Get the token from sessionStorage or localStorage
+  const token = sessionStorage.getItem('authToken') || localStorage.getItem('authToken');
+
+  // Configure Axios defaults
+  axios.defaults.withCredentials = true;
+  axios.defaults.baseURL = 'http://localhost:8000/api'; // Adjust your API base URL if different
+  axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  axios.defaults.headers.post['Content-Type'] = 'application/json';
+  axios.defaults.headers.put['Content-Type'] = 'application/json';
 
   useEffect(() => {
     document.title = "Cafe Delights - User Orders";
@@ -19,10 +30,46 @@ const UserOrderEmp = () => {
   const [orders, setOrders] = useState([]);
   const [showInvoiceOverlay, setShowInvoiceOverlay] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [isSearching, setIsSearching] = useState(false);
   const navigate = useNavigate();
 
+  // Function to fetch orders from the backend
+  const fetchOrders = async () => {
+    try {
+      const response = await axios.get('/user/employee/myOrders');
+      // Map the backend data structure to match the frontend's expectations
+      const fetchedOrders = response.data.data.map(order => ({
+        id: order.order_id,
+        status: order.status,
+        createdAt: new Date(order.created_at).toLocaleString(), // Format date
+        canShowBill: order.can_show_bill,
+        // Backend's getCustomerOrders doesn't return 'note' or 'items' array directly
+        // We will pass an empty array for items and a placeholder for note
+        // The full items list will be fetched when viewing the invoice.
+        itemsCount: order.item_count, 
+        note: order.note, // Placeholder, as note is not in getCustomerOrders response
+      }));
+      setOrders(fetchedOrders);
+    } catch (error) {
+      if (error.response && error.response.status === 404) {
+        setOrders([]); // No orders found
+      } else {
+        toast.error('Failed to load orders. Please try again.');
+        console.error('Error fetching orders:', error);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch orders on component mount
+  useEffect(() => {
+    fetchOrders();
+  }, []);
+
   const handleEditOrder = (order) => {
-    navigate('/login/customer-home/menu-order', {
+    navigate('/login/employee-home/menu-order', {
         state: {
             editMode: true,
             orderToEdit: order,
@@ -36,12 +83,24 @@ const UserOrderEmp = () => {
           Are you sure you want to cancel this order?
           <div className="toast-buttons-order">
             <button
-              onClick={() => {
-                const updatedOrders = orders.filter((order) => order.id !== orderId);
-                setOrders(updatedOrders);
-                localStorage.setItem('orders', JSON.stringify(updatedOrders));
-                toast.dismiss(t.id);
-                toast.success('Order cancelled successfully!');
+              onClick={async () => { // Make async to await API call
+                try {
+                  // Send DELETE request to cancel the order
+                  // Assumes backend route is /user/customer/orders/cancel/{id}
+                  await axios.delete(`/user/employee/orders/cancel/${orderId}`);
+                  
+                  // If successful, update the local state
+                  const updatedOrders = orders.filter((order) => order.id !== orderId);
+                  setOrders(updatedOrders);
+                  
+                  toast.dismiss(t.id);
+                  toast.success('Order cancelled successfully!');
+                } catch (error) {
+                  toast.dismiss(t.id);
+                  const errorMessage = error.response?.data?.message || 'Failed to cancel order.';
+                  toast.error(errorMessage);
+                  console.error('Error cancelling order:', error);
+                }
               }}
               className="toast-btn-order confirm-btn-order"
             >
@@ -65,41 +124,108 @@ const UserOrderEmp = () => {
         className: 'custom-confirm-toast',
       }
     );
-    
   };
 
-  const handleConfirmOrder = (orderId) => {
-    const updatedOrders = orders.map((order) =>
-      order.id === orderId ? { ...order, status: 'confirmed' } : order
-    );
-    setOrders(updatedOrders);
-    localStorage.setItem('orders', JSON.stringify(updatedOrders));
-    toast.success('Order confirmed successfully!');
+  const handleConfirmOrder = async (orderId) => { // Make async
+    try {
+      // Send POST request to confirm the order
+      // Assumes backend route is /user/customer/orders/confirm/{id}
+      await axios.post(`/user/employee/orders/confirm/${orderId}`);
+      
+      // If successful, update the local state to 'processing' (as per backend logic)
+      const updatedOrders = orders.map((order) =>
+        order.id === orderId ? { ...order, status: 'confirmed' } : order
+      );
+      setOrders(updatedOrders);
+      toast.success('Order confirmed successfully!');
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || 'Failed to confirm order.';
+      toast.error(errorMessage);
+      console.error('Error confirming order:', error);
+    }
   };
 
-  const handleShowInvoice = (order) => {
-    setSelectedInvoice(order);
-    setShowInvoiceOverlay(true);
+  const handleShowInvoice = async (order) => { // Make async
+    try {
+      // Fetch invoice details from the backend
+      const response = await axios.get(`/user/employee/myOrders/invoice/${order.id}`);
+      const invoiceData = response.data;
+
+      // Map backend invoice data to frontend structure
+      const mappedInvoice = {
+        id: order.id, // Use order ID from the card
+        customerName: invoiceData.username,
+        items: invoiceData.items.map(item => ({
+          name: item.menu_item,
+          quantity: item.quantity,
+          price: item.price / item.quantity, // Calculate unit price if total price is provided
+        })),
+        totalPrice: invoiceData.total_price, // Use total_price from backend
+      };
+
+      setSelectedInvoice(mappedInvoice);
+      setShowInvoiceOverlay(true);
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || 'Failed to fetch invoice.';
+      toast.error(errorMessage);
+      console.error('Error fetching invoice:', error);
+    }
   };
   
   const handleCloseInvoice = () => {
     setSelectedInvoice(null);
     setShowInvoiceOverlay(false);
   };
-  
-
-  useEffect(() => {
-    const storedOrders = localStorage.getItem('orders');
-    if (storedOrders) {
-      setOrders(JSON.parse(storedOrders));
-    }
-  }, []);
-  
+    
+  // حالة للتعامل مع الطلبات المفلترة بالبحث
+  const [filteredOrders, setFilteredOrders] = useState([]);
   const searchTerm = useContext(OrderSearchContext);
 
-  const filteredOrders = orders.filter((order) =>
-    order.id.toString().includes(searchTerm)
-  );
+  // تحديث الطلبات المفلترة عند تغيير الـ searchTerm أو الـ orders
+  useEffect(() => {
+    if (searchTerm.trim() === '') {
+      setFilteredOrders(orders);
+      setIsSearching(false);
+    } else {
+      setIsSearching(true);
+      // جلب طلب واحد بالـ ID من الـ API للبحث
+      const searchSingleOrder = async () => {
+        try {
+          const response = await axios.get(`http://localhost:8000/api/user/employee/orders/search?order_id=${searchTerm}`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          const fetchedOrder = response.data.data;
+          setFilteredOrders([{
+            id: fetchedOrder.order_id,
+            status: fetchedOrder.status,
+            note: fetchedOrder.note,
+            createdAt: new Date(fetchedOrder.created_at).toLocaleString(), // Format date
+            itemsCount: fetchedOrder.item_count, 
+          }]);
+        } catch (error) {
+          console.error('Error searching order:', error);
+          if (error.response && error.response.status === 404) {
+            setFilteredOrders([]); // لا يوجد طلب مطابق
+          } else {
+            toast.error("Failed to search order. Please try again.");
+          }
+        } finally {
+          setIsSearching(false);
+        }
+      };
+
+      const handler = setTimeout(() => {
+        searchSingleOrder();
+      }, 500);
+
+      return () => {
+        clearTimeout(handler);
+      };
+    }
+  }, [searchTerm, orders]); //  يعتمد على searchTerm و orders
+  
   
   return (
     <div className={styles.ordersPage}>
@@ -107,55 +233,104 @@ const UserOrderEmp = () => {
       <h1 className={styles.pageTitle}><FontAwesomeIcon icon={faMugHot} className={`${styles.icon} ${styles.floatingIcon}`}/>
         My Orders
       </h1>
+      
       <div className={styles.ordersGrid}>
-      {filteredOrders.length > 0 ? ( 
-        filteredOrders.map((order) => (
-          <div key={order.id} className={styles.orderCard}>
-            <div className={styles.orderHeader}>
-              <span>Order #{order.id}</span>
-              <span className={`${styles.status} ${styles[order.status.toLowerCase()]}`}>
-                {order.status}
-              </span>
-            </div>
+      {loading ? (
+        <p className={styles.emptyText}>Loading...</p>
+      ) : isSearching ? (
+        <p className={styles.emptyText}>Searching...</p>
+      ) : searchTerm.trim() !== '' ? (
+        filteredOrders.length > 0 ? (
+          filteredOrders.map((order) => (
+            <div key={order.id} className={styles.orderCard}>
+              <div className={styles.orderHeader}>
+                <span>Order #{order.id}</span>
+                <span className={`${styles.status} ${styles[order.status]}`}>
+                  {order.status}
+                </span>
+              </div>
 
-            <div className={styles.orderBody}>
-              <p><strong>Date:</strong> {order.createdAt}</p>
-              <p><strong>Note:</strong> {order.note || '—'}</p>
-              <p><strong>Items:</strong> {order.items?.length || 0}</p>
-            </div>
+              <div className={styles.orderBody}>
+                <p><strong>Date:</strong> {order.createdAt}</p>
+                <p><strong>Note:</strong> {order.note || '—'}</p>
+                <p><strong>Items:</strong> {order.itemsCount}</p>
+              </div>
 
-            <div className={styles.actions}>
+              <div className={styles.actions}>
 
-              {order.status === 'pending' && (
-              <button className={styles.editBtn} onClick={() => handleEditOrder(order)}>
-                <FontAwesomeIcon icon={faPen} /> Edit
-              </button>
-              )}
-
-              {order.status === 'pending' && (
-              <button className={styles.cancelBtn} onClick={() => handleCancelOrder(order.id)}>
-                <FontAwesomeIcon icon={faTrash} /> Cancel
-              </button>
-              )}
-
-              {order.status === 'pending' && (
-                <button className={styles.confirmBtn} onClick={() => handleConfirmOrder(order.id)}>
-                  <FontAwesomeIcon icon={faCheck} /> Confirm
+                {order.status === 'pending' && (
+                <button className={styles.editBtn} onClick={() => handleEditOrder(order)}>
+                  <FontAwesomeIcon icon={faPen} /> Edit
                 </button>
-              )}
+                )}
 
-              {order.status === 'delivered' && (
-                <button className={styles.invoiceBtn} onClick={() => handleShowInvoice(order)}>
-                  <FontAwesomeIcon icon={faReceipt} /> Invoice
+                {order.status === 'pending' && (
+                <button className={styles.cancelBtn} onClick={() => handleCancelOrder(order.id)}>
+                  <FontAwesomeIcon icon={faTrash} /> Cancel
                 </button>
-              )}
+                )}
+
+                {order.status === 'pending' && (
+                  <button className={styles.confirmBtn} onClick={() => handleConfirmOrder(order.id)}>
+                    <FontAwesomeIcon icon={faCheck} /> Confirm
+                  </button>
+                )}
+
+                {/* Only show invoice button if canShowBill is true */}
+                {order.canShowBill && ( 
+                    <button className={styles.invoiceBtn} onClick={() => handleShowInvoice(order)}>
+                      <FontAwesomeIcon icon={faReceipt} /> Invoice
+                    </button>
+                )}
+              </div>
             </div>
-          </div>
           ))
         ) : (
           <p className={styles.noResults}>No matching orders found.</p>
+        )
+        ) : orders.length === 0 ? (
+          <p className={styles.emptyOrderList}>No orders to display.</p>
+        ) : (
+          orders.map((order) => (
+            <div key={order.id} className={styles.orderCard}>
+              <div className={styles.orderHeader}>
+                <span>Order #{order.id}</span>
+                <span className={`${styles.status} ${styles[order.status]}`}>
+                  {order.status}
+                </span>
+              </div>
+
+              <div className={styles.orderBody}>
+                <p><strong>Date:</strong> {order.createdAt}</p>
+                <p><strong>Note:</strong> {order.note || '—'}</p>
+                <p><strong>Items:</strong> {order.itemsCount}</p>
+              </div>
+
+              <div className={styles.actions}>
+                {order.status === 'pending' && (
+                  <>
+                    <button className={styles.editBtn} onClick={() => handleEditOrder(order)}>
+                      <FontAwesomeIcon icon={faPen} /> Edit
+                    </button>
+                    <button className={styles.cancelBtn} onClick={() => handleCancelOrder(order.id)}>
+                      <FontAwesomeIcon icon={faTrash} /> Cancel
+                    </button>
+                    <button className={styles.confirmBtn} onClick={() => handleConfirmOrder(order.id)}>
+                      <FontAwesomeIcon icon={faCheck} /> Confirm
+                    </button>
+                  </>
+                )}
+                {order.canShowBill && (
+                  <button className={styles.invoiceBtn} onClick={() => handleShowInvoice(order)}>
+                    <FontAwesomeIcon icon={faReceipt} /> Invoice
+                  </button>
+                )}
+              </div>
+            </div>
+          ))
         )}
       </div>
+
 
       {showInvoiceOverlay && selectedInvoice && (
        <div className={styles.invoiceOverlay}>
@@ -163,7 +338,7 @@ const UserOrderEmp = () => {
            <button className={styles.closeOverlay} onClick={handleCloseInvoice}>×</button>
            <h2>Invoice for Order #{selectedInvoice.id}</h2>
 
-           <p><strong>Customer:</strong> {selectedInvoice.customerName || 'N/A'}</p>
+           <p><strong>Name:</strong> {selectedInvoice.customerName || 'N/A'}</p>
            <ul className={styles.invoiceItems}>
               {selectedInvoice.items.map((item, index) => (
                 <li key={index}>

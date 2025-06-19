@@ -1,7 +1,6 @@
-$manager = new \App\Models\Manager;
-$manager->name = 'ManagerAdnan';
-$manager->username = 'ManagerAdnan';
-$manager->email = 'adminA@example.com';
-$manager->password = bcrypt('mcadnan2003');
-$manager->remember_token = \Illuminate\Support\Str::random(60);
-$manager->save();
+$table = new \App\Models\Table;
+$table->number = 1;
+$table->capacity = 5;
+$table->status = 'avalibale';
+$table->manager_id = 1;
+$table->save();

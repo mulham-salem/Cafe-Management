@@ -56,8 +56,6 @@ class NotificationManagementController extends Controller
                 // اسم المرسل
                 if ($notification->sent_by === 'system') {
                     $data['sent_by'] = 'System';
-                } elseif ($notification->sent_by === 'manager' && $notification->manager) {
-                    $data['sent_by'] = $notification->manager->name;
                 } elseif ($notification->sent_by === 'supplier' && $notification->user) {
                     $data['sent_by'] = $notification->user->name;
                 } else {
@@ -78,10 +76,10 @@ class NotificationManagementController extends Controller
         $supplier = auth('user')->user();
 
         $offerResponses = Notification::where('user_id', $supplier->id)
-            ->with('manager', 'user')
+            ->with('manager')
             ->where('sent_by', 'manager')
             ->where('purpose', 'Supply Offer Response')
-            ->whereIn('manager_id', [3, 4])
+            ->whereIn('manager_id', [1, 2])
             ->orderByDesc('createdAt')
             ->get()
             ->map(function ($notification) {
@@ -91,17 +89,8 @@ class NotificationManagementController extends Controller
                     'seen' => $notification->seen,
                     'createdAt' => $notification->createdAt,
                     'purpose' => $notification->purpose,
+                    'sent_by' => $notification->manager->name,
                 ];
-                                // اسم المرسل
-                if ($notification->sent_by === 'system') {
-                    $data['sent_by'] = 'System';
-                } elseif ($notification->sent_by === 'manager' && $notification->manager) {
-                    $data['sent_by'] = $notification->manager->name;
-                } elseif ($notification->sent_by === 'supplier' && $notification->user) {
-                    $data['sent_by'] = $notification->user->name;
-                } else {
-                    $data['sent_by'] = 'Unknown';
-                }
                 return $data;
             })
         ->toArray(); // نحوله لـ array عادي
@@ -119,26 +108,17 @@ class NotificationManagementController extends Controller
                     'seen' => $notification->seen,
                     'createdAt' => $notification->createdAt,
                     'purpose' => $notification->purpose,
+                    'sent_by' => $notification->manager->name,
                     'status' => optional($notification->supplyRequest)->status,
                     'note' => optional($notification->supplyRequest)->note,
+                    'rejection_reason' => optional($notification->supplyRequest)->rejection_reason,
                     'items' => optional($notification->supplyRequest)->supplyRequestItems->map(function ($item) {
                         return [
                             'name' => $item->inventoryItem->name ?? 'Unknown Item',
                             'quantity' => $item->quantity,
                         ];
                     }),
-                    'manager_name' => optional($notification->supplyRequest->manager)->user->name ?? 'Unknown Manager',
                 ];
-                // اسم المرسل
-                if ($notification->sent_by === 'system') {
-                    $data['sent_by'] = 'System';
-                } elseif ($notification->sent_by === 'manager' && $notification->manager) {
-                    $data['sent_by'] = $notification->manager->name;
-                } elseif ($notification->sent_by === 'supplier' && $notification->user) {
-                    $data['sent_by'] = $notification->user->name;
-                } else {
-                    $data['sent_by'] = 'Unknown';
-                }
                 return $data;
             })
             ->toArray(); // نحوله لـ array عادي
@@ -179,7 +159,7 @@ class NotificationManagementController extends Controller
         $supplyRequest->status = $request->response;
 
         if ($request->response === 'rejected') {
-            $supplyRequest->note = $request->note;
+            $supplyRequest->rejection_reason = $request->rejection_reason;
         }
 
         $supplyRequest->save();
@@ -190,8 +170,8 @@ class NotificationManagementController extends Controller
             'supply_request_id' => $supplyRequest->id,
             'sent_by' => 'supplier',
             'purpose' => 'Response For Supply Request',
-            'message' => "Supplier responded to your supply request #{$supplyRequest->id} with: {$request->response}".
-                        ($request->response === 'rejected' && $request->rejection_reason ? " - Reason: {$request->rejection_reason}" : ''),
+            'message' => "Supplier responded to your supply request #{$supplyRequest->id} with: {$request->response}\n".
+                ($request->response === 'rejected' && $request->rejection_reason ? "Reason: {$request->rejection_reason}" : ''),
             'createdAt' => now(),
             'seen' => false,
         ]);

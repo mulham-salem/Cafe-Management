@@ -46,6 +46,8 @@ const InventorySupply = () => {
   const [threshold, setThreshold] = useState('');
 
   const [editItem, setEditItem] = useState(null);
+  const [loadingInventory, setLoadingInventory] = useState(true);
+  const [loadingOffer, setLoadingOffer] = useState(true);
 
     // دالة لجلب المخزون من الـ API
     const fetchInventory = async () => {
@@ -55,6 +57,8 @@ const InventorySupply = () => {
       } catch (error) {
         console.error('Error fetching inventory:', error);
         toast.error('Failed to load inventory items.');
+      } finally {
+        setLoadingInventory(false);
       }
     };
   
@@ -201,6 +205,8 @@ const InventorySupply = () => {
       } catch (error) {
         toast.error("Failed to fetch initial data.");
         console.error("Error fetching initial data:", error);
+      } finally {
+        setLoadingOffer(false);
       }
     };
     fetchInitialData();
@@ -343,7 +349,7 @@ const InventorySupply = () => {
         itemCalculatedPrices: itemCalculatedPricesString,
       };
       setBills([...bills, newBill]); // 
-      toast.success("🧾 Purchase Bill Saved! and Inventory Updated"); // 
+      toast.success(<>🧾 Purchase Bill Saved! <br/> and Inventory Updated</>); // 
       setShowBillModal(false); // 
       setSelectedOfferId(''); // 
       setBillDate(''); // 
@@ -404,7 +410,9 @@ const InventorySupply = () => {
             <button className={styles.backBtn} onClick={() => changeTab(null)}>
               <FontAwesomeIcon icon={faArrowRotateBack} /> Back to Main
             </button>
-
+            {loadingInventory ? (
+              <p className={styles.emptyText}>Loading...</p>
+            ) : (
             <table className={`${styles.table} ${styles.fadeInOverlay}`}>
               <thead>
                 <tr>
@@ -446,7 +454,7 @@ const InventorySupply = () => {
                 ))}
               </tbody>
             </table>
-
+            )}
             {showAddItemModal && (
               <div className={`${styles.overlay} ${styles.fadeInOverlay}`}>
                 <div className={`${styles.modal} ${styles.slideUpModal}`}>
@@ -578,6 +586,11 @@ const InventorySupply = () => {
             <button className={styles.backBtn3} onClick={() => changeTab('supply')}>
               <FontAwesomeIcon icon={faArrowRotateBack} /> Back to Main
             </button>
+            {loadingOffer ? (
+              <p className={styles.emptyText}>Loading...</p>
+            ) : offers.length === 0 ? (
+              <p className={styles.emptyText}>No offers to display.</p>
+            ) : (
             <div className={`${styles.offerList} ${styles.fadeInOverlay}`}>
             {offers.map((offer) => (
                 <div key={offer.id} className={styles.offerCard}>
@@ -613,6 +626,7 @@ const InventorySupply = () => {
                 </div>
             ))}
             </div>
+            )}
         </section>
         )}
 

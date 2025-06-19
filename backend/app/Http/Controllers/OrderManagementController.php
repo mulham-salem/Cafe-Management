@@ -7,10 +7,12 @@ use App\Models\MenuItem;
 use App\Models\Notification;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\User;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
 class OrderManagementController extends Controller
@@ -60,6 +62,7 @@ class OrderManagementController extends Controller
         ]);
 
         $user = auth('user')->user();
+
         $column = $user->role === 'employee' ? 'employee_id' : 'customer_id';
 
         DB::beginTransaction();
@@ -107,12 +110,13 @@ class OrderManagementController extends Controller
     public function getCustomerOrders(): JsonResponse //3
     {
         $user = auth('user')->user();
-        $column = $user->role === 'employee' ? 'employee_id' : 'customer_id';
+        $query = Order::with(['orderItems.menuItem', 'bill']);
 
-        $orders = Order::with(['orderItems.menuItem', 'bill'])
-            ->where($column, $user->id)
-            ->orderByDesc('created_at')
-            ->get();
+        if ($user->role === 'customer') {
+            $query->where('customer_id', $user->id);
+        }
+
+        $orders = $query->orderByDesc('created_at')->get();
 
         if ($orders->isEmpty()) {
             return response()->json(['message' => 'No orders found'], 404);
@@ -135,12 +139,18 @@ class OrderManagementController extends Controller
     public function viewOrderBill($orderId): JsonResponse //4
     {
         $user = auth('user')->user();
-        $column = $user->role === 'employee' ? 'employee_id' : 'customer_id';
 
-        $order = Order::with(['orderItems.menuItem', 'bill'])
-            ->where('id', $orderId)
-            ->where($column, $user->id)
-            ->first();
+        $orderQuery = Order::with(['orderItems.menuItem', 'bill', 'customer.user', 'employee.user'])
+                    ->where('id', $orderId);
+
+        if ($user->role === 'customer') {
+            $customerId = optional($user->customer)->id;
+            $orderQuery->where('customer_id', $customerId);
+        }
+
+        // مافي شرط إضافي للموظف: بيشوف أي فاتورة لأي طلب
+
+        $order = $orderQuery->first();
 
         if (! $order) {
             return response()->json(['message' => "Order isn't existed or unavailable"], 404);
@@ -150,17 +160,25 @@ class OrderManagementController extends Controller
             return response()->json(['message' => "Order isn't delivered yet ,can't show invoice now "], 403);
         }
 
+        if ($order->employee_id) {
+            $username = optional($order->employee)->user->name ?? 'Unknown Employee';
+        } elseif ($order->customer_id) {
+            $username = optional($order->customer)->user->name ?? 'Unknown Customer';
+        } else {
+            $username = 'Unknown';
+        }
+
         return response()->json([
             'message' => "Bill for order #{$order->id}",
-            'username' => $user->role === 'employee' ? ($order->employee->name ?? 'Unknown') : ($order->customer->name ?? 'Unknown'),
+            'username' => $username,
             'items' => $order->orderItems->map(function ($item) {
-                return [
-                    'menu_item' => $item->menuItem->name,
-                    'quantity' => $item->quantity,
-                    'price' => $item->quantity * $item->unit_price,
-                ];
+            return [
+                'menu_item' => $item->menuItem->name,
+                'quantity' => $item->quantity,
+                'price' => $item->price,
+            ];
             }),
-            'total_price' => $order->bill->total_price,
+            'total_price' => $order->bill->total_amount,
         ]);
     }
 
@@ -169,13 +187,18 @@ class OrderManagementController extends Controller
         $user = auth('user')->user();
         $column = $user->role === 'employee' ? 'employee_id' : 'customer_id';
 
-        $order = Order::with('orderItems.menuItem')
+        $query = Order::with('orderItems.menuItem')
             ->where('id', $orderId)
-            ->where($column, $user->id)
-            ->where('status', 'pending')
-            ->first();
+            ->where('status', 'pending');
 
-        if (! $order) {
+        if ($user->role !== 'employee') {
+            $query->where('customer_id', $user->id); // فقط الزبون نتحقق إنه صاحب الطلب
+        }
+
+        $order = $query->first();
+
+
+        if (! $order && $user->role !== 'employee') {
             return response()->json([
                 'message' => 'Can only edit unconfirmed orders or this order not yours',
             ], 403);
@@ -277,7 +300,7 @@ class OrderManagementController extends Controller
             ($user->role === 'employee' && $order->employee_id === $user->id) ||
             ($user->role === 'customer' && $order->customer_id === $user->id);
 
-        if (! $hasPermission) {
+        if (! $hasPermission && $user->role !== 'employee') {
             return response()->json([
                 'message' => "You don't have permission to cancel this order.",
             ], 403);
@@ -364,13 +387,13 @@ class OrderManagementController extends Controller
     }
 
 
-    //----------------------------------------------------Employee Section---------------------------------------------------//
+    //----------------------------------------------------Employee Only---------------------------------------------------//
 
     public function updateOrderStatus(Request $request, $orderId): JsonResponse
     {
         $employee = auth('user')->user();
 
-        $order = Order::with('customer')->findOrFail($orderId);
+        $order = Order::with('customer', 'employee')->findOrFail($orderId);
 
         $current = $order->status;
         $new = $request->input('status');
@@ -380,33 +403,37 @@ class OrderManagementController extends Controller
         }
 
         if (
+            ($current === 'confirmed' && $new === 'preparing') ||
             ($current === 'preparing' && $new === 'ready') ||
             ($current === 'ready' && $new === 'delivered')
         ) {
             $order->status = $new;
             $order->save();
 
-            if ($new === 'ready') {
+            $isEmployeeCreator = $order->employee && $order->employee->id === $employee->id;
+
+            if ($new === 'ready' && ! $isEmployeeCreator) {
                 Notification::create([
                     'user_id' => $employee->id,
                     'sent_by' => 'System',
-                    'purpose' => 'orderReady',
-                    'message' => "customer has been notified that the order #{$order->id} is ready.",
-                    'created_at' => now(),
+                    'purpose' => 'Order Ready',
+                    'message' => "The customer has been notified that the order #{$order->id} is ready.",
+                    'createdAt' => now(),
                 ]);
 
                 Notification::create([
                     'user_id' => $order->customer->id,
                     'sent_by' => 'System',
-                    'purpose' => 'orderReadyToCustomer',
-                    'message' => "Your order {$order->id} is ready for delivery.",
-                    'created_at' => now(),
+                    'purpose' => 'Order Ready',
+                    'message' => "Your order #{$order->id} is ready now!",
+                    'createdAt' => now(),
                 ]);
             }
 
             return response()->json([
-                'status' => 'Order status has been updated successfully.',
+                'status' => 'Order status updated successfully.',
                 'order' => $order,
+                'notifiedCustomer' => ! $isEmployeeCreator,
             ]);
         }
 
@@ -418,9 +445,17 @@ class OrderManagementController extends Controller
     public function searchOrder(Request $request): JsonResponse
     {
         $orderId = $request->query('order_id');
+        $statuses = $request->query('statuses');
 
-        $order = Order::with('orderItems', 'customer', 'employee')
-            ->find($orderId);
+        $query = Order::with('orderItems', 'customer', 'employee')
+              ->where('id', $orderId);
+
+        if($statuses) {
+            $statusesArray = explode(',', $statuses);
+            $query->whereIn('status', $statusesArray);
+        }
+
+        $order = $query->first();
 
         if (! $order) {
             return response()->json([
@@ -431,10 +466,10 @@ class OrderManagementController extends Controller
         return response()->json([
             'data' => [
                 'order_id' => $order->id,
-                'created_at' => $order->created_at->toDateTimeString(),
-                'items_count' => $order->orderItems->count(),
+                'created_at' => $order->created_at,
                 'status' => $order->status,
                 'note' => $order->note ?? '-',
+                'item_count' => $order->orderItems->count(),
             ],
         ]);
     } //9
@@ -455,7 +490,6 @@ class OrderManagementController extends Controller
                         return [
                             'item_name' => $item->menuItem->name,
                             'quantity' => $item->quantity,
-                            'price' => $item->price,
                         ];
                     }),
                 ];
@@ -463,5 +497,18 @@ class OrderManagementController extends Controller
         ]);
     } //10
 
+    public function getCustomerOrdersShort(): JsonResponse
+    {
+        $user = auth('user')->user();
 
+        if ($user->role !== 'customer') {
+            return response()->json(['error' => 'Only customers can access this data.'], 403);
+        }
+
+        $orders = Order::where('customer_id', $user->id)
+            ->orderByDesc('created_at')
+            ->get(['id', 'status']);
+
+        return response()->json(['orders' => $orders], 200);
+    } //11
 }

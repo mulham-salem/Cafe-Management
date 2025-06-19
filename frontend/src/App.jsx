@@ -22,6 +22,7 @@ import UserOrderEmp from './components/Employee/UserOrderEmp';
 import KitchenOrders from './components/Employee/KitchenOrders';
 import EmployeeNotification from './components/Employee/EmployeeNotification';
 import ProtectedRoute from './components/ProtectedRoute';
+import { OrderNotificationProvider } from './context/OrderNotificationProvider';
 
 
 function App() {
@@ -57,16 +58,18 @@ function App() {
           <Route path='supplier-notification' element={<SupplierNotification />} />
         </Route>
 
-        <Route path="/login/customer-home" element={
-          <ProtectedRoute>
-            <CustomerHome />
-          </ProtectedRoute>
-        }>
-          <Route path="menu-order" element={<MenuAndOrder />} />
-          <Route path="user-order" element={<UserOrder />} />
-          <Route path="table-reservation" element={<TableReservation />} />
-          <Route path="customer-notification" element={<CustomerNotification />} />
-        </Route>
+          <Route path="/login/customer-home" element={
+            <ProtectedRoute>
+              <OrderNotificationProvider>
+                <CustomerHome />
+              </OrderNotificationProvider>
+            </ProtectedRoute>
+          }>
+            <Route path="menu-order" element={<MenuAndOrder />} />
+            <Route path="user-order" element={<UserOrder />} />
+            <Route path="table-reservation" element={<TableReservation />} />
+            <Route path="customer-notification" element={<CustomerNotification />} />
+          </Route>
 
         <Route path="/login/employee-home" element={
           <ProtectedRoute>

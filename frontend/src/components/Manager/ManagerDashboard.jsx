@@ -96,6 +96,68 @@ const ManagerDashboard = () => {
     }
   };
   
+  useEffect(() => {
+    const checkNewNotifications = async () => {
+      try {
+        const token = localStorage.getItem("authToken") || sessionStorage.getItem("authToken");
+  
+        const response = await axios.get("http://localhost:8000/api/manager/notifications", {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+  
+        const allNotifications = response.data.notifications;
+  
+        const unseenSupplyOffers = allNotifications.filter(n =>
+          n.seen === 0 && n.purpose === 'Supply Offer'
+        );
+  
+        const unseenSupplyResponses = allNotifications.filter(n =>
+          n.seen === 0 && n.purpose === 'Response For Supply Request'
+        );
+  
+        // توست منفصل لكل نوع لو وجد
+        if (unseenSupplyOffers.length > 0) {
+
+          toast.info(`You received ${unseenSupplyOffers.length} new supply offer${unseenSupplyOffers.length > 1 ? 's' : ''}.`);
+  
+          // تعليم كمقروءة
+          const ids = unseenSupplyOffers.map(n => n.id);
+          await Promise.all(
+            ids.map(id =>
+              axios.patch(`http://localhost:8000/api/manager/notifications/${id}/seen`, {}, {
+                headers: { Authorization: `Bearer ${token}` }
+              })
+            )
+          );
+        }
+  
+        if (unseenSupplyResponses.length > 0) {
+
+          toast.info(`You received ${unseenSupplyResponses.length} new response${unseenSupplyResponses.length > 1 ? 's' : ''} for your supply request.`);
+  
+          // تعليم كمقروءة
+          const ids = unseenSupplyResponses.map(n => n.id);
+          await Promise.all(
+            ids.map(id =>
+              axios.patch(`http://localhost:8000/api/manager/notifications/${id}/seen`, {}, {
+                headers: { Authorization: `Bearer ${token}` }
+              })
+            )
+          );
+        }
+  
+      } catch (err) {
+        console.error("Failed to load notifications: ", err);
+      }
+    };
+  
+    checkNewNotifications();
+  
+    const interval = setInterval(checkNewNotifications, 10000);
+    return () => clearInterval(interval);
+  }, []);
+  
+  
   return (
     <div className={styles.dashboard}>
         <ToastContainer/>

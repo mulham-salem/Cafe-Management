@@ -16,6 +16,8 @@ const TableReservation = () => {
   const [activeTab, setActiveTab] = useState('new');
   const [tables, setTables] = useState([]);
   const [reservations, setReservations] = useState([]);
+  const [loadingTables, setLoadingTables] = useState(true);
+  const [loadingReser, setLoadingReser] = useState(true);
 
   const [reservationDate, setReservationDate] = useState('');
   const [reservationTime, setReservationTime] = useState('');
@@ -73,6 +75,8 @@ const TableReservation = () => {
       setTables(response.data);
     } catch (error) {
       toast.error('Failed to load available tables.');
+    } finally {
+      setLoadingTables(false);
     }
   };
 
@@ -82,6 +86,8 @@ const TableReservation = () => {
       setReservations(response.data);
     } catch (error) {
       toast.error('Failed to load your reservations.');
+    } finally {
+      setLoadingReser(false);
     }
   };
 
@@ -311,7 +317,10 @@ const TableReservation = () => {
             <div className={styles.tableColumn}>
               <h3>Available Tables</h3>
               <div className={styles.tableGrid}>
-                {tables
+                {loadingTables ? (
+                  <p className={styles.emptyText}>Loading...</p>
+                ) :
+                  tables
                   .filter((table) => table.status === 'available' && table.capacity >= Number(guestCount))
                   .map((table) => (
                     <div
@@ -334,8 +343,11 @@ const TableReservation = () => {
           <div className={`${styles.myReservations} ${styles.fadeInTab}`}>
             <h2>My Reservations</h2>
             <div className={styles.reservationList}>
-              {reservations.length === 0 ? (
-                <p className={styles.noReservationsMessage}> You have no active reservations at the moment. </p>
+              { loadingReser ? (
+                <p className={styles.emptyText2}>Loading...</p>
+              ) :  
+              !loadingReser && reservations.length === 0 ? (
+                  <p className={styles.noReservationsMessage}> You have no active reservations at the moment. </p>
               ) : (
               reservations.map(res => (
                 <div key={res.id} className={styles.reservationCard}>
