@@ -67,7 +67,7 @@ const MenuManagement = () => {
       }));
       setMenuItems(formattedItems);
     } catch (error) {
-      toast.error('Failed to load menu items. Please ensure you are logged in.');
+      //toast.error('Failed to load menu items. Please ensure you are logged in.');
     } finally {
       setLoading(false);
     }
@@ -200,7 +200,9 @@ const MenuManagement = () => {
       <hr className={styles.sectionDivider} />
       <div className={styles.menuGrid}>
         {loading ? (
-          <p className={styles.emptyText}>Loading...</p>
+          <div className={styles.loadingOverlay}>
+            <p className={styles.emptyText}>Loading...</p>
+          </div>
         ) :
         menuItems.filter((item) => item.category === category).length === 0 ? (
           <p className={styles.noItemsMessage}>No menu items available in this category.</p>

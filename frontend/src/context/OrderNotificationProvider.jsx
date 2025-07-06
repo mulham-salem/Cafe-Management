@@ -51,10 +51,10 @@ export const OrderNotificationProvider = ({ children }) => {
         console.error('Failed to fetch orders', error);
       }
     };
-    // أول طلب مباشر
+  
     fetchOrders();
 
-    // كل 10 ثواني براقب الطلبات
+  
     const interval = setInterval(fetchOrders, 10000);
 
     return () => clearInterval(interval);
@@ -66,7 +66,3 @@ export const OrderNotificationProvider = ({ children }) => {
     </OrderNotificationContext.Provider>
   );
 };
-
-
-
-

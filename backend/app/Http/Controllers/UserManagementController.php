@@ -15,6 +15,11 @@ use Illuminate\Validation\Rule;
 
 class UserManagementController extends Controller
 {
+    /**
+     * Display a listing of users managed by the authenticated manager.
+     *
+     * @return JsonResponse
+     */
     public function index(): JsonResponse
     {
         $manager = Auth::guard('manager')->user();
@@ -36,6 +41,12 @@ class UserManagementController extends Controller
         return response()->json($users);
     }
 
+    /**
+     * Store a newly created user in storage.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function store(Request $request): JsonResponse
     {
         $manager = Auth::guard('manager')->user();
@@ -97,8 +108,13 @@ class UserManagementController extends Controller
         ], 201);
 
     }
-    // This Is Show Method For User Permissions........................................................................................
 
+    /**
+     * Display the specified user with their permissions.
+     *
+     * @param  string  $id
+     * @return JsonResponse
+     */
     public function show(string $id): JsonResponse
     {
         $user = User::with('permissions')->findOrFail($id);
@@ -107,8 +123,14 @@ class UserManagementController extends Controller
             'user' => $user->only(['id', 'name', 'email', 'username', 'role']),
         ]);
     }
-    // This Is Update Method For User Data And Permissions&Roles........................................................................................
 
+    /**
+     * Update the specified user's data and permissions in storage.
+     *
+     * @param Request $request
+     * @param  string  $id
+     * @return JsonResponse
+     */
     public function update(Request $request, string $id): JsonResponse
     {
         $manager = Auth::guard('manager')->user();
@@ -152,8 +174,13 @@ class UserManagementController extends Controller
         ]);
 
     }
-    // This Is Destroy Method For Deleting User Data And Permissions&Roles........................................................................................
 
+    /**
+     * Remove the specified user from storage.
+     *
+     * @param  string  $id
+     * @return JsonResponse
+     */
     public function destroy(string $id): JsonResponse
     {
         $manager = Auth::guard('manager')->user();

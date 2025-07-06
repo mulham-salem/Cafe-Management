@@ -10,10 +10,10 @@ import axios from 'axios';
 const CustomerNotification = () => {
   
   const [notifications, setNotifications] = useState([]);
-  const [loading, setLoading] = useState(true); // Optional: Show loading state
+  const [loading, setLoading] = useState(true); 
   const [error, setError] = useState(null);
 
-  const token = sessionStorage.getItem('authToken') || localStorage.getItem('authToken'); // أو sessionStorage.getItem() إذا مخزن فيه
+  const token = sessionStorage.getItem('authToken') || localStorage.getItem('authToken'); 
 
   useEffect(() => {
      document.title = "Cafe Delights - Customer Notifications";
@@ -25,7 +25,7 @@ const CustomerNotification = () => {
             Authorization: `Bearer ${token}`,
             Accept: 'application/json',
           },
-          withCredentials: true, // لو بتستخدم Laravel Sanctum مع الكوكيز (optional)
+          withCredentials: true, 
         });
   
         setNotifications(response.data.notifications);
@@ -49,7 +49,6 @@ const CustomerNotification = () => {
         },
       });
 
-      // تحديث محلي للحالة
       setNotifications((prev) =>
         prev.map((notif) =>
           notif.id === id ? { ...notif, seen: true } : notif

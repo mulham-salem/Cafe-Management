@@ -1,37 +1,38 @@
-import React, { useState, useEffect } from 'react';
-import styles from './styles/ChangePassword.module.css';
-import logo from '/logo_1.png'; 
-import { Link, useLocation } from 'react-router-dom';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import styles from "./styles/ChangePassword.module.css";
+import logo from "/logo_1.png";
+import { Link, useLocation } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import axios from "axios";
 
 const ChangePassword = () => {
-    useEffect(() => {
-        document.title = "Cafe Delights - Change Password";
-    }, []);  
+  
+  useEffect(() => {
+    document.title = "Cafe Delights - Change Password";
+  }, []);
 
-    const location = useLocation();
-    const from = location.state?.from || '/login';
+  const location = useLocation();
+  const from = location.state?.from || "/login";
 
-    const [isTextVisible, setIsTextVisible] = useState(false);
+  const [isTextVisible, setIsTextVisible] = useState(false);
 
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setIsTextVisible(true);
-        }, 300);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsTextVisible(true);
+    }, 300);
 
-        return () => clearTimeout(timer);
-    }, []);
+    return () => clearTimeout(timer);
+  }, []);
 
   const [showPassword, setShowPassword] = useState(false);
 
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const path = location.pathname; 
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const path = location.pathname;
 
-  let apiBase = "http://localhost:8000/api/user"; 
+  let apiBase = "http://localhost:8000/api/user";
 
   if (path.includes("/login/manager-dashboard")) {
     apiBase = "http://localhost:8000/api/manager";
@@ -45,11 +46,13 @@ const ChangePassword = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
-    const token = sessionStorage.getItem('authToken') || localStorage.getItem('authToken');
+
+    const token =
+      sessionStorage.getItem("authToken") || localStorage.getItem("authToken");
 
     try {
-      const response = await axios.post(`${apiBase}/change-password`,
+      const response = await axios.post(
+        `${apiBase}/change-password`,
         {
           current_password: currentPassword,
           new_password: newPassword,
@@ -62,70 +65,85 @@ const ChangePassword = () => {
           withCredentials: true,
         }
       );
-  
+
       toast.success(response.data.message || "Password changed successfully!");
 
-      setCurrentPassword('');
-      setNewPassword('');
-      setConfirmPassword('');
-
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
     } catch (error) {
-      const errorMessage = error.response?.data?.message || "Password update failed.";
+      const errorMessage =
+        error.response?.data?.message || "Password update failed.";
       toast.error(errorMessage);
     }
   };
-  
+
   return (
     <div className={styles.container}>
       <ToastContainer />
       <div className={styles.card}>
-        <img src={logo} alt="Cafe Delights Logo" className={`${styles.logo} ${isTextVisible ? styles.fadeInUp : ''}`} />
+        <img
+          src={logo}
+          alt="Cafe Delights Logo"
+          className={`${styles.logo} ${isTextVisible ? styles.fadeInUp : ""}`}
+        />
         <h1 className={styles.name}>Cafe Delights</h1>
         <h2 className={styles.title}>Keep Your Account Secure</h2>
 
         <form className={styles.form} onSubmit={handleSubmit}>
           <div className={styles.inputGroup}>
             <label>Current Password</label>
-            <input type={showPassword ? 'text' : 'password'} placeholder="Enter current password" 
-              value={currentPassword} 
-              onChange={(e) => setCurrentPassword(e.target.value)} 
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Enter current password"
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
               required
             />
           </div>
 
           <div className={styles.inputGroup}>
             <label>New Password</label>
-            <input type={showPassword ? 'text' : 'password'} placeholder="Enter new password"
-             value={newPassword} 
-             onChange={(e) => setNewPassword(e.target.value)} 
-             required
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Enter new password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              required
             />
           </div>
 
           <div className={styles.inputGroup}>
             <label>Confirm New Password</label>
-            <input type={showPassword ? 'text' : 'password'} placeholder="Confirm new password"
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Confirm new password"
               value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)} 
+              onChange={(e) => setConfirmPassword(e.target.value)}
               required
             />
           </div>
 
           <div className={styles.toggle}>
-            <input type="checkbox" id="showPass" onChange={() => setShowPassword(!showPassword)} />
+            <input
+              type="checkbox"
+              id="showPass"
+              onChange={() => setShowPassword(!showPassword)}
+            />
             <label htmlFor="showPass">Show Password</label>
           </div>
 
-          <button type="submit" className={styles.saveBtn}>Save Password</button>
+          <button type="submit" className={styles.saveBtn}>
+            Save Password
+          </button>
 
           <div className={styles.backLink}>
             <Link to={from}> {`← Back to home`} </Link>
           </div>
-          
         </form>
       </div>
     </div>
   );
-}
+};
 
 export default ChangePassword;

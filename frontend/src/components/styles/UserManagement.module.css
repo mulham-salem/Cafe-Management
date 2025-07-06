@@ -1,12 +1,20 @@
+body,
+html {
+  height: 100%;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
 .container {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   padding: 20px;
+  height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
   width: 100%;
   max-width: 100%;
-  position: relative;
-  max-height: 650px;
+  scroll-behavior: smooth;
 }
 
 .container::-webkit-scrollbar {
@@ -14,15 +22,14 @@
 }
 
 .createButton {
-  background-color: #5c3607;
+  background-color: #4a2b04;
   color: white;
   border: none;
-  padding: 10px 12px;
-  font-size: 16px;
+  padding: clamp(6px, 0.7vw, 12px) clamp(8px, 0.7vw, 16px);
+  font-size: clamp(12px, 1vw, 18px);
   border-radius: 10px;
-  position: relative;
-  bottom: 15px;
-  left: 15px;
+  margin-top: 5vh;
+  margin-bottom: 1.5vh;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -32,19 +39,24 @@
   animation: fadeIn 0.8s ease;
 }
 
+.container.open {
+  padding-top: 15vh;
+}
+
 .createButton:hover {
-  background-color: #8d4d04;
+  background-color: #6b3a01;
+  transition: All ease-in-out 0.4s;
 }
 
 .table {
   width: 100%;
   border-collapse: collapse;
   background-color: white;
+  font-size: clamp(12px, 1vw, 18px);
   box-shadow: 0px 0px 10px tan;
   border-radius: 12px;
-  margin-left: 17px;
-  margin-bottom: 80px;
-  z-index: 1001;
+  z-index: 1000;
+  table-layout: fixed;
   animation: fadeIn 0.8s ease;
 }
 
@@ -75,7 +87,6 @@
   gap: 12px;
 }
 
-
 .table td {
   vertical-align: middle;
 }
@@ -83,7 +94,7 @@
 .actionIcon {
   cursor: pointer;
   color: #5a3d1a;
-  font-size: 18px;
+  font-size: clamp(12px, 1.1vw, 18px);
   position: relative;
   bottom: 5px;
   margin-top: 12px;
@@ -96,7 +107,7 @@
 }
 
 .icon {
-  font-size: 18px;
+  font-size: clamp(12px, 1.1vw, 18px);
 }
 
 .table tr:hover {
@@ -104,7 +115,7 @@
 }
 
 .input {
-  width: 101%;
+  width: 88%;
   padding: 6px;
   border: 1px solid #ccc;
   border-radius: 8px;
@@ -113,10 +124,10 @@
 .permissionPopup {
   position: fixed;
   top: 40%;
-  left: 55%;
+  left: 50%;
   transform: translate(-50%, -25%);
-  background-color: #fff8e1;
-  padding: 20px;
+  background-color: #fbf6e4;
+  padding: clamp(12px, 1.4vw, 25px);
   border: 2px solid #5a3d1a;
   border-radius: 15px;
   box-shadow: 0 0 10px #5a3d1a;
@@ -130,16 +141,22 @@
 }
 
 .permissionPopup h4 {
-  margin-bottom: 20px;
+  margin-bottom: 2.5vh;
   color: #5a3d1a;
-  font-size: 18px;
+  font-size: clamp(14px, 1.2vw, 20px);
 }
 
 .checkboxList label {
   display: block;
   margin-bottom: 8px;
   font-weight: 500;
+  font-size: clamp(12px, 1vw, 18px);
 }
+
+.checkboxList input[type="checkbox"] {
+  position: relative;
+  top: 1px;
+} 
 
 .checkboxList {
   accent-color: #5a3d1a;
@@ -161,7 +178,7 @@
   border-radius: 8px;
   border: 1px solid #ccc;
   background-color: white;
-  font-size: 14px;
+  font-size: clamp(12px, 0.8vw, 18px);
   width: 120px;
   transition: border 0.4s ease;
   appearance: none;
@@ -173,7 +190,7 @@
   background-position: right 10px center;
   background-size: 20px;
   position: relative;
-  z-index: 1000;
+  z-index: 1001;
 }
 
 .selectBox:focus {
@@ -214,15 +231,15 @@
 }
 
 .actionIcon[data-action="Edit"]:hover {
-  color: blue; 
+  color: blue;
 }
 
 .actionIcon[data-action="Delete"]:hover {
-  color: red; 
+  color: red;
 }
 
 .actionIcon[data-action="Assign Roles"]:hover {
-  color: #ffc107; 
+  color: #ffc107;
 }
 
 .actionIcon[data-action="Add"]:hover {
@@ -234,25 +251,25 @@
 }
 
 .actionIcon[data-action="Cancel"]:hover {
-  color: red; 
+  color: red;
 }
 
 .modalActions {
   display: flex;
-  justify-content: flex-end; 
-  gap: 20px;                  
+  justify-content: flex-end;
+  gap: 20px;
   padding: 2px 8px;
-  background-color: white;  
+  background-color: white;
   border: 2px solid #5c3607;
   border-radius: 10px;
-  position: sticky;           
+  position: sticky;
   bottom: 175px;
   z-index: 10;
 }
 
 .modalActions .icon {
   cursor: pointer;
-  font-size: 20px;
+  font-size: clamp(12px, 1.1vw, 18px);
   color: #5c3607;
   transition: color 0.4s ease;
 }
@@ -262,7 +279,7 @@
 }
 
 .icon[data-action="Cancel"]:hover {
-  color: red; 
+  color: red;
 }
 
 .icon:hover {
@@ -270,12 +287,38 @@
   transition: transform 0.3s;
 }
 
+.loadingOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  animation: fadeInDelay 0.3s ease-in both;
+  animation-delay: 0.4s; 
+}
+
 .emptyText {
-  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-  font-size: 18px;
-  text-align: center;
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif;
+  font-size: clamp(14px, 2.5vw, 18px);
   color: #888;
-  margin-bottom: 60px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+@keyframes fadeInDelay {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1; 
+  }
 }
 
 @keyframes fadeIn {
@@ -287,4 +330,220 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+@media screen and (min-width: 1600px) {
+  .container {
+    padding: 30px 40px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .table th,
+  .table td {
+    padding: 18px 22px;
+  }
+
+  .permissionPopup {
+    width: 320px;
+    height: auto;
+    padding: 25px;
+  }
+
+  .checkboxList input[type="checkbox"] {
+    top: 0vh;
+  } 
+
+  .modalActions {
+    padding: 4px 8px;
+    position: relative;
+    bottom: 0;
+  }
+}
+
+@media screen and (max-width: 1200px) {
+  .container {
+    padding: 0;
+    max-height: none;
+  }
+
+  .createButton {
+    padding: 8px 10px;
+    gap: 6px;
+  }
+
+  .table th,
+  .table td {
+    padding: 10px 12px;
+    white-space: nowrap;
+  }
+
+  .permissionPopup {
+    width: 240px;
+    height: auto;
+    padding: 15px;
+  }
+
+  .selectBox {
+    width: 100px;
+  }
+
+  .input {
+    width: 100%;
+  }
+
+  .modalActions {
+    padding: 4px 8px;
+    bottom: 0px;
+  }
+
+  .checkboxList input[type="checkbox"] {
+    top: clamp(2px, 0.1vh, 4px);
+  } 
+}
+
+@media screen and (width: 768px) {
+  .container {
+    padding: clamp(12px, 3vw, 20px);
+    max-height: none;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .createButton {
+    font-weight: 450;
+    align-self: flex-start;
+    position: static;
+  }
+
+  .table {
+    font-size: clamp(13px, 2.2vw, 15px);
+    overflow-x: auto;
+    display: block;
+    border-radius: 10px;
+  }
+
+  .table th,
+  .table td {
+    padding: 10px;
+    min-width: 100px;
+  }
+
+  .table thead {
+    position: sticky;
+    top: 0;
+    background-color: cornsilk;
+    z-index: 5;
+  }
+
+  .permissionPopup {
+    padding: clamp(15px, 3vw, 20px);
+    z-index: 1050;
+  }
+
+  .actionIcon[data-action="Add"] {
+    color: rgb(25, 233, 25);
+    font-size: 1.1rem;
+  }
+  
+  .actionIcon[data-action="Cancel"] {
+    color: red;
+    font-size: 1.1rem;
+  }
+
+  .input,
+  .selectBox {
+    width: 100%;
+  }
+
+  .modalActions {
+    gap: 14px;
+    padding: 6px 10px;
+    bottom: 100px;
+  }
+
+  .actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .checkboxList input[type="checkbox"] {
+    top: clamp(2px, 0.1vh, 4px);
+  } 
+}
+
+@media screen and (max-width: 480px) {
+  .container {
+    height: 100%;
+    overflow-y: auto;
+    padding: clamp(10px, 5vw, 16px);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .createButton {
+    margin-top: 5vh;
+    align-self: flex-start;
+    margin-bottom: 0;
+    padding: 6px 8px;
+    font-weight: 450;
+  }
+
+  .table {
+    font-size: clamp(11px, 2.8vw, 13px);
+    border-radius: 6px;
+    box-shadow: none;
+    overflow-x: auto;
+    display: block;
+  }
+
+  .table::-webkit-scrollbar {
+    display: none;
+  }
+
+  .table th,
+  .table td {
+    padding: 8px;
+    min-width: 100px;
+    text-align: center;
+  }
+
+  .actions {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .permissionPopup {
+    width: 60%;
+    height: clamp(240px, 25vh, 340px);
+    z-index: 1050;
+  }
+
+  .actionIcon[data-action="Add"] {
+    color: rgb(25, 233, 25);
+    font-size: 1rem;
+  }
+  
+  .actionIcon[data-action="Cancel"] {
+    color: red;
+    font-size: 1rem;
+  }
+
+  .modalActions {
+    position: relative;
+    bottom: 0px;
+  }
+
+  .input,
+  .selectBox {
+    width: 100%;
+  }
+
+  .checkboxList input[type="checkbox"] {
+    top: clamp(2px, 0.1vh, 4px);
+  } 
 }

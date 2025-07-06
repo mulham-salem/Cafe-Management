@@ -52,7 +52,7 @@ const TableManagement = () => {
       const response = await axiosInstance.get('/manager/table');
       setTables(response.data.tables); 
     } catch (error) {
-      toast.error('Failed to load tables.');
+      //toast.error('Failed to load tables.');
     } finally {
       setLoading(false);
     }
@@ -99,7 +99,6 @@ const TableManagement = () => {
     }
   };
 
- 
   const handleStatusUpdate = async (id, currentStatus) => { 
     const nextStatusValue = nextStatusLogic(currentStatus); 
 
@@ -254,7 +253,9 @@ const TableManagement = () => {
     <div className={styles.container}>
       <ToastContainer />
       {loading ? (
-        <p className={styles.emptyText}>Loading...</p>
+        <div className={styles.loadingOverlay}>
+          <p className={styles.emptyText}>Loading...</p>
+        </div>
       ) : (
       <>
       <div className={styles.headerRow}>
@@ -301,12 +302,12 @@ const TableManagement = () => {
         <tbody>
           {tables.map((table) => (
             <tr key={table.id}>
-              <td>{table.number}</td>
-              <td>{table.capacity}</td>
-              <td>{
-                    table.status.charAt(0).toUpperCase() + table.status.slice(1)
-                  }</td>
-              <td className={styles.actions}>
+              <td data-label="Number">{table.number}</td>
+              <td data-label="Capacity">{table.capacity}</td>
+              <td data-label="Status">
+                  { table.status.charAt(0).toUpperCase() + table.status.slice(1) }
+              </td>
+              <td data-label="Action" className={styles.actions}>
                 <button onClick={() => handleStatusUpdate(table.id, table.status)} className={styles.statusBtn}>
                   <FontAwesomeIcon icon={faPen} data-action="Update Status" title="Update Status"/>
                 </button>

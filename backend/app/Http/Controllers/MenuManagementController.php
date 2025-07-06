@@ -40,6 +40,11 @@ class MenuManagementController extends Controller
         'Mint Chocolate Mousse',
     ];
 
+    /**
+     * Display a listing of menu items managed by the authenticated manager.
+     *
+     * @return JsonResponse
+     */
     public function index(): JsonResponse
     {
         $managerId = auth('manager')->id();
@@ -63,6 +68,12 @@ class MenuManagementController extends Controller
         return response()->json($formattedMenuItems);
     }
 
+    /**
+     * Store a newly created menu item in storage.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
@@ -89,6 +100,12 @@ class MenuManagementController extends Controller
         return response()->json(['message' => 'Menu item created successfully'], 201);
     }
 
+    /**
+     * Display the specified menu item.
+     *
+     * @param  int  $id
+     * @return JsonResponse
+     */
     public function show($id): JsonResponse
     {
         $menuItem = MenuItem::with('category')->find($id);
@@ -112,6 +129,13 @@ class MenuManagementController extends Controller
         ]);
     }
 
+    /**
+     * Update the specified menu item in storage.
+     *
+     * @param Request $request
+     * @param  string  $id
+     * @return JsonResponse
+     */
     public function update(Request $request, string $id): JsonResponse
     {
         $validated = $request->validate([
@@ -140,6 +164,12 @@ class MenuManagementController extends Controller
         return response()->json(['message' => 'Menu item updated successfully.', 'data' => $menuItem]);
     }
 
+    /**
+     * Remove the specified menu item from storage.
+     *
+     * @param  string  $id
+     * @return JsonResponse
+     */
     public function destroy(string $id): JsonResponse
     {
         $menuItem = MenuItem::findOrFail($id);
@@ -161,4 +191,3 @@ class MenuManagementController extends Controller
         return response()->json(['message' => 'Menu item deleted successfully.']);
     }
 }
-

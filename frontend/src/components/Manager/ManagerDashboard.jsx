@@ -10,23 +10,23 @@ import axios from 'axios';
 
 const ManagerDashboard = () => {
 
-    const location = useLocation();
-    const currentPath = location.pathname;
+  const location = useLocation();
+  const currentPath = location.pathname;
 
-    useEffect(() => {
-        document.title = "Cafe Delights - Manager Dashboard";
-        profile();
-    }, []);  
+  useEffect(() => {
+      document.title = "Cafe Delights - Manager Dashboard";
+      profile();
+  }, []);  
 
-    const [isTextVisible, setIsTextVisible] = useState(false);
+  const [isTextVisible, setIsTextVisible] = useState(false);
 
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setIsTextVisible(true);
-        }, 800);
+  useEffect(() => {
+      const timer = setTimeout(() => {
+          setIsTextVisible(true);
+      }, 800);
 
-        return () => clearTimeout(timer);
-    }, []);
+      return () => clearTimeout(timer);
+  }, []);
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
@@ -92,7 +92,7 @@ const ManagerDashboard = () => {
       setManagerName(response.data.name || 'Manager');
 
     } catch (error) {
-        toast.error("Failed to fetch manager name");
+        //toast.error("Failed to fetch manager name");
     }
   };
   
@@ -115,12 +115,10 @@ const ManagerDashboard = () => {
           n.seen === 0 && n.purpose === 'Response For Supply Request'
         );
   
-        // توست منفصل لكل نوع لو وجد
         if (unseenSupplyOffers.length > 0) {
 
           toast.info(`You received ${unseenSupplyOffers.length} new supply offer${unseenSupplyOffers.length > 1 ? 's' : ''}.`);
   
-          // تعليم كمقروءة
           const ids = unseenSupplyOffers.map(n => n.id);
           await Promise.all(
             ids.map(id =>
@@ -135,7 +133,6 @@ const ManagerDashboard = () => {
 
           toast.info(`You received ${unseenSupplyResponses.length} new response${unseenSupplyResponses.length > 1 ? 's' : ''} for your supply request.`);
   
-          // تعليم كمقروءة
           const ids = unseenSupplyResponses.map(n => n.id);
           await Promise.all(
             ids.map(id =>
@@ -171,7 +168,7 @@ const ManagerDashboard = () => {
             </div>
             <div className={styles.headerCenter}>
                 <span className={styles.pageTitle}>{getTitle()}</span>
-		    </div>
+		        </div>
             <div className={styles.rightSection}>
                 <div className={styles.managerName}>
                     {managerName}
@@ -239,10 +236,10 @@ const ManagerDashboard = () => {
             {currentPath === "/login/manager-dashboard" && (
             <div className={ `${styles.mainText} ${isTextVisible ? styles.fadeIn : ''}`}>
                 <h2>
-                    <span className={styles.highlight}>Welcome back,</span> {managerName}<br />
-                    <span className={styles.sub}>Your command center is brewed and ready.</span><br />
+                    <span className={styles.highlight}>Welcome back, {managerName} </span> <br />
+                    <span className={styles.sub}>Your command center is brewed and ready.</span>
                     <span className={styles.keywords}>
-                        User <strong>Roles</strong>, Menu <strong>Magic</strong>, Table <strong>Mastery</strong>,<br />
+                        User <strong>Roles</strong>, Menu <strong>Magic</strong>, Table <strong>Mastery</strong>,
                         Inventory <strong>Control</strong>, Promotion <strong>Power</strong>.
                     </span>
                     <span className={styles.cta}>
@@ -258,10 +255,4 @@ const ManagerDashboard = () => {
 }
 
 export default ManagerDashboard;
-
-
-
-
-
-
 

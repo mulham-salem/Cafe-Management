@@ -7,16 +7,20 @@ use App\Models\MenuItem;
 use App\Models\Notification;
 use App\Models\Order;
 use App\Models\OrderItem;
-use App\Models\User;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
 class OrderManagementController extends Controller
 {
+    /**
+     * Fetches menu items, optionally filtered by category.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function fetchMenuItems(Request $request): JsonResponse //1
     {
         $category = $request->query('category', 'all');
@@ -52,6 +56,12 @@ class OrderManagementController extends Controller
         ], 200);
     }
 
+    /**
+     * Creates a new order.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function createOrder(Request $request): JsonResponse //2
     {
         $request->validate([
@@ -107,6 +117,11 @@ class OrderManagementController extends Controller
         }
     }
 
+    /**
+     * Retrieves orders for the authenticated customer or employee.
+     *
+     * @return JsonResponse
+     */
     public function getCustomerOrders(): JsonResponse //3
     {
         $user = auth('user')->user();
@@ -127,7 +142,7 @@ class OrderManagementController extends Controller
                 return [
                     'order_id' => $order->id,
                     'status' => $order->status,
-                    'created_at' => $order->created_at,
+                    'created_at' => $order->createdAt,
                     'can_show_bill' => $order->status === 'delivered' && $order->bill !== null,
                     'note' => $order->note ?? '-',
                     'item_count' => $order->orderItems->count(),
@@ -136,6 +151,12 @@ class OrderManagementController extends Controller
         ], 200);
     }
 
+    /**
+     * Views the bill for a specific order.
+     *
+     * @param int $orderId
+     * @return JsonResponse
+     */
     public function viewOrderBill($orderId): JsonResponse //4
     {
         $user = auth('user')->user();
@@ -147,8 +168,6 @@ class OrderManagementController extends Controller
             $customerId = optional($user->customer)->id;
             $orderQuery->where('customer_id', $customerId);
         }
-
-        // مافي شرط إضافي للموظف: بيشوف أي فاتورة لأي طلب
 
         $order = $orderQuery->first();
 
@@ -182,6 +201,13 @@ class OrderManagementController extends Controller
         ]);
     }
 
+    /**
+     * Edits an existing order. Supports GET (to show edit interface) and PUT (to update order).
+     *
+     * @param Request $request
+     * @param int $orderId
+     * @return JsonResponse
+     */
     public function editOrder(Request $request, $orderId): JsonResponse //5
     {
         $user = auth('user')->user();
@@ -192,18 +218,17 @@ class OrderManagementController extends Controller
             ->where('status', 'pending');
 
         if ($user->role !== 'employee') {
-            $query->where('customer_id', $user->id); // فقط الزبون نتحقق إنه صاحب الطلب
+            $query->where('customer_id', $user->id);
         }
 
         $order = $query->first();
-
 
         if (! $order && $user->role !== 'employee') {
             return response()->json([
                 'message' => 'Can only edit unconfirmed orders or this order not yours',
             ], 403);
         }
-        // here you can get the order edit interface like you view it in react.
+
         if ($request->isMethod('get')) {
             $items = $order->orderItems->map(function ($item) {
                 return [
@@ -285,12 +310,18 @@ class OrderManagementController extends Controller
         ], 405);
     }
 
+    /**
+     * Allows a user (customer or employee) to cancel a pending order.
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
     public function cancelOrder($id): JsonResponse //6
     {
         $user = auth('user')->user();
         $order = Order::with(['employee.user', 'customer.user'])->findOrFail($id);
 
-        if ($order->confirmed_at !== null) {
+        if ($order->confirmedAt !== null) {
             return response()->json([
                 'message' => "Can't be deleted after confirming it or preparing ",
             ], 403);
@@ -313,6 +344,12 @@ class OrderManagementController extends Controller
         ]);
     }
 
+    /**
+     * Allows a user (customer or employee) to confirm a pending order.
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
     public function confirmOrder($id): JsonResponse //7
     {
         $user = auth('user')->user();
@@ -328,7 +365,7 @@ class OrderManagementController extends Controller
             ($user->role === 'employee' && $order->employee_id === $user->id) ||
             ($user->role === 'customer' && $order->customer_id === $user->id);
 
-        if (! $hasPermission) {
+        if (! $hasPermission && $user->role !== 'employee') {
             return response()->json(['message' => 'No permission to confirm'], 403);
         }
 
@@ -389,6 +426,13 @@ class OrderManagementController extends Controller
 
     //----------------------------------------------------Employee Only---------------------------------------------------//
 
+    /**
+     * Allows an employee to update the status of an order.
+     *
+     * @param Request $request
+     * @param int $orderId
+     * @return JsonResponse
+     */
     public function updateOrderStatus(Request $request, $orderId): JsonResponse
     {
         $employee = auth('user')->user();
@@ -431,7 +475,7 @@ class OrderManagementController extends Controller
             }
 
             return response()->json([
-                'status' => 'Order status updated successfully.',
+                'message' => 'Order status updated successfully.',
                 'order' => $order,
                 'notifiedCustomer' => ! $isEmployeeCreator,
             ]);
@@ -442,6 +486,12 @@ class OrderManagementController extends Controller
         ], 403);
     } //8
 
+    /**
+     * Searches for an order by its ID and optionally by status.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function searchOrder(Request $request): JsonResponse
     {
         $orderId = $request->query('order_id');
@@ -466,7 +516,7 @@ class OrderManagementController extends Controller
         return response()->json([
             'data' => [
                 'order_id' => $order->id,
-                'created_at' => $order->created_at,
+                'created_at' => $order->createdAt,
                 'status' => $order->status,
                 'note' => $order->note ?? '-',
                 'item_count' => $order->orderItems->count(),
@@ -474,6 +524,11 @@ class OrderManagementController extends Controller
         ]);
     } //9
 
+    /**
+     * Retrieves orders intended for the kitchen display (confirmed, preparing, ready, delivered).
+     *
+     * @return JsonResponse
+     */
     public function getKitchenOrders(): JsonResponse
     {
         $orders = Order::with(['orderItems.menuItem', 'customer', 'employee'])
@@ -497,6 +552,11 @@ class OrderManagementController extends Controller
         ]);
     } //10
 
+    /**
+     * Retrieves a short list of orders for the authenticated customer (ID and status only).
+     *
+     * @return JsonResponse
+     */
     public function getCustomerOrdersShort(): JsonResponse
     {
         $user = auth('user')->user();

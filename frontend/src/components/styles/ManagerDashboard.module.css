@@ -1,37 +1,37 @@
 .dashboard {
-    font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-    display: flex;
-    height: 100vh;
-    background-color: white;
-  }
-  
-  .header {
-    position: fixed;
-    top: 0;
-    width: 98%;
-    height: 75px;
-    background-color: cornsilk;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 20px;
-    z-index: 1000;
-  }
-  
-  .leftSection {
-    display: flex;
-    align-items: center;
-  }
-  
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  display: flex;
+  height: 100vh;
+  background-color: white;
+}
+
+.header {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  width: clamp(310px, 98vw, 7680px);
+  height: clamp(60px, 10vh, 120px);
+  background-color: cornsilk;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  z-index: 1002;
+}
+
+.leftSection {
+  display: flex;
+  align-items: center;
+}
+
 .menuIcon {
-  font-size: 20px;
+  font-size: clamp(14px, 1.4vw, 26px);
   color: #301c03;
   cursor: pointer;
-  margin-right: 20px;
+  margin-right: 1.2vw;
   transform: rotate(0deg) translate(0px, 0px);
   transition: transform 0.5s;
 }
-
 
 .menuIcon.close:hover {
   transform: scale(1.2);
@@ -48,309 +48,498 @@
   transition: transform 0.5s;
 }
 
-  .logoSection {
-    display: flex;
-    align-items: center;
-  }
-  
-  .logo {
-    height: 60px;
-    width: 60px;
-  }
-  
-  .logo:hover {
-    transform: scale(1.2);
-    transition: transform 0.3s;
-  }
+.logoSection {
+  display: flex;
+  align-items: center;
+}
 
-  @font-face {
-    font-family: 'Playfair-Display';
-    src: url('Fonts/Playfair_Display/static/PlayfairDisplay-Regular.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-  }
+.logo {
+  width: clamp(40px, 5vw, 60px);
+  height: clamp(40px, 5vw, 60px);
+}
 
-  .cafeName {
-    font-family: 'Playfair-Display', serif;
-    font-weight: bold;
-    font-size: 22px;
-    color: #301c03;
-  }
-  
-  .rightSection {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-  }
-  
-  .notificationIcon {
-    font-size: 22px;
-    color: #301c03;
-    cursor: pointer;
-    position: relative;
-    top: 1px;
-  }
-  
-  .managerName {
-    position: relative;
-    color: #301c03;
-    cursor: pointer;
-    font-weight: bold;
-    padding: 8px 8px;
-    transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-  }
-  
-  .dropdown {
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    min-width: fit-content;
-    width: auto;
-    padding: 8px 0;
-    border-radius: 8px;
+.logo:hover {
+  transform: scale(1.2);
+  transition: transform 0.3s;
+}
+
+@font-face {
+  font-family: "Playfair-Display";
+  src: url("Fonts/Playfair_Display/static/PlayfairDisplay-Regular.ttf")
+    format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+.cafeName {
+  font-family: "Playfair-Display", serif;
+  font-weight: bold;
+  font-size: clamp(10px, 1.3vw, 26px);
+  color: #301c03;
+}
+
+.rightSection {
+  display: flex;
+  align-items: center;
+  gap: 1vw;
+}
+
+.notificationIcon {
+  font-size: clamp(14px, 2vw, 24px);
+  color: #301c03;
+  cursor: pointer;
+  position: relative;
+  top: 0.2vh;
+}
+
+.managerName {
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  font-size: clamp(10px, 1.1vw, 22px);
+  position: relative;
+  color: #301c03;
+  cursor: pointer;
+  font-weight: bold;
+  padding: clamp(5px, 1vw, 8px);
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+}
+
+.dropdown {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  min-width: fit-content;
+  width: auto;
+  padding: 8px 0;
+  border-radius: 8px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(-50%) translateY(20px);
+  transition: all 0.3s ease;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.dropdownButton {
+  width: 80%;
+  padding: clamp(6px, 0.5vw, 12px) clamp(6px, 0.5vw, 16px);
+  border: none;
+  text-align: center;
+  background-color: #48280f;
+  color: white;
+  font-size: clamp(8px, 0.8vw, 18px);
+  cursor: pointer;
+  border-radius: 10px;
+  white-space: nowrap;
+  font-weight: 520;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5vw;
+}
+
+.dropdownButton:hover {
+  background-color: cornsilk;
+  transform: none;
+  color: #301c03;
+  transform: scale(1.05);
+  transition: transform 0.2s;
+  font-weight: bold;
+}
+
+.managerName:hover .dropdown {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+@font-face {
+  font-family: "Titillium_Web2";
+  src: url("Fonts/Titillium_Web/TitilliumWeb-SemiBold.ttf") format("truetype");
+  font-style: normal;
+  font-weight: normal;
+}
+
+.sidebar {
+  display: flex;
+  font-family: "Titillium_Web2";
+  position: fixed;
+  top: clamp(60px, 10vh, 75px);
+  left: -276px;
+  width: clamp(120px, 15.5vw, 275px);
+  height: calc(100% - 60px);
+  background-color: #301c03;
+  color: white;
+  transition: left 0.5s ease;
+  opacity: 0;
+  z-index: 1001;
+}
+
+.sidebar.fadeIn {
+  opacity: 1;
+  transform: translateX(0);
+  animation: fadeIn 0.6s ease-in forwards;
+}
+
+@keyframes fadeIn {
+  from {
     opacity: 0;
-    visibility: hidden;
-    transform: translateX(-50%) translateY(20px);
-    transition: all 0.3s ease;
-    z-index: 1000;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
+    transform: translateX(-260px);
   }
-
-  .dropdownButton {
-    width: 80%;
-    padding: 8px 16px;
-    border: none;
-    text-align: center;
-    background-color: #48280f;
-    color: white;
-    font-size: 13px;
-    cursor: pointer;
-    border-radius: 10px;
-    white-space: nowrap;
-    font-weight: 520;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .dropdownButton:hover {
-    background-color: cornsilk;
-    transform: none;
-    color: #301c03;
-    transform: scale(1.1);
-    transition: transform 0.2s;
-    font-weight: bold;
-  }
-
-
-  /* .keyIcon {
-    position: relative;
-    right: 10px;
-  }
-
-  .logoutIcon {
-    position: relative;
-    left: 8px; 
-    text-align: center;
-  }
-
-  .logout {
-    position: relative;
-    left: 10px;
-  }
-  .changePassword {
-    position: relative;
-    right: 15px;
-  } */
-
-  .managerName:hover .dropdown {
-    opacity: 1;
-    visibility: visible;
-    transform: translateX(-50%) translateY(0);
-  }
-  
-  @font-face {
-    font-family: 'Titillium_Web2';
-    src: url('Fonts/Titillium_Web/TitilliumWeb-SemiBold.ttf') format('truetype');
-    font-style: normal;
-    font-weight: normal;
-  }
-  .sidebar {
-    font-family: 'Titillium_Web2';
-    position: fixed;
-    top: 70px;
-    left: -260px;
-    width: 260px;
-    height: calc(100% - 60px);
-    background-color: #301c03;
-    color: white;
-    transition: left 0.5s ease;
-    opacity: 0;
-    z-index: 999;
-  }
-  
-  .sidebar.fadeIn {
+  to {
     opacity: 1;
     transform: translateX(0);
-    animation: fadeIn 0.6s ease-in forwards;
   }
+}
 
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateX(-260px);
-    }
-    to {
-      opacity: 1;
-      transform: translateX(0);
-    }
-  }
-  
-  .sidebar.open {
-    left: 0;
-  }
-  
-  .sidebar ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-  
-  .sidebar li {
-    padding: 35px 20px;
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    margin-bottom: 20px;
-    margin-top: 20px;
-  }
-  
-  .sidebar li:hover {
-    transform: scale(1.1);
-    transition: transform 0.1s;
-  }
-  
-  .icon {
-    margin-right: 10px;
-  }
-  
-  .icon:hover, .notificationIcon:hover {
-    transform: scale(1.3);
-    transition: transform 0.2s;
-  }
+.sidebar.open {
+  left: 0;
+}
 
-  .mainContent {
-    flex: 1;
-    background-color: #fff;
-    padding: 80px 40px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: calc(100vh - 60px); 
-    transition: margin-left 0.4s ease;
-  }
-  
-  .sidebar.open ~ .mainContent {
-    margin-left: 200px;
-  }
-  
-  .mainText h2 {
-    font-size: 26px;
-    color: #472905;
-    line-height: 1.4;
-    text-align: center;
-    max-width: 700px;
-    background-color: rgb(255, 251, 248);
-    padding: 30px 40px;
-    border-radius: 20px;
-    box-shadow: 0px 4px 15px rgb(0, 0, 0, 0.5);
-  }
-  
-  .mainText {
-    opacity: 0;
-  }
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+}
 
-  .mainText.fadeIn {
-    opacity: 1;
-    transform: translateX(0);
-    animation: fadeIn 1s ease-in;
-  }
+.sidebar li {
+  padding: clamp(20px, 5vh, 35px) clamp(20px, 4vw, 30px);
+  font-size: clamp(8px, 1.05vw, 20px);
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.sidebar li:hover {
+  transform: scale(1.1);
+  transition: transform 0.1s;
+}
+
+.icon {
+  font-size: clamp(10px, 1vw, 20px);
+  margin-right: clamp(8px, 1vw, 10px);
+}
+
+.icon:hover,
+.notificationIcon:hover {
+  transform: scale(1.3);
+  transition: transform 0.2s;
+}
+
+.mainContent {
+  flex: 1;
+  background-color: #fff;
+  padding: clamp(50px, 6vh, 80px) clamp(20px, 4vw, 40px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: calc(100vh - 60px);
+  transition: margin-left 0.4s ease;
+}
+
+.sidebar.open ~ .mainContent {
+  margin-left: clamp(140px, 15vw, 260px);
+  transition: margin-left 0.4s ease;
+}
 
 
-  .mainText .highlight {
-    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-    color: rgb(249, 215, 44);
-    font-weight: bold;
-    font-size: 30px;
-  }
-  
-  .mainText .sub {
-    font-style: italic;
-    color: black;
-    font-weight: 600;
-    font-size: 20px;
-  }
-  
-  .mainText .keywords {
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    display: block;
-    margin-top: 15px;
-    font-size: 20px;
-    font-weight: 500;
-    color: black;
-  }
-  
-  .keywords strong {
-    color:  rgb(209, 120, 4);
-  }
+.mainText h2 {
+  font-size: clamp(18px, 1.5vw, 30px);
+  color: #472905;
+  line-height: 1.5;
+  text-align: center;
+  max-width: clamp(300px, 55%, 800px);
+  background-color: rgb(255, 251, 248);
+  padding: clamp(17px, 2.5vw, 35px);
+  border-radius: 20px;
+  box-shadow: 0px 4px 15px rgb(0, 0, 0, 0.5);
+}
 
-  .mainText .cta {
-    display: block;
-    margin-top: 20px;
-    font-weight: bold;
-    color: #7c4501;
-    font-size: 18px;
-  }
-  
-  .cta strong {
-    font-weight: bolder;
-  }
+.mainText {
+  justify-items: center;
+  opacity: 0;
+}
 
-  .headerCenter {
-    flex: 1;
-    text-align: center;
-  }
-  
-  .pageTitle {
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-    font-size: 24px;
-    font-weight: bold;
-    color: #5e3e26;
-    padding: 10px 18px;
-    background-color: #fff;
-    border-radius: 10px;
-    display: inline-block;
-  }
+.mainText.fadeIn {
+  opacity: 1;
+  transform: translateX(0);
+  animation: fadeIn 1s ease-in;
+}
 
+.mainText .highlight {
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif;
+  color: rgb(168, 140, 3);
+  font-weight: bold;
+  font-size: clamp(20px, 1.8vw, 34px);
+  position: relative;
+  bottom: 1vh;
+}
+
+.mainText .sub {
+  font-style: italic;
+  color: black;
+  font-weight: 600;
+  font-size: clamp(14px, 1.1vw, 28px);
+}
+
+.mainText .keywords {
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  display: block;
+  margin-top: 15px;
+  font-size: clamp(14px, 1.1vw, 28px);
+  font-weight: 500;
+  color: black;
+}
+
+.keywords strong {
+  color: rgb(209, 120, 4);
+}
+
+.mainText .cta {
+  display: block;
+  margin-top: 20px;
+  font-weight: bold;
+  color: #542e00;
+  font-size: clamp(14px, 1vw, 24px);
+}
+
+.cta strong {
+  font-weight: bolder;
+}
+
+.headerCenter {
+  flex: 1;
+  text-align: center;
+}
+
+.pageTitle {
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+  font-size: clamp(12px, 1.6vw, 28px);
+  font-weight: bold;
+  color: #5e3e26;
+  padding: clamp(5px, 1vw, 12px) clamp(10px, 2vw, 20px);
+  background-color: #fff;
+  border-radius: 10px;
+  display: inline-block;
+  position: relative;
+  right: 3.5vw;
+}
 
 .inactive {
+  width: 100%;
   color: white;
+  display: flex;
+  align-items: center;
 }
 
 .active {
   display: flex;
   align-items: center;
-  padding: 15px 20px;
-  width: 176px;
+  padding: clamp(8px, 1vw, 15px) clamp(8px, 0.5vw, 15px);
+  width: 100%;
   background-color: white;
   color: #301c03;
   font-weight: bold;
-  border-radius: 12px;
-  margin-bottom: -10px;
-  margin-top: -10px;
+  border-radius: 10px;
+  white-space: nowrap;
+  margin-bottom: -1.39vh;
+  margin-top: -1.39vh;
 }
 
+@media screen and (min-width: 7680px) and (max-height: 4320px){
+  .header {
+    width: 100vw;
+    max-width: 7650px;
+  }
+
+  .notificationIcon {
+    bottom: 0;
+  }
+
+  .mainText h2 {
+    max-width: 59%;
+    padding: 60px 50px;
+    word-break: break-word;
+    text-wrap: balance;
+  }
+}
+
+@media screen and (min-width: 5120px) and (max-height: 2880px){
+  .header {
+    width: 100vw;
+    max-width: 5090px;
+  }
+  .notificationIcon {
+    bottom: 0;
+  }
+
+  .mainText h2 {
+    max-width: 59%;
+    padding: 60px 50px;
+    word-break: break-word;
+    text-wrap: balance;
+  }
+}
+
+@media screen and (min-width: 3840px) and (max-height: 2160px){
+  .header {
+    width: 100vw;
+    max-width: 3800px;
+  }
+
+  .notificationIcon {
+    bottom: 0;
+  }
+
+  .mainText h2 {
+    padding: 60px 50px;
+    word-break: break-word;
+    text-wrap: balance;
+  }
+}
+
+@media screen and (min-width: 2560px) and (max-height: 1440px){
+  .header {
+    width: 99vw;
+    max-width: 2600px;
+  }
+
+  .notificationIcon {
+    bottom: 0;
+  }
+}
+
+@media screen and (max-width: 1024px){
+  .header {
+    width: 97vw;
+  }
+
+  .notificationIcon {
+    top: 0;
+  }
+
+  .sidebar {
+    width: 18vw;
+  }
+
+  .sidebar li {
+    padding: 10px 20px;
+    word-break: break-word;
+    text-wrap: balance;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .dashboard {
+    flex-direction: column;
+  }
+
+  .header {
+    flex-wrap: nowrap;
+    gap: 10px;
+    width: 95vw;
+  }
+
+  .managerName {
+    margin-left: auto;
+  }
+
+  .notificationIcon {
+    top: 0;
+  }
+
+  .sidebar {
+    width: 20vw;
+  }
+
+  .sidebar li {
+    padding: 10px 15px;
+    word-break: break-word;
+    text-wrap: balance;
+  }
+
+  .sidebar ul {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+  }
+
+  .mainContent {
+    margin-left: 0 !important;
+    padding: clamp(40px, 6vh, 60px) clamp(10px, 4vw, 30px);
+  }
+}
+
+@media screen and (max-width: 540px) {
+  .sidebar {
+    width: 25vw;
+  }
+}
+
+@media screen and (max-width: 480px) {
+
+  .header {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px;
+    height: 55px;
+  }
+
+  .leftSection,
+  .rightSection,
+  .headerCenter {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    flex: 1;
+  }
+
+  .headerCenter {
+    justify-content: center; 
+  }
+
+  .pageTitle {
+    right: 0;
+    white-space: nowrap;
+    border-radius: 5px;
+  }
+
+  .sidebar {
+    width: clamp(120px, 16vw, 275px);
+  }
+
+  .sidebar ul {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+  }
+
+  .sidebar li {
+    padding: 10px 8px;
+  }
+
+  .mainContent {
+    margin-left: 0 !important;
+    padding: clamp(40px, 6vh, 60px) clamp(10px, 4vw, 30px);
+  }
+
+  .sidebar ~ .mainContent .mainText {
+    display: none !important;
+  }
+
+  .cafeName {
+    display: none;
+  }
+}

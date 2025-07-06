@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import styles from '../styles/SupplierNotification.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBell, faCheckCircle, faClock } from '@fortawesome/free-solid-svg-icons';
@@ -14,31 +14,30 @@ const SupplierNotification = () => {
 
   const token = sessionStorage.getItem('authToken') || localStorage.getItem('authToken');
 
+  const fetchNotifications = useCallback(async () => {
+    try {
+      const response = await axios.get('http://localhost:8000/api/user/supplier/notifications', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: 'application/json',
+        },
+        withCredentials: true,
+      });
+
+      setNotifications(response.data.notifications);
+    } catch (err) {
+      console.error('Error fetching notifications:', err);
+      setError('Failed to load notifications.');
+    } finally {
+      setLoading(false);
+    }
+  }, []); 
+
   useEffect(() => {
     document.title = "Cafe Delights - Supplier Notifications";
-
-    const fetchNotifications = async () => {
-      try {
-        const response = await axios.get('http://localhost:8000/api/user/supplier/notifications', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            Accept: 'application/json',
-          },
-          withCredentials: true,
-        });
-
-        setNotifications(response.data.notifications);
-      } catch (err) {
-        console.error('Error fetching notifications:', err);
-        setError('Failed to load notifications.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchNotifications();
-  }, []);
-
+  }, [fetchNotifications])
+  
   const markAsSeen = async (id) => {
     try {
       await axios.patch(`http://localhost:8000/api/user/supplier/notifications/${id}/seen`, {}, {
@@ -75,12 +74,14 @@ const SupplierNotification = () => {
       } else {
         toast.info('Supply request rejected. Manager will be notified.');
       }
-      // بعد الرد، نعتبره تم
+  
       setNotifications((prev) =>
         prev.map((notif) =>
           notif.id === id ? { ...notif, seen: true } : notif
         )
       );
+
+      fetchNotifications();
     } catch (err) {
       console.error('Error submitting response:', err);
       alert('Failed to send response.');
@@ -119,7 +120,6 @@ const SupplierNotification = () => {
                 </p>
                 {notif.purpose === 'Supply Request' && (
                   <>
-                    {/* تفاصيل حالة الطلب دائمًا تظهر تحت الأزرار */}
                     <div className={styles.detailsSection}>
 
                       {notif.items && notif.items.length > 0 && (
@@ -153,7 +153,6 @@ const SupplierNotification = () => {
 
                     </div>
 
-                      {/* أزرار الرد تظهر فقط إذا الحالة pending */}
                       {notif.status === 'pending' && (
                       <div className={styles.responseSection}>
                         <button className={styles.acceptButton} onClick={() => respond(notif.id, 'accepted')}>

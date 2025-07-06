@@ -4,13 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Models\InventoryItem;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Models\Notification;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Log;
 
 class InventoryManagementController extends Controller
 {
+    /**
+     * Display a listing of the inventory items for the authenticated manager.
+     *
+     * @return JsonResponse
+     */
     public function index()
     {
         $managerId = auth('manager')->id();
@@ -20,45 +25,47 @@ class InventoryManagementController extends Controller
         return response()->json(['inventory_items' => $items,]);
     }
 
-    //    ..................................................................................................................
-
     /**
      * Checks for low stock and creates a notification if necessary.
      * Returns the low stock message if a new notification was created, otherwise null.
      *
-     * @param  \App\Models\InventoryItem  $item
+     * @param InventoryItem $item
      * @return string|null
      */
-    protected function checkAndCreateLowStockNotification(InventoryItem $item)
+    protected function checkAndCreateLowStockNotification(InventoryItem $item): ?string
     {
         if ($item->quantity <= $item->threshold_level) {
             $managerId = auth('manager')->id();
             $message = "{$item->name} only has {$item->quantity} {$item->unit} left.\n(threshold: {$item->threshold_level} {$item->unit}).";
 
-            // التحقق مما إذا كان هناك إشعار غير مقروء بنفس الرسالة والهدف
-            // هذا يمنع تكرار الإشعارات لنفس حالة النقص
             $existingNotification = Notification::where('manager_id', $managerId)
                 ->where('purpose', 'Low Stock Alert')
                 ->where('message', $message)
-                ->where('seen', false) // فقط إذا لم يُرَ الإشعار بعد
+                ->where('seen', false)
                 ->first();
 
             if (!$existingNotification) {
-                // إنشاء إشعار جديد
+
                 Notification::create([
                     'manager_id' => $managerId,
-                    'sent_by' => 'system', // تم الإرسال بواسطة النظام
-                    'purpose' => 'Low Stock Alert', // الغرض من الإشعار هو نقص المخزون
+                    'sent_by' => 'system',
+                    'purpose' => 'Low Stock Alert',
                     'message' => $message,
-                    'createdAt' => Carbon::now(), // استخدام Carbon لضبط الوقت الحالي
-                    'seen' => false, // الإشعار غير مقروء في البداية
+                    'createdAt' => Carbon::now(),
+                    'seen' => false,
                 ]);
-                return $message; // إرجاع رسالة التنبيه لعرضها في الفرونت إند
+                return $message;
             }
         }
-        return null; // لا يوجد تنبيه جديد
+        return null;
     }
 
+    /**
+     * Display the specified inventory item for the authenticated manager.
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
     public function show($id)
     {
         try {
@@ -78,8 +85,13 @@ class InventoryManagementController extends Controller
             ], 404);
         }
     }
-    //    ................................................................................................................................................
 
+    /**
+     * Store a newly created inventory item in storage.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -108,8 +120,14 @@ class InventoryManagementController extends Controller
 
         return response()->json($response, 201);
     }
-    //    ................................................................................................................................................
 
+    /**
+     * Update the specified inventory item in storage.
+     *
+     * @param Request $request
+     * @param int $id
+     * @return JsonResponse
+     */
     public function update(Request $request, $id)
     {
         $item = InventoryItem::where('manager_id', auth('manager')->id())->findOrFail($id);
@@ -138,8 +156,13 @@ class InventoryManagementController extends Controller
 
         return response()->json($response);
     }
-    //    ................................................................................................................................................
 
+    /**
+     * Remove the specified inventory item from storage.
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
     public function destroy($id)
     {
         $item = InventoryItem::where('manager_id', auth('manager')->id())->findOrFail($id);
@@ -159,3 +182,4 @@ class InventoryManagementController extends Controller
         ]);
     }
 }
+

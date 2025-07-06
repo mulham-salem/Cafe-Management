@@ -22,28 +22,25 @@ const MenuAndOrder = () => {
   const [showOverlay, setShowOverlay] = useState(false);
   const [loading, setLoading] = useState(true);
 
-    // Get the token from sessionStorage or localStorage
   const token = sessionStorage.getItem('authToken') || localStorage.getItem('authToken');
 
-  // Configure Axios defaults
   axios.defaults.withCredentials = true;
-  axios.defaults.baseURL = 'http://localhost:8000/api'; // Adjust your API base URL if different
+  axios.defaults.baseURL = 'http://localhost:8000/api'; 
   axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
   axios.defaults.headers.post['Content-Type'] = 'application/json';
   axios.defaults.headers.put['Content-Type'] = 'application/json';
 
-  // Fetch menu items from the backend
   useEffect(() => {
     const fetchMenu = async () => {
       try {
-        const response = await axios.get('/user/customer/menuitem'); // Adjust API endpoint if necessary
+        const response = await axios.get('/user/customer/menuitem'); 
         if (response.data.data) {
           setMenu(response.data.data.map(item => ({
             ...item,
-            id: item.id, // Using name as a temporary ID, you should use a unique ID from your backend if available
-            imageUrl: item.image, // Map 'image' from backend to 'imageUrl' for consistency
+            id: item.id, 
+            imageUrl: item.image, 
             category: item.category,
-            available: item.available // Assuming items fetched are available. Adjust if your backend sends availability.
+            available: item.available 
           })));
           setFilteredMenu(response.data.data.map(item => ({
             ...item,
@@ -75,8 +72,6 @@ const MenuAndOrder = () => {
       setFilteredMenu(menu);
     } else {
       const filtered = menu.filter(item => {
-        // Assuming your backend category names are 'drinks' and 'snacks'
-        // You might need to adjust this if your backend uses different category identifiers (e.g., category_id)
         return item.category === category.toLowerCase();
       });
       setFilteredMenu(filtered);
@@ -97,7 +92,6 @@ const MenuAndOrder = () => {
         updatedItems[existingItemIndex] = {
           ...updatedItems[existingItemIndex], 
           quantity: updatedItems[existingItemIndex].quantity + 1 ,
-          // * إعادة حساب السعر الإجمالي بناءً على سعر الوحدة الجديد *
           price: (updatedItems[existingItemIndex].quantity + 1) * updatedItems[existingItemIndex].unitPrice 
         };
         return updatedItems; 
@@ -137,26 +131,21 @@ const MenuAndOrder = () => {
       return;
     }
 
-    // Map orderItems to the structure expected by your Laravel backend
     const itemsForBackend = orderItems.map(item => ({
-      menuItem_id: item.id, // Assuming 'id' from your frontend state maps to 'menu_item_id' in backend
+      menuItem_id: item.id, 
       quantity: item.quantity,
-      note: item.note,
     }));
 
     try {
       let toastMessage;
       if (editMode && orderToEdit) {
-     // * الجزء الذي يجب تعديله لإرسال طلب التعديل (PUT) *
         const response = await axios.put(`/user/customer/orders/${orderToEdit.id}/edit`, { 
-      // هام: تأكد أن 'orderToEdit.id' هو الـ ID الصحيح للطلب
-      // يجب أن يتم تمريره من الصفحة السابقة
-        items: itemsForBackend, // تم بناء هذا Array في بداية الدالة
+        items: itemsForBackend, 
         note: note.trim(),
       });
       toastMessage = response.data.message; 
       } else {
-        const response = await axios.post('/user/customer/orders/create', { // Adjust API endpoint if necessary
+        const response = await axios.post('/user/customer/orders/create', { 
           items: itemsForBackend,
           note: note.trim(),
         });
@@ -172,7 +161,7 @@ const MenuAndOrder = () => {
       if (error.response && error.response.data && error.response.data.error) {
         toast.error(error.response.data.error);
       } else if (error.response && error.response.data && error.response.data.message) {
-        toast.error(error.response.data.message); // For validation errors
+        toast.error(error.response.data.message); 
       }
       else {
         toast.error('Failed to create order.');
@@ -187,25 +176,19 @@ const MenuAndOrder = () => {
 
   useEffect(() => {
     if (editMode && orderToEdit) {
-      // * الجزء الذي يجب تعديله لجلب بيانات الطلب للتعديل (GET) *
       const fetchOrderForEdit = async () => {
         try {
           const response = await axios.get(`/user/customer/orders/${orderToEdit.id}/edit`);
-          // هام: تأكد أن 'orderToEdit.id' هو الـ ID الصحيح للطلب
           const fetchedOrder = response.data;
           
-          // تحويل البيانات المسترجعة من الباك إند لتناسب هيكل orderItems في الواجهة الأمامية
           const formattedItems = fetchedOrder.items.map(item => ({
-            id: item.menuItem_id, // هذا يجب أن يتطابق مع 'id' في كائن الـ MenuItem الذي أرجعته دالة fetchMenuItems
+            id: item.menuItem_id, 
             name: item.name,
             price: item.price,
             unitPrice: item.price / item.quantity,
             quantity: item.quantity,
-            // إذا كنت بحاجة لـ imageUrl أو description للعرض في الـ OverlayForm، ستحتاج لجلبها من الباك إند
-            // حالياً، دالة editOrder في الباك إند لا ترجع هذه البيانات مباشرة.
-            // قد تحتاج لتعديل الباك إند (في الـ GET) لإرجاعها، أو جلبها من الـ 'menu' state لديك.
-            imageUrl: item.image, // مؤقتًا فارغ، يمكنك جلبها من الـ 'menu' state إذا كانت متوفرة
-            available: true, // افتراضياً متوفر عند التعديل، عدّل حسب منطق الباك إند
+            imageUrl: item.image, 
+            available: true, 
           }));
 
           setOrderItems(formattedItems || []);
@@ -228,7 +211,6 @@ const MenuAndOrder = () => {
       updatedItems[index] = {
         ...itemToUpdate,
         quantity: itemToUpdate.quantity + 1,
-        // * حساب السعر الإجمالي الجديد بناءً على سعر الوحدة *
         price: (itemToUpdate.quantity + 1) * itemToUpdate.unitPrice, 
       };
       return updatedItems;
@@ -244,11 +226,9 @@ const MenuAndOrder = () => {
         updatedItems[index] = {
           ...itemToUpdate,
           quantity: itemToUpdate.quantity - 1,
-          // * حساب السعر الإجمالي الجديد بناءً على سعر الوحدة *
           price: (itemToUpdate.quantity - 1) * itemToUpdate.unitPrice, 
         };
       } else {
-        // إذا وصلت الكمية إلى 0، احذف العنصر
         updatedItems.splice(index, 1); 
       }
       return updatedItems;

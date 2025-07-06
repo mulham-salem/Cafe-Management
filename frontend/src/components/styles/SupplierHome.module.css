@@ -1,140 +1,141 @@
 .container {
-    font-family: "Segoe UI", sans-serif;
-    min-height: 100vh;
-    max-height: 100vh;
-    background: linear-gradient(to bottom right, #fdfdfd, #f4f9ff);
-    padding-bottom: 40px;
-    width: 100%;
-    overflow-y: auto;
-    overflow-x: hidden;  
-    overscroll-behavior: smooth;
-  }
+  font-family: "Segoe UI", sans-serif;
+  min-height: 100vh;
+  max-height: 100vh;
+  background: linear-gradient(to bottom right, #fdfdfd, #f4f9ff);
+  padding-bottom: 40px;
+  width: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: smooth;
+}
 
-  .container::-webkit-scrollbar {
-    display: none;
-  } 
+.container::-webkit-scrollbar {
+  display: none;
+}
 
-  .navbar {
-    background-color: #1f2d3d;
-    color: white;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 14px 30px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  }
-  
-  .navIcon {
-    color: white;
-    font-size: 1.4rem;
-    transition: transform 0.3s ease;
-  }
-  
-  .navIcon:hover {
-    transform: scale(1.2);
-    color: #fecb8d;
-  }
-  
-  @font-face {
-    font-family: 'Playfair Display';
-    src: url('Fonts/Playfair_Display/static/PlayfairDisplay-Regular.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-  }
+.navbar {
+  background-color: #1f2d3d;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 30px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
 
-  .brand {
-    font-family: 'Playfair Display';
-    display: flex;
-    align-items: center;
-    margin-left: 4%;
-    gap: 2px;
-    font-size: 1.4rem;
-    font-weight: bolder;
-    letter-spacing: 0.2px;
-  }
-  
-  .logo {
-    width: 50px;
-    height: 50px;
-    scale: 1.2;
-  }
+.navIcon {
+  color: white;
+  font-size: 1.4rem;
+  transition: transform 0.3s ease;
+}
 
-  .logo:hover {
-    transform: scale(1.4);
-    transition: ease 0.3s;
-  }
-  
-  .userArea {
-    position: relative;
-    cursor: pointer;
-    font-weight: bold;
-    padding: 8px 8px;
-    transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-  }
+.navIcon:hover {
+  transform: scale(1.2);
+  color: #fecb8d;
+}
 
-  .rightSection {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
+@font-face {
+  font-family: "Playfair Display";
+  src: url("Fonts/Playfair_Display/static/PlayfairDisplay-Regular.ttf")
+    format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
 
-  .dropdown {
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    min-width: fit-content;
-    width: auto;
-    padding: 8px 0;
-    border-radius: 8px;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateX(-50%) translateY(20px);
-    transition: all 0.3s ease;
-    z-index: 1000;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    z-index: 1000;
-  }
+.brand {
+  font-family: "Playfair Display";
+  display: flex;
+  align-items: center;
+  margin-left: 4%;
+  gap: 2px;
+  font-size: 1.4rem;
+  font-weight: bolder;
+  letter-spacing: 0.2px;
+}
 
-  .dropdownButton {
-    border: 1px solid #1f2d3d; 
-    padding: 8px 16px;
-    background-color: white;
-    color: #1f2d3d;
-    font-size: 13px;
-    cursor: pointer;
-    border-radius: 10px;
-    width: 80%;
-    white-space: nowrap;
-    font-weight: 540;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
+.logo {
+  width: 50px;
+  height: 50px;
+  scale: 1.2;
+}
 
-  .dropdownButton:hover {
-    background-color: #f4f9ff;
-    transform: none;
-    transform: scale(1.1);
-    transition: transform 0.2s;
-    font-weight: bold;
-  }
-  
-  /* .keyIcon {
+.logo:hover {
+  transform: scale(1.4);
+  transition: ease 0.3s;
+}
+
+.userArea {
+  position: relative;
+  cursor: pointer;
+  font-weight: bold;
+  padding: 8px 8px;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+}
+
+.rightSection {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dropdown {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  min-width: fit-content;
+  width: auto;
+  padding: 8px 0;
+  border-radius: 8px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(-50%) translateY(20px);
+  transition: all 0.3s ease;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  z-index: 1000;
+}
+
+.dropdownButton {
+  border: 1px solid #1f2d3d;
+  padding: 8px 16px;
+  background-color: white;
+  color: #1f2d3d;
+  font-size: 13px;
+  cursor: pointer;
+  border-radius: 10px;
+  width: 80%;
+  white-space: nowrap;
+  font-weight: 540;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dropdownButton:hover {
+  background-color: #f4f9ff;
+  transform: none;
+  transform: scale(1.1);
+  transition: transform 0.2s;
+  font-weight: bold;
+}
+
+/* .keyIcon {
     position: relative;
     right: 10px;
   } */
 
-  /* .logoutIcon {
+/* .logoutIcon {
     position: relative;
     left: 8px; 
     text-align: center;
   } */
 
-  /* .logout {
+/* .logout {
     position: relative;
     left: 10px;
   } */
@@ -144,250 +145,252 @@
     right: 15px;
   } */
 
-  .userArea:hover .dropdown {
+.userArea:hover .dropdown {
+  opacity: 1;
+  visibility: visible;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+.heroText {
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  text-align: center;
+  margin-top: 30px;
+  animation: fadeInDown 1.5s ease forwards;
+}
+
+.heroText h1 {
+  font-size: 2.5rem;
+  color: #1f2d3d;
+}
+
+.heroText p {
+  color: #555;
+  margin-top: 8px;
+  font-weight: 600;
+}
+
+.tabs {
+  display: flex;
+  justify-content: center;
+  margin: 30px 0 20px;
+  gap: 20px;
+}
+
+.tabs button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 12px;
+  background-color: #dcdcdc;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: bold;
+}
+
+.activeTab {
+  background-color: #1f2d3d !important;
+  color: white !important;
+  transform: scale(1.08);
+  box-shadow: 0 0 8px rgba(31, 45, 61, 0.4);
+}
+
+.tabs button:hover {
+  background-color: #c0c0c0;
+}
+
+.mainContent {
+  width: 100%;
+  max-width: 960px;
+  margin: auto;
+}
+
+.offerForm {
+  background-color: white;
+  padding: 25px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  border: 1px solid #1f2d3d;
+  margin-top: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  animation: fadeIn 0.6s ease forwards;
+}
+
+.offerForm input,
+.offerForm textarea {
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  width: 96%;
+  transition: border-color 0.5s ease;
+}
+
+.offerForm input[type="date"] {
+  position: relative;
+  top: 8px;
+  max-width: 97%;
+}
+.offerForm input:focus,
+.offerForm textarea:focus {
+  border-color: #1f2d3d;
+  outline: none;
+}
+
+.offerForm textarea {
+  position: relative;
+  left: 0px;
+}
+
+.offerForm h4 {
+  margin-top: 1px;
+  color: #1f2d3d;
+  font-size: 18px;
+  position: relative;
+  top: 18px;
+}
+
+.itemRow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 40px;
+  margin-right: 24px;
+}
+
+.addItemBtn,
+.submitBtn {
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 12px;
+  font-weight: bold;
+  background-color: #1f2d3d;
+  color: white;
+  cursor: pointer;
+  display: block;
+  text-align: center;
+  font-size: 15px;
+  transition: background-color 0.4s ease, transform 0.2s ease;
+}
+
+.addItemBtn:hover,
+.submitBtn:hover {
+  background-color: #32465a;
+  transform: scale(1.03);
+}
+
+.offersList {
+  margin-top: 35px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  animation: fadeIn 0.6s ease;
+}
+
+.offerCard {
+  background-color: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  animation: fadeInUp 0.5s ease;
+}
+
+.offerCard h3 {
+  margin-bottom: 20px;
+  color: #1f2d3d;
+}
+
+.offerCard p {
+  margin: 6px 0;
+}
+
+.rejection strong {
+  color: #c0392b;
+  font-weight: bold;
+}
+
+.itemsTable {
+  width: 100%;
+  margin-top: 10px;
+  border-collapse: collapse;
+}
+
+.itemsTable th,
+.itemsTable td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+.itemsTable th {
+  background-color: #f4f4f4;
+  color: #1f2d3d;
+}
+
+.emptyText {
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif;
+  font-size: 18px;
+  text-align: center;
+  color: #888;
+  margin-top: 100px;
+}
+
+.emptyText {
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif;
+  font-size: 18px;
+  text-align: center;
+  color: #888;
+  margin-top: 100px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
     opacity: 1;
-    visibility: visible;
-    visibility: visible;
-    transform: translateX(-50%) translateY(0);
+    transform: translateY(0);
   }
-  
-  .heroText {
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    text-align: center;
-    margin-top: 30px;
-    animation: fadeInDown 1.5s ease forwards;
-  }
-  
-  .heroText h1 {
-    font-size: 2.5rem;
-    color: #1f2d3d;
-  }
-  
-  .heroText p {
-    color: #555;
-    margin-top: 8px;
-    font-weight: 600;
-  }
-  
-  .tabs {
-    display: flex;
-    justify-content: center;
-    margin: 30px 0 20px;
-    gap: 20px;
-  }
-  
-  .tabs button {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 12px;
-    background-color: #dcdcdc;
-    color: #333;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-weight: bold;
-  }
-  
-  .activeTab {
-    background-color: #1f2d3d !important;
-    color: white !important;
-    transform: scale(1.08);
-    box-shadow: 0 0 8px rgba(31, 45, 61, 0.4);
-  }
-  
-  .tabs button:hover {
-    background-color: #c0c0c0;
-  }
-  
-  .mainContent {
-    width: 100%;
-    max-width: 960px;
-    margin: auto;
-  }
-  
-  .offerForm {
-    background-color: white;
-    padding: 25px;
-    border-radius: 16px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    border: 1px solid #1f2d3d;
-    margin-top: 30px;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    animation: fadeIn 0.6s ease forwards;
-  }
-  
-  .offerForm input,
-  .offerForm textarea {
-    padding: 10px 14px;
-    border-radius: 10px;
-    border: 1px solid #ccc;
-    font-size: 1rem;
-    width: 96%;
-    transition: border-color 0.5s ease;
-  }
-  
-  .offerForm input[type=datetime-local] {
-    position: relative;
-    top: 8px;
-    max-width: 97%;
-  }
-  .offerForm input:focus,
-  .offerForm textarea:focus {
-    border-color: #1f2d3d;
-    outline: none;
-  }
-  
-  .offerForm textarea {
-    position: relative;
-    left: 0px;
-  }
+}
 
-  .offerForm h4 {
-    margin-top: 1px;
-    color: #1f2d3d;
-    font-size: 18px;
-    position: relative;
-    top: 18px;
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
   }
-  
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
   .itemRow {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 40px;
-    margin-right: 24px;
+    grid-template-columns: 1fr 1fr;
   }
-  
-  .addItemBtn,
-  .submitBtn {
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    padding: 10px 16px;
-    border: none;
-    border-radius: 12px;
-    font-weight: bold;
-    background-color: #1f2d3d;
-    color: white;
-    cursor: pointer;
-    display: block;
-    text-align: center;
-    font-size: 15px;
-    transition: background-color 0.4s ease, transform 0.2s ease;
-  }
-  
-  .addItemBtn:hover,
-  .submitBtn:hover {
-    background-color: #32465a;
-    transform: scale(1.03);
-  }
-  
-  .offersList {
-    margin-top: 35px;
-    display: flex;
+
+  .tabs {
     flex-direction: column;
-    gap: 20px;
-    animation: fadeIn 0.6s ease;
-  }
-  
-  .offerCard {
-    background-color: #fff;
-    border-radius: 16px;
-    padding: 20px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-    animation: fadeInUp 0.5s ease;
-  }
-  
-  .offerCard h3 {
-    margin-bottom: 20px;
-    color: #1f2d3d;
-  }
-  
-  .offerCard p {
-    margin: 6px 0;
-  }
-  
-  .rejection strong {
-    color: #c0392b;
-    font-weight: bold;
-  }
-  
-  .itemsTable {
-    width: 100%;
-    margin-top: 10px;
-    border-collapse: collapse;
-  }
-  
-  .itemsTable th,
-  .itemsTable td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: center; 
-  }
-  
-  .itemsTable th {
-    background-color: #f4f4f4;
-    color: #1f2d3d;
+    gap: 10px;
   }
 
-  .emptyText {
-    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-    font-size: 18px;
-    text-align: center;
-    color: #888;
-    margin-top: 100px;
+  .heroText h1 {
+    font-size: 1.8rem;
   }
-
-  .emptyText {
-    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-    font-size: 18px;
-    text-align: center;
-    color: #888;
-    margin-top: 100px;
-  }
-  
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(50px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
-  @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(50px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
-  @keyframes fadeInDown {
-    from {
-      opacity: 0;
-      transform: translateY(-50px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
-  @media (max-width: 768px) {
-    .itemRow {
-      grid-template-columns: 1fr 1fr;
-    }
-  
-    .tabs {
-      flex-direction: column;
-      gap: 10px;
-    }
-  
-    .heroText h1 {
-      font-size: 1.8rem;
-    }
-  }
+}

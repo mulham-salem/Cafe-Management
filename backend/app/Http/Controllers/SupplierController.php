@@ -8,9 +8,16 @@ use App\Models\Supplier;
 use App\Models\SupplyOffer;
 use App\Models\SupplyOfferItem;
 use Exception;
+use Illuminate\Http\JsonResponse;
 
 class SupplierController extends Controller
 {
+    /**
+     * Stores a new supply offer submitted by an authenticated supplier.
+     *
+     * @param StoreSupplyOfferRequest $request
+     * @return JsonResponse
+     */
     public function store(StoreSupplyOfferRequest $request)
     {
         $user = auth('user')->user();
@@ -67,6 +74,12 @@ class SupplierController extends Controller
         }
     }
 
+
+    /**
+     * Retrieves all supply offers submitted by the authenticated supplier.
+     *
+     * @return JsonResponse
+     */
     public function viewMyOffers()
     {
         $supplier = auth('user')->user();
@@ -100,3 +113,6 @@ class SupplierController extends Controller
         ]);
     }
 }
+
+
+

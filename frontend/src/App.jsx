@@ -1,7 +1,10 @@
 import React from 'react';
+
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+
 import Login from './components/Login';
 import ChangePassword from './components/ChangePassword';
+
 import ManagerDashboard from './components/Manager/ManagerDashboard';
 import UserManagement from './components/Manager/UserManagement';
 import MenuManagement from './components/Manager/MenuManagement';
@@ -9,19 +12,24 @@ import TableManagement from './components/Manager/TableManagement';
 import InventorySupply from './components/Manager/InventorySupply';
 import PromotionManagement from './components/Manager/PromotionManagement';
 import ManagerNotification from './components/Manager/ManagerNotification';
+
 import SupplierHome from './components/Supplier/SupplierHome';
 import SupplierNotification from './components/Supplier/SupplierNotification';
+
 import CustomerHome from './components/Customer/CustomerHome';
 import CustomerNotification from './components/Customer/CustomerNotification';
 import MenuAndOrder from './components/Customer/MenuAndOrder';
 import UserOrder from './components/Customer/UserOrder';
 import TableReservation from './components/Customer/TableReservation';
+
 import EmployeeHome from './components/Employee/EmployeeHome';
 import MenuAndOrderEmp from './components/Employee/MenuAndOrderEmp';
 import UserOrderEmp from './components/Employee/UserOrderEmp';
 import KitchenOrders from './components/Employee/KitchenOrders';
 import EmployeeNotification from './components/Employee/EmployeeNotification';
+
 import ProtectedRoute from './components/ProtectedRoute';
+
 import { OrderNotificationProvider } from './context/OrderNotificationProvider';
 
 

@@ -29,6 +29,7 @@ const TableReservation = () => {
 
   
   const token = sessionStorage.getItem('authToken') || localStorage.getItem('authToken');
+  
   axios.defaults.withCredentials = true;
   axios.defaults.baseURL = 'http://localhost:8000/api'; 
   axios.defaults.headers = {
@@ -115,7 +116,7 @@ const TableReservation = () => {
             📅 Date: {reservationDate} <br />
             🕒 Time: {reservationTime} <br />
             👥 Guests: {guestCount} <br />
-            🍽️ Table ID: {selectedTableId}
+            🍽️ Table: {selectedTableId}
           </small>
         </span>
       );
@@ -245,7 +246,7 @@ const TableReservation = () => {
       fetchAvailableTables(guestCount || 1); 
 
       toast.success(
-        `Reservation for table #${reservation.table_id} has been canceled 🗑️`,
+        `Reservation for table #${reservation.table_id} has been canceled`, {icon:'🗑️'}
       );
     } catch (error) {
       console.error('Error canceling reservation:', error);

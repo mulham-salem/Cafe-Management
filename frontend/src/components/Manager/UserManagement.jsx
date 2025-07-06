@@ -308,10 +308,12 @@ const UserManagement = () => {
   };
 
   return (
-    <div className={styles.container}>
+    <div className={`${styles.container} ${showInputs ? styles.open : styles.close}`}>
       <ToastContainer />
       {loading ? (
-        <p className={styles.emptyText}>Loading...</p>
+        <div className={styles.loadingOverlay}>
+          <p className={styles.emptyText}>Loading...</p>
+        </div>
       ) : (
       <>
         {!showInputs && (
@@ -454,6 +456,3 @@ const UserManagement = () => {
   );
 }
 export default UserManagement;
-
-
-

@@ -1,287 +1,605 @@
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
 .container {
-    font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-    padding: 2rem;
-    height: 90%;
-    overflow-y: auto;
-    overflow-x: hidden; 
-    width: 100%;
-  }
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  padding: clamp(1rem, 2vw, 3rem);
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  width: 100%;
+}
 
 .container::-webkit-scrollbar {
-    display: none;
-} 
-  
-  .addButton {
-    background-color: rgb(65, 44, 44);
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    font-size: 16px;
-    border-radius: 8px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: background-color 0.4s;
-    position: relative;
-    font-weight: bold;
-    bottom: 10px;
-    left: 1228px;
+  display: none;
+}
+
+.addButton {
+  background-color: rgb(65, 44, 44);
+  color: white;
+  border: none;
+  padding: clamp(8px, 0.6vw, 12px) clamp(10px, 1vw, 24px);
+  font-size: clamp(12px, 1.1vw, 18px);
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.4s;
+  position: fixed;
+  font-weight: bold;
+  left: 1300px;
+  top: 90px;
+}
+
+.addButton:hover {
+  background-color: #8d4d04;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  width: clamp(280px, 22vw, 400px);
+  gap: 0.8rem;
+  margin-bottom: 4px;
+  background-color: #fff;
+  padding: clamp(12px, 1.5vw, 30px);
+  border-radius: 15px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  z-index: 1001;
+  border: 1px solid #ccc;
+  position: relative;
+  top: 0;
+}
+
+.form input,
+.form textarea,
+.form select {
+  padding: clamp(8px, 0.6vw, 12px) clamp(10px, 1.8vw, 18px);
+  box-sizing: border-box;
+  font-size: clamp(14px, 1vw, 18px);
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  width: 100%;
+  margin: auto;
+}
+
+.form input:focus,
+.form textarea:focus,
+.form select:focus {
+  color: #52300a;
+}
+
+.form input[type="checkbox"] {
+  accent-color: #5a3d1a;
+  position: relative;
+  bottom: 4px;
+  width: 18px;
+  height: 18px;
+  margin-right: clamp(130px, 12vw, 200px);
+  margin-top: 1vh;
+}
+
+.form label {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-size: clamp(14px, 1.1vw, 18px);
+  font-weight: 500;
+  display: flex;
+  margin: auto;
+  margin-top: 2vh;
+}
+
+.form select {
+  width: 100%;
+}
+
+.formOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(1px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.formOverlay textarea {
+  position: relative;
+  left: 0px;
+  margin-top: 0px;
+}
+
+.saveButton {
+  background-color: #522d03;
+  color: white;
+  border: none;
+  padding: clamp(8px, 0.5vw, 12px) clamp(10px, 2vw, 24px);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: clamp(14px, 1vw, 18px);
+  font-weight: bold;
+  transition: background-color 0.3s;
+  margin-top: 20px;
+  display: block;
+  text-align: center;
+}
+
+.saveButton:hover {
+  background-color: #7e5118;
+}
+
+.sectionTitle {
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande", "Lucida Sans", Arial, sans-serif;
+  font-size: clamp(1.1rem, 1.6vw, 2rem);
+  margin-top: 6vh;
+  color: rgb(65, 44, 44);
+  position: relative;
+  top: 1.5vh;
+  text-align: left;
+}
+
+.sectionDivider {
+  border: none;
+  height: 2px;
+  background-color: rgb(73, 50, 50);
+  margin-bottom: 1.5rem;
+}
+
+.menuGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: clamp(0.8rem, 1.5vw, 2rem);
+  width: 100%;
+}
+
+.card {
+  background-color: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #ddd;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 260px;
+  min-height: 320px;
+  margin: 0 auto;
+  animation: fadeInDown 0.8s ease-in;
+}
+
+.card:hover {
+  transform: translateY(-10px);
+  transition: ease-out 0.2s;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.cardImage {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+
+.cardContent {
+  padding: 10px;
+  flex-grow: 1;
+}
+
+@font-face {
+  font-family: "Jost";
+  src: url("Fonts/Jost/static/Jost-Bold.ttf")
+    format("truetype");
+  font-weight: bold;
+  font-style: normal;
+}
+
+.cardContent h4 {
+  font-family: "Jost";
+  margin: 0;
+  font-size: clamp(0.9rem, 1.2vw, 1.2rem);
+  margin-bottom: 4px;
+  color: rgb(65, 44, 44);
+}
+
+.cardContent p {
+  margin: 0.4rem 0;
+  font-size: clamp(0.7rem, 0.9vw, 0.8rem);
+  color: #555;
+  word-wrap: break-word;
+}
+
+.cardActions {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 8px;
+  background-color: rgb(65, 44, 44);
+  border-top: 1px solid #ddd;
+}
+
+.cardActions svg {
+  color: white;
+  cursor: pointer;
+  transition: color 0.3s;
+  font-size: 18px;
+}
+
+.cardActions svg[data-action="Edit"]:hover {
+  color: blue;
+}
+
+.cardActions svg[data-action="Delete"]:hover {
+  color: red;
+}
+
+.cardActions svg:hover {
+  transform: scale(1.3);
+  transition: transform 0.3s;
+}
+
+@keyframes fadeInOverlay {
+  from {
+    opacity: 0;
   }
-  
-  .addButton:hover {
-    background-color: #8d4d04;
+  to {
+    opacity: 1;
   }
-  
-  .form {
-    display: flex;
-    flex-direction: column;
-    width: 300px;
-    gap: 0.8rem;
-    margin-bottom: 4px;
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 15px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-    z-index: 1001;
-    border: 1px solid #ccc;
-    position: relative;
-    top: 0;
-    left: 5%;
+}
+
+@keyframes slideUpModal {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
   }
-  
-  .form input,
-  .form textarea,
-  .form select {
-    padding: 10px 15px;
-    font-size: 16px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    width: 90%;
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.formOverlay {
+  animation: fadeInOverlay 0.3s ease forwards;
+}
+
+.form {
+  animation: slideUpModal 0.4s ease forwards;
+}
+
+.noItemsMessage {
+  text-align: center;
+  width: 100%;
+  padding: 40px 0;
+  color: #888;
+  font-size: clamp(1rem, 1.1vw, 1.2rem);
+  font-style: italic;
+  font-weight: 450;
+  grid-column: 1 / -1;
+}
+
+.loadingOverlay {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  animation: fadeInDelay 0.3s ease-in both;
+  animation-delay: 0.4s; 
+}
+
+.emptyText {
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif;
+  font-size: clamp(14px, 2.5vw, 18px);
+  color: #888;
+}
+
+@keyframes fadeInDelay {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1; 
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media screen and (min-width: 7680px) and (max-height: 4320px) {
+  .container {
+    padding: 3rem;
+    padding-bottom: 12rem;
   }
 
-  .form input:focus,
-  .form textarea:focus,
-  .form select:focus {
-    color: #52300a;
-  } 
+  .sectionTitle {
+    top: 0.3vh;
+  }
+
+  .addButton {
+    left: 7400px;
+    top: 200px;
+  }
 
   .form input[type="checkbox"] {
-    position: relative;
-    accent-color: #5a3d1a;
-    right: 100px;
-    top: 0px;
-    width: 18px;
-    height: 18px;
+    margin-right: 3vw;
+    bottom: clamp(10px, 0.6vw, 35px);
+  }
+}
+
+@media screen and (min-width: 5120px) and (max-height: 2880px) {
+  .container {
+    padding-bottom: 10rem;
   }
 
-  .form label {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    font-size: 16px;
-    font-weight: 500;
-    display: flex;
-    position: relative;
-    left: 150px;
-    top: 10px;
+  .sectionTitle {
+    top: 0.6vh;
   }
 
-  .form select {
-    width: 100%;
+  .addButton {
+    left: 4840px;
+    top: 165px;
   }
 
-  .formOverlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
-    background-color: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(1px);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
+  .form input[type="checkbox"] {
+    margin-right: 4.5vw;
+    bottom: clamp(10px, 0.6vw, 28px);
+  }
+}
+
+@media screen and (min-width: 3840px) and (max-height: 2160px) {
+  .container {
+    padding-bottom: 8rem;
   }
 
-  .formOverlay textarea {
-    position: relative;
-    left: 0px;
-    margin-top: 0px;
+  .sectionTitle {
+    top: 0.6vh;
+  }
+
+  .addButton {
+    left: 3560px;
+    top: 150px;
+  }
+
+  .form input[type="checkbox"] {
+    margin-right: 6vw;
+    bottom: clamp(10px, 0.8vw, 20px);
+  }
+}
+
+@media screen and (min-width: 2560px) and (max-height: 1440px) {
+  .container {
+    padding-bottom: 6rem;
+  }
+
+  .sectionTitle {
+    top: 1vh;
+  }
+
+  .addButton {
+    left: 2280px;
+    top: 138px;
+  }
+
+  .form input[type="checkbox"] {
+    margin-right: 9vw;
+    bottom: clamp(8px, 0.7vw, 14px);
+  }
+}
+
+@media screen and (min-width: 1600px) and (max-height: 1080px){
+  .container {
+    padding-bottom: 4rem;
+  }
+
+  .addButton {
+    left: 1660px;
+    top: 115px;
+  }
+
+  .form input[type="checkbox"] {
+    margin-right: 12vw;
+    bottom: clamp(8px, 0.4vw, 14px);
+  }
+}
+
+@media screen and (max-width: 1280px) {
+  .addButton {
+    left: clamp(600px, 90vw, 1075px);
+    top: clamp(80px, 12vh, 92px);
+  }
+  .form input[type="checkbox"] {
+    margin-right: 150px;
+    bottom: clamp(8px, 0.4vw, 14px);
+  }
+}
+
+@media screen and (max-width: 1024px) {
+  .container {
+    padding-bottom: 4rem;
+  }
+
+  .card {
+    min-width: 240px;
+  }
+
+  .addButton {
+    left: clamp(600px, 81vw, 840px);
+    top: clamp(70px, 12vh, 170px);
+    padding: 10px 8px;
+  }
+
+  .sectionTitle {
+    top: 1.2vh;
+    margin-top: 8vh;
+  }
+
+  .form input[type="checkbox"] {
+    margin-right: 150px;
+    bottom: clamp(8px, 0.4vw, 14px);
   }
 
   .saveButton {
-    background-color: #522d03;
-    color: white;
-    border: none;
-    padding: 0.6rem;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background-color 0.3s;
-    margin-top: 20px;
-    display: block;
-    text-align: center;
-  }
-  
-  .saveButton:hover {
-    background-color: #7e5118;
-  }
-  
-  .sectionTitle {
-    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-    font-size: 1.6rem;
+    padding: 5px 8px;
     margin-top: 10px;
-    margin-bottom: 0.4rem;
-    color: rgb(65, 44, 44);
-    position: relative;
-    bottom: 5%;
-    text-align: left;
   }
-  
-  .sectionDivider {
-    border: none;
-    height: 2px;
-    background-color: rgb(73, 50, 50);
-    margin-bottom: 2rem;
-    position: relative;
-    bottom: 5%;
-  }
-  
-  .menuGrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1.5rem;
-    width: 100%;
-    position: relative;
-    bottom: 40px;
-  }
-  
+}
+
+@media screen and (max-width: 768px) {
   .card {
-    background-color: #fff;
-    border-radius: 15px;
-    overflow: hidden; 
-    border: 1px solid #ddd;
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    display: flex;
-    flex-direction: column;
-    min-width: 300px;
-    max-width: 90%;
-    margin-left: 10px;
-    animation: fadeInDown 0.8s ease-in;
+    min-width: 240px;
   }
-  
-  .card:hover {
-    transform: translateY(-10px);
-    transition: ease-out 0.2s;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+
+  .form select {
+    width: 100%;
+  }
+
+  .form input[type="checkbox"] {
+    margin-right: 150px;
+    bottom: 10px;
+  }
+
+  .addButton {
+    position: relative;
+    left: 555px;
+    top: 115px;
+    padding: 8px 10px;
+  }
+
+  .sectionTitle {
+    top: 1.5vh;
+    margin-top: 8vh;
+  }
+}
+
+@media screen and (max-width: 540px) {
+  .card {
+    min-width: 280px;
+  }
+
+  .form select {
+    width: 100%;
+  }
+
+  .form input[type="checkbox"] {
+    bottom: 8px;
+  }
+
+  .sectionTitle {
+    top: 1.5vh;
+    margin-top: 8vh;
+  }
+
+  .addButton {
+    left: 345px;
+    top: 90px;
+    padding: 8px 10px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+
+  .menuGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .card {
+    min-width: 80%;
   }
 
   .cardImage {
-    width: 100%;
-    height: 250px;
-    object-fit: cover;
-  }
-  
-  .cardContent {
-    padding: 12px 1rem 0.3rem;
-    flex-grow: 1;
-  }
-  
-  .cardContent h4 {
-    margin: 0;
-    font-size: 1.2rem;
-    color: #222;
-  }
-  
-  .cardContent p {
-    margin: 0.4rem 0;
-    font-size: 0.95rem;
-    color: #555;
-    word-wrap: break-word;
-  }
-  
-  .cardActions {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    padding: 10px 15px;
-    background-color: rgb(65, 44, 44);
-    border-top: 1px solid #ddd;
-  }
-  
-  .cardActions svg {
-    color: white;
-    cursor: pointer;
-    transition: color 0.3s;
-    font-size: 20px;
-  }
-  
-  .cardActions svg[data-action="Edit"]:hover {
-    color: blue; 
-  }
-  
-  .cardActions svg[data-action="Delete"]:hover {
-    color: red; 
-  }
-  
-  .cardActions svg:hover {
-    transform: scale(1.3);
-    transition: transform 0.3s;
+    height: 180px;
   }
 
-  @keyframes fadeInOverlay {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-  
-  @keyframes slideUpModal {
-    from {
-      opacity: 0;
-      transform: translateY(30px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
-  .formOverlay {
-    animation: fadeInOverlay 0.3s ease forwards;
-  }
-  
   .form {
-    animation: slideUpModal 0.4s ease forwards;
+    left: 0;
+    width: 80%;
   }
   
-  .noItemsMessage {
-    text-align: center; 
-    width: 100%; 
-    padding: 40px 0; 
-    color: #888; 
-    font-size: 1.2em; 
-    font-style: italic; 
-    grid-column: 1 / -1; 
+  .form input[type="checkbox"] {
+    margin-right: 50vw;
+    bottom: 5px;
   }
 
-  .emptyText {
-    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-    font-size: 18px;
-    margin-left: 700px;
-    color: #888;
+  .form select {
+    width: 100%;
   }
 
-  @keyframes fadeInDown {
-    from {
-      opacity: 0;
-      transform: translateY(-20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+  .sectionTitle {
+    top: 1.5vh;
+    margin-top: 40px;
   }
+
+  .addButton {
+    position: relative;
+    left: 82%;
+    transform: translateX(-50%);
+    top: 70px;
+    width: 36%;
+    padding: 6px 2px;
+    justify-content: center;
+
+  }
+}
+
+@media screen and (max-width: 480px) and (max-height: 500px){
+
+  .card {
+    min-width: 80%;
+  }
+
+  .form {
+    left: 0;
+    margin-top: auto;
+    width: 80%;
+    height: 74%;
+  }
+
+  .form input,
+  .form textarea,
+  .form select {
+    margin-bottom: 1px;
+    padding: 5px 10px;
+  }
+  
+  .form select {
+    width: 100%;
+  }
+
+  .form input[type="checkbox"] {
+    margin-right: 130px;
+  }
+
+  .saveButton {
+    padding: 5px 8px;
+    margin-top: 0;
+  }
+
+  .sectionTitle {
+    margin-top: 10vh;
+    top: 3vh;
+  }
+
+  .addButton {
+    left: 50%;
+    transform: translateX(-50%);
+    top: 40px;
+    width: 90%;
+    justify-content: center;
+    padding: 5px 10px;
+    margin-top: 5vh;
+  }
+}

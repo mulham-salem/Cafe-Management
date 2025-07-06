@@ -4,15 +4,15 @@ import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import "../styles/toastStyles.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBoxes, faTruckLoading, faPlus, faEdit, faTrash, faBell, faFileInvoiceDollar, faPaperPlane, faTimes, faArrowRotateBack } from '@fortawesome/free-solid-svg-icons';
+import { faBoxes, faTruckLoading, faPlus, faEdit, faTrash, faBell, faFileInvoiceDollar, faPaperPlane, faTimes, faArrowRotateBack, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
 
-// Get the token from sessionStorage or localStorage
+
 const token = sessionStorage.getItem('authToken') || localStorage.getItem('authToken');
 
-// Configure Axios defaults
+
 axios.defaults.withCredentials = true;
-axios.defaults.baseURL = 'http://localhost:8000/api'; // Adjust your API base URL if different
+axios.defaults.baseURL = 'http://localhost:8000/api'; 
 axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 axios.defaults.headers.post['Content-Type'] = 'application/json';
 axios.defaults.headers.put['Content-Type'] = 'application/json';
@@ -36,7 +36,7 @@ const InventorySupply = () => {
 
   const [showAddItemModal, setShowAddItemModal] = useState(false);
 
-  // حالة المخزون ستُجلب من الباك إند
+
   const [inventory, setInventory] = useState([]);
   
   const [itemName, setItemName] = useState('');
@@ -56,13 +56,12 @@ const InventorySupply = () => {
         setInventory(response.data.inventory_items);
       } catch (error) {
         console.error('Error fetching inventory:', error);
-        toast.error('Failed to load inventory items.');
+        //toast.error('Failed to load inventory items.');
       } finally {
         setLoadingInventory(false);
       }
     };
   
-    // useEffect لجلب المخزون عند تحميل المكون لأول مرة أو عند تغيير التاب إلى 'inventory'
     useEffect(() => {
       if (activeTab === 'inventory') {
         fetchInventory();
@@ -85,16 +84,14 @@ const InventorySupply = () => {
   //   });
   // }, [inventory]);
 
-  const handleDelete = async (id) => { // أضف `async` هنا
+  const handleDelete = async (id) => { 
     const item = inventory.find((item) => item.id === id);
     if (!item) return;
 
     try {
-      // التحقق مما إذا كان العنصر مرتبطًا بعناصر القائمة
-      // هذه الخطوة تتم على الباك إند، لذا لا تحتاج لـ `if` هنا
-      await axios.delete(`/manager/inventory/${id}`); // إرسال طلب الحذف
+      await axios.delete(`/manager/inventory/${id}`); 
       toast.info(`🗑️ ${item.name} deleted`);
-      fetchInventory(); // أعد جلب المخزون بعد الحذف لتحديث الواجهة
+      fetchInventory(); 
     } catch (error) {
       console.error('Error deleting item:', error);
       if (error.response && error.response.data && error.response.data.message) {
@@ -105,7 +102,7 @@ const InventorySupply = () => {
     }
   };
 
-  const handleAddItem = async (e) => { // أضف `async` هنا
+  const handleAddItem = async (e) => {
     e.preventDefault();
 
     if (!itemName || !quantity || !unit || !expiryDate || !threshold) {
@@ -122,13 +119,12 @@ const InventorySupply = () => {
       name: itemName,
       quantity: parseFloat(quantity),
       unit: unit,
-      expiry_date: expiryDate, // تطابق مع اسم العمود في الباك إند
-      threshold_level: parseFloat(threshold), // تطابق مع اسم العمود في الباك إند
+      expiry_date: expiryDate, 
+      threshold_level: parseFloat(threshold), 
     };
 
     try {
       if (editItem) {
-        // تحديث عنصر موجود (PUT request)
         const response = await axios.put(`/manager/inventory/${editItem.id}`, itemData);
         toast.success(`✏️ ${itemName} updated`);
 
@@ -136,7 +132,6 @@ const InventorySupply = () => {
           toast.warning(response.data.low_stock_alert, { icon: "⚠️" });
         }
       } else {
-        // إضافة عنصر جديد (POST request)
         const response = await axios.post('/manager/inventory', itemData);
         toast.success(`✅ ${itemName} added`);
 
@@ -151,17 +146,16 @@ const InventorySupply = () => {
       setExpiryDate('');
       setThreshold('');
       setEditItem(null);
-      fetchInventory(); // أعد جلب المخزون بعد الإضافة أو التعديل لتحديث الواجهة
+      fetchInventory(); 
 
     } catch (error) {
       console.error('Error adding/updating item:', error);
       if (error.response && error.response.data && error.response.data.message) {
         toast.error(error.response.data.message);
       } else if (error.response && error.response.data && error.response.data.errors) {
-         // Handle validation errors from Laravel
          const errors = error.response.data.errors;
          for (const key in errors) {
-             toast.error(errors[key][0]);
+            toast.error(errors[key][0]);
          }
       }
        else {
@@ -177,24 +171,22 @@ const InventorySupply = () => {
   const [title, setTitle] = useState('');
   const [requestItems, setRequestItems] = useState([]);
 
-  // Fetch initial data (suppliers, offers)
+ 
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
-        // Fetch suppliers
         const suppliersResponse = await axios.get('/manager/suppliers');
         setSuppliers(suppliersResponse.data);
 
-        // Fetch offers
-        const offersResponse = await axios.get('/manager/supply'); // Assumes 'index' method on backend fetches pending offers
+        const offersResponse = await axios.get('/manager/supply'); 
         setOffers(offersResponse.data.map(offer => ({
           id: offer.id,
           title: offer.title,
           supplier: offer.supplier_name,
           totalPrice: offer.total_price,
-          deliveryDate: offer.delivery_date.split(' ')[0], // Format date for display
+          deliveryDate: offer.delivery_date.split(' ')[0],
           note: offer.note,
-          status: offer.status, // All fetched offers are pending
+          status: offer.status, 
           items: offer.items.map(item => ({
             name: item.item_name,
             quantity: item.quantity,
@@ -203,7 +195,7 @@ const InventorySupply = () => {
           })),
         })));
       } catch (error) {
-        toast.error("Failed to fetch initial data.");
+        //toast.error("Failed to fetch initial data.");
         console.error("Error fetching initial data:", error);
       } finally {
         setLoadingOffer(false);
@@ -212,32 +204,30 @@ const InventorySupply = () => {
     fetchInitialData();
   }, []);
 
-
-  // Initialize request items when the modal is shown, using the provided 'inventory' state 
   useEffect(() => {
-    if (showRequestModal && inventory.length > 0) { // Only initialize if inventory is loaded
+    if (showRequestModal && inventory.length > 0) { 
       const initial = inventory.map((item) => ({
         id: item.id,
         name: item.name,
         quantity: 0,
       }));
-      setRequestItems(initial); // 
+      setRequestItems(initial); 
     }
-  }, [showRequestModal, inventory]); // 
+  }, [showRequestModal, inventory]);  
 
-  const handleSubmitSupplyRequest = async (e) => { // 
-    e.preventDefault(); // 
+  const handleSubmitSupplyRequest = async (e) => {  
+    e.preventDefault();  
 
-    if (!selectedSupplier) { // 
-      toast.error("Please select a supplier"); // 
-      return; // 
+    if (!selectedSupplier) {  
+      toast.error("Please select a supplier");  
+      return;  
     }
 
-    const validItems = requestItems.filter((i) => i.quantity > 0); // 
+    const validItems = requestItems.filter((i) => i.quantity > 0); 
 
-    if (validItems.length === 0) { // 
-      toast.error("Please enter quantity for at least one item"); // 
-      return; // 
+    if (validItems.length === 0) {  
+      toast.error("Please enter quantity for at least one item"); 
+      return; 
     }
 
     try {
@@ -250,13 +240,13 @@ const InventorySupply = () => {
           quantity: item.quantity
         }))
       };
-      await axios.post('/manager/supply', payload); // Connects to store method
-      toast.success("📦 Supply request sent!"); // 
-      setShowRequestModal(false); // 
-      setSelectedSupplier(''); // 
-      setNote(''); // 
+      await axios.post('/manager/supply', payload); 
+      toast.success("📦 Supply request sent!"); 
+      setShowRequestModal(false);  
+      setSelectedSupplier(''); 
+      setNote(''); 
       setTitle('');
-      // Optionally re-fetch offers or update state if needed immediately
+      
     } catch (error) {
       toast.error("Failed to send supply request.");
       console.error("Error sending supply request:", error);
@@ -264,44 +254,95 @@ const InventorySupply = () => {
   };
   
   const handleQuantityChange = (e, idx) => {
-    const qty = parseInt(e.target.value) || 0; // 
-    setRequestItems((prev) => { // 
-      const updated = [...prev]; // 
-      updated[idx].quantity = qty; // 
-      return updated; // 
+    const qty = parseInt(e.target.value) || 0; 
+    setRequestItems((prev) => { 
+      const updated = [...prev];  
+      updated[idx].quantity = qty; 
+      return updated; 
     });
   };
 
-  const [offers, setOffers] = useState([]); //  Will be fetched from API
-  const [rejectingOffer, setRejectingOffer] = useState(null); // 
-  const [rejectionReason, setRejectionReason] = useState(''); // 
+  const [searchTerm, setSearchTerm] = useState('');
+  const [showSearchResults, setShowSearchResults] = useState(false);
 
-  const handleAcceptOffer = async (id) => { // 
+  const searchResults = requestItems.filter(item =>
+    item.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+    searchTerm.length > 0
+  );
+
+  const handleSearchFocus = () => {
+    setShowSearchResults(true);
+  };
+
+  const handleSearchBlur = () => {
+    setTimeout(() => setShowSearchResults(false), 200);
+  };
+
+  const handleItemClick = (item) => {
+    const itemIndex = requestItems.findIndex(i => i.id === item.id);
+    if (itemIndex !== -1) {
+      const fakeEvent = { target: { value: '1' } };
+      handleQuantityChange(fakeEvent, itemIndex);
+    }
+    setSearchTerm('');
+    setShowSearchResults(false);
+  };
+
+  const selectedItems = requestItems.filter(item => item.quantity > 0);
+
+  const updateQuantity = (itemId, newQuantity) => {
+    const qty = Math.max(0, parseInt(newQuantity) || 0);
+    const itemIndex = requestItems.findIndex(i => i.id === itemId);
+    if (itemIndex !== -1) {
+      const fakeEvent = { target: { value: qty.toString() } };
+      handleQuantityChange(fakeEvent, itemIndex);
+    }
+  };
+
+  const increaseQuantity = (itemId) => {
+    const item = requestItems.find(i => i.id === itemId);
+    if (item) {
+      updateQuantity(itemId, item.quantity + 1);
+    }
+  };
+
+  const decreaseQuantity = (itemId) => {
+    const item = requestItems.find(i => i.id === itemId);
+    if (item) {
+      updateQuantity(itemId, Math.max(0, item.quantity - 1));
+    }
+  };
+
+  const [offers, setOffers] = useState([]); 
+  const [rejectingOffer, setRejectingOffer] = useState(null);  
+  const [rejectionReason, setRejectionReason] = useState('');  
+
+  const handleAcceptOffer = async (id) => { 
     try {
-      await axios.post(`/manager/supply-offers/${id}/accept`); // Connects to acceptOffer method
-      setOffers((prev) => // 
-        prev.map((offer) => // 
-          offer.id === id ? { ...offer, status: 'accepted' } : offer // 
+      await axios.post(`/manager/supply-offers/${id}/accept`); 
+      setOffers((prev) =>  
+        prev.map((offer) =>  
+          offer.id === id ? { ...offer, status: 'accepted' } : offer  
         )
       );
-      toast.success('✅ Offer accepted'); // 
+      toast.success('✅ Offer accepted');  
     } catch (error) {
       toast.error("Failed to accept offer.");
       console.error("Error accepting offer:", error);
     }
   };
 
-  const handleRejectOffer = async (id) => { // 
+  const handleRejectOffer = async (id) => {  
     try {
-      await axios.post(`/manager/supply-offers/${id}/reject`, { reason: rejectionReason }); // Connects to rejectOffer method
-      setOffers((prev) => // 
-        prev.map((offer) => // 
-          offer.id === id ? { ...offer, status: 'Rejected', reason: rejectionReason } : offer // 
+      await axios.post(`/manager/supply-offers/${id}/reject`, { reason: rejectionReason }); 
+      setOffers((prev) =>  
+        prev.map((offer) =>  
+          offer.id === id ? { ...offer, status: 'Rejected', reason: rejectionReason } : offer 
         )
       );
-      toast.info('❌ Offer rejected'); // 
-      setRejectingOffer(null); // 
-      setRejectionReason(''); // 
+      toast.info('❌ Offer rejected');  
+      setRejectingOffer(null); 
+      setRejectionReason('');  
     } catch (error) {
       toast.error("Failed to reject offer.");
       console.error("Error rejecting offer:", error);
@@ -313,46 +354,46 @@ const InventorySupply = () => {
   const [billDate, setBillDate] = useState('');
   const [bills, setBills] = useState([]); 
 
-  const approvedOffers = offers.filter(o => o.status === 'accepted'); // 
+  const approvedOffers = offers.filter(o => o.status === 'accepted'); 
 
-  const handleSubmitBill = async (e) => { // 
-    e.preventDefault(); // 
+  const handleSubmitBill = async (e) => { 
+    e.preventDefault(); 
 
-    const offer = approvedOffers.find(o => o.id.toString() === selectedOfferId); // 
+    const offer = approvedOffers.find(o => o.id.toString() === selectedOfferId);  
 
-    if (!offer || !billDate) { // 
-      toast.error("Missing required fields"); // 
-      return; // 
+    if (!offer || !billDate) {  
+      toast.error("Missing required fields");  
+      return; 
     }
     const itemCalculatedPricesArray = offer.items.map(item =>
-      (item.quantity * item.unitPrice).toFixed(2) // ???????? ???? ?????????????? ???? 2 ????????
+      (item.quantity * item.unitPrice).toFixed(2) 
     );
-    const itemCalculatedPricesString = itemCalculatedPricesArray.join(', '); // ?????????? ???????????? ????????????
+    const itemCalculatedPricesString = itemCalculatedPricesArray.join(', '); 
 
     try {
       const payload = {
         supply_offer_id: offer.id,
-        supplier_id: suppliers.find(s => s.name === offer.supplier)?.id, // Find supplier ID from state
+        supplier_id: suppliers.find(s => s.name === offer.supplier)?.id, 
         purchase_date: billDate,
         item_calculated_prices: itemCalculatedPricesString,
       };
-      const response = await axios.post('/manager/supply-purchase-bill', payload); // Connects to storePurchaseBill method
+      const response = await axios.post('/manager/supply-purchase-bill', payload); 
       const newBillId = response.data.purchase_bill_id; 
 
-      const newBill = { // 
-        id: newBillId, // 
-        offerId: offer.id, // 
-        supplier: offer.supplier, // 
-        items: offer.items, // 
-        total: offer.totalPrice, // 
-        date: billDate, // 
+      const newBill = {  
+        id: newBillId,  
+        offerId: offer.id,  
+        supplier: offer.supplier,  
+        items: offer.items, 
+        total: offer.totalPrice,  
+        date: billDate,  
         itemCalculatedPrices: itemCalculatedPricesString,
       };
-      setBills([...bills, newBill]); // 
-      toast.success(<>🧾 Purchase Bill Saved! <br/> and Inventory Updated</>); // 
-      setShowBillModal(false); // 
-      setSelectedOfferId(''); // 
-      setBillDate(''); // 
+      setBills([...bills, newBill]);  
+      toast.success(<>🧾 Purchase Bill Saved! <br/> and Inventory Updated</>);  
+      setShowBillModal(false);  
+      setSelectedOfferId('');  
+      setBillDate(''); 
     } catch (error) {
       if (error.response && error.response.data && error.response.data.message) {
         toast.error(error.response.data.message);
@@ -378,6 +419,7 @@ const InventorySupply = () => {
       <ToastContainer />
       {activeTab === null && (
         <div className={`${styles.backgroundFull} ${loaded ? styles.visible : ''}`}>
+          <div className={styles.bcgOverlay}>
             <div className={styles.backgroundContent}>
                 <h2>Welcome to Inventory & Supply</h2>
                 <p>Choose a section to get started</p>
@@ -395,7 +437,8 @@ const InventorySupply = () => {
                         <FontAwesomeIcon icon={faTruckLoading}  className={styles.iconTabBtn} /> Supply Management
                     </button>
                 </div>
-             </div>
+              </div>
+            </div>
         </div>
       )}
 
@@ -403,15 +446,21 @@ const InventorySupply = () => {
         {activeTab === 'inventory' && (
           <section className={styles.inventortSection}>
             <h3 className={styles.inventortSectionTitle}>📦 Inventory Items</h3>
-            <button className={styles.addBtn} onClick={() => setShowAddItemModal(true)}>
-              <FontAwesomeIcon icon={faPlus} /> Add Item
-            </button>
+            <div className={styles.headerContainer}>
+              <div className={styles.headerButtons}>
+                <button className={styles.addBtn} onClick={() => setShowAddItemModal(true)}>
+                  <FontAwesomeIcon icon={faPlus} /> Add Item
+                </button>
 
-            <button className={styles.backBtn} onClick={() => changeTab(null)}>
-              <FontAwesomeIcon icon={faArrowRotateBack} /> Back to Main
-            </button>
+                <button className={styles.backBtn} onClick={() => changeTab(null)}>
+                  <FontAwesomeIcon icon={faArrowRotateBack} /> Back to Main
+                </button>
+              </div>
+            </div>
             {loadingInventory ? (
-              <p className={styles.emptyText}>Loading...</p>
+              <div className={styles.loadingOverlay}>
+                <p className={styles.emptyText}>Loading...</p>
+              </div>
             ) : (
             <table className={`${styles.table} ${styles.fadeInOverlay}`}>
               <thead>
@@ -514,11 +563,15 @@ const InventorySupply = () => {
         )}
 
         {showRequestModal && (
-        <div className={`${styles.overlay} ${styles.fadeInOverlay}`}>
-            <div className={`${styles.slideUpModal} ${styles.requestModal}`}>
-            <h4>📝 New Supply Request</h4>
-            <form onSubmit={handleSubmitSupplyRequest}>
-                <label>🏷️ Request Title:</label>
+          <div className={styles.overlayRequest}>
+            <div className={styles.modalContainer}>
+              <div className={styles.modalHeader}>
+                📋 New Supply Request
+              </div>
+
+              <div className={styles.modalContent}>
+                <div className={styles.formGroup}>
+                  <label>🏷️ Request Title:</label>
                   <input
                     type="text"
                     value={title}
@@ -526,109 +579,198 @@ const InventorySupply = () => {
                     className={styles.titleInput}
                     placeholder="e.g. Weekly Ingredient Request"
                     required
-                />
-                <label>📋 Select Items & Quantities:</label>
-                <div className={styles.itemList}>
-                {requestItems.map((item, idx) => (
-                    <div key={item.id} className={styles.itemRow}>
-                    <span className={styles.itemName}>{item.name}</span>
+                  />
+                </div>
+
+                <div className={styles.searchSection}>
+                  <label>🔍 Search Items:</label>
+                  <div className={styles.searchContainer}>
                     <input
-                        type="number"
-                        placeholder="Qty"
-                        min={0}
-                        value={item.quantity}
-                        onChange={(e) => handleQuantityChange(e, idx)}
+                      type="text"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      onFocus={handleSearchFocus}
+                      onBlur={handleSearchBlur}
+                      className={styles.searchInput}
+                      placeholder="Search for items to add..."
                     />
-                    </div>
-                ))}
+
+                    {showSearchResults && searchResults.length > 0 && (
+                      <div className={styles.searchResults}>
+                        {searchResults.map(item => (
+                          <div
+                            key={item.id}
+                            onMouseDown={() => handleItemClick(item)}
+                            className={styles.searchItem}
+                          >
+                            <span>{item.name}</span>
+                            <button type="button" className={styles.addItemBtn}>
+                              Add
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
 
-                <label>👤 Select Supplier:</label>
-                <select
-                className={styles.selectBox}
-                value={selectedSupplier}
-                onChange={(e) => setSelectedSupplier(e.target.value)}
-                required
-                >
-                <option value="">-- Choose Supplier --</option>
-                {suppliers.map((s) => (
-                    <option key={s.id} value={s.id}>{s.name}</option>
-                ))}
-                </select>
+                <div className={styles.selectedSection}>
+                  <div className={styles.selectedHeader}>
+                    <span>📦 Selected Items</span>
+                    <span className={styles.itemCount}>
+                      {selectedItems.length} items
+                    </span>
+                  </div>
 
-                <label>🗒️ Note (optional):</label>
-                <textarea
-                className={styles.textArea}
-                rows="3"
-                value={note}
-                onChange={(e) => setNote(e.target.value)}
-                placeholder="Additional instructions..."
-                />
+                  <div className={styles.selectedItems}>
+                    {selectedItems.length === 0 ? (
+                      <div className={styles.emptyState}>
+                        <div className={styles.emptyIcon}>📦</div>
+                        <div>No items selected</div>
+                        <small>Use the search above to add items</small>
+                      </div>
+                    ) : (
+                      selectedItems.map(item => (
+                        <div key={item.id} className={styles.selectedItem}>
+                          <div className={styles.itemInfo}>
+                            <span className={styles.itemName}>{item.name}</span>
+                          </div>
 
-                <div className={styles.requestModalActions}>
-                <button type="submit" className={styles.supplySaveBtn}>Send</button>
-                <button
-                    type="button"
-                    className={styles.supplyCancelBtn}
+                          <div className={styles.quantityControls}>
+                            <button
+                              type="button"
+                              onClick={() => decreaseQuantity(item.id)}
+                              className={styles.quantityBtn}
+                            >
+                              −
+                            </button>
+                            <input
+                              type="number"
+                              value={item.quantity}
+                              onChange={(e) => updateQuantity(item.id, e.target.value)}
+                              className={styles.quantityInput}
+                              min="0"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => increaseQuantity(item.id)}
+                              className={styles.quantityBtn}
+                            >
+                              +
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => updateQuantity(item.id, 0)}
+                              className={styles.removeBtn}
+                            >
+                              <FontAwesomeIcon icon={faTrashCan}/>
+                            </button>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className={styles.modalFooter}>
+                <div className={styles.formGroup}>
+                  <label>👤 Select Supplier:</label>
+                  <select
+                    className={styles.selectInput}
+                    value={selectedSupplier}
+                    onChange={(e) => setSelectedSupplier(e.target.value)}
+                    required
+                  >
+                    <option value="">-- Choose Supplier --</option>
+                    {suppliers.map((s) => (
+                      <option key={s.id} value={s.id}>{s.name}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className={styles.formGroup}>
+                  <label>🗒️ Notes (optional):</label>
+                  <textarea
+                    className={styles.requestTextArea}
+                    rows="3"
+                    value={note}
+                    onChange={(e) => setNote(e.target.value)}
+                    placeholder="Additional instructions..."
+                  />
+                </div>
+
+                <div className={styles.formActions}>
+                  <button
+                    onClick={handleSubmitSupplyRequest}
+                    className={styles.requestSubmitBtn}
+                  >
+                    Send Request
+                  </button>
+                  <button
                     onClick={() => setShowRequestModal(false)}
-                >
+                    className={styles.requestCancelBtn}
+                  >
                     <FontAwesomeIcon icon={faTimes} /> Cancel
-                </button>
+                  </button>
                 </div>
-            </form>
+              </div>
             </div>
-        </div>
+          </div>
         )}
 
         {activeTab === 'offers' && (
-        <section>
+        <section className={styles.supplyOfferSection}>
+          <div className={styles.supplyOfferHeader}>
             <h3 className={styles.supplyOffersTitle}>📦 Supply Offers</h3>
             <button className={styles.backBtn3} onClick={() => changeTab('supply')}>
               <FontAwesomeIcon icon={faArrowRotateBack} /> Back to Main
             </button>
-            {loadingOffer ? (
+          </div>
+          {loadingOffer ? (
+            <div className={styles.loadingOverlay}>
               <p className={styles.emptyText}>Loading...</p>
-            ) : offers.length === 0 ? (
-              <p className={styles.emptyText}>No offers to display.</p>
-            ) : (
-            <div className={`${styles.offerList} ${styles.fadeInOverlay}`}>
-            {offers.map((offer) => (
-                <div key={offer.id} className={styles.offerCard}>
-                <h4 className={styles.offerTitle}>{offer.title}</h4>
-                <p><strong>Supplier:</strong> {offer.supplier}</p>
-                <p><strong>Total Price:</strong> ${offer.totalPrice.toFixed(2)}</p>
-                <p><strong>Delivery Date:</strong> {offer.deliveryDate}</p>
-                <p><strong>Note:</strong> {offer.note}</p>
-                <div className={styles.offerItems}>
-                    {offer.items.map((item, idx) => (
-                    <div key={idx} className={styles.offerItem}>
-                        • {item.name} - {item.quantity} - {item.unit} - ${item.unitPrice}
-                    </div>
-                    ))}
-                </div>
-                <div className={styles.offerActions}>
-                    {offer.status === 'pending' ? (
-                        <>
-                        <button className={styles.acceptBtn} onClick={() => handleAcceptOffer(offer.id)}>✅ Accept</button>
-                        <button className={styles.rejectBtn} onClick={() => setRejectingOffer(offer)}>❌ Reject</button>
-                        </>
-                    ) : (
-                        <span
-                        className={`${styles.statusBadge} ${
-                            offer.status === 'accepted' ? styles.statusApproved : styles.statusRejected
-                        }`}
-                        >
-                        {offer.status === 'accepted' ? '✅ Accepted' : '❌ Rejected'}
-                        </span>
-                    )}
-                </div>
-
-                </div>
-            ))}
             </div>
-            )}
-        </section>
+          ) : offers.length === 0 ? (
+            <p className={styles.emptyText}>No offers to display.</p>
+          ) : (
+          <div className={`${styles.offerList} ${styles.fadeInOverlay}`}>
+          {offers.map((offer) => (
+              <div key={offer.id} className={styles.offerCard}>
+              <h4 className={styles.offerTitle}>{offer.title}</h4>
+              <p><strong>Supplier:</strong> {offer.supplier}</p>
+              <p><strong>Total Price:</strong> ${offer.totalPrice.toFixed(2)}</p>
+              <p><strong>Delivery Date:</strong> {offer.deliveryDate}</p>
+              <p><strong>Note:</strong> {offer.note}</p>
+              <div className={styles.offerItems}>
+                  {offer.items.map((item, idx) => (
+                  <div key={idx} className={styles.offerItem}>
+                      • {item.name} - {item.quantity} - {item.unit} - ${item.unitPrice}
+                  </div>
+                  ))}
+              </div>
+              <div className={styles.offerActions}>
+                  {offer.status === 'pending' ? (
+                      <>
+                      <button className={styles.acceptBtn} onClick={() => handleAcceptOffer(offer.id)}>✅ Accept</button>
+                      <button className={styles.rejectBtn} onClick={() => setRejectingOffer(offer)}>❌ Reject</button>
+                      </>
+                  ) : (
+                      <span
+                      className={`${styles.statusBadge} ${
+                          offer.status === 'accepted' ? styles.statusApproved : styles.statusRejected
+                      }`}
+                      >
+                      {offer.status === 'accepted' ? '✅ Accepted' : '❌ Rejected'}
+                      </span>
+                  )}
+              </div>
+            </div>
+          ))}
+          </div>
         )}
+      </section>
+      )}
 
         {rejectingOffer && (
         <div className={`${styles.overlay} ${styles.fadeInOverlay}`}>
@@ -711,7 +853,7 @@ const InventorySupply = () => {
                   </div>
                 )}
 
-                <div className={styles.modalActions}>
+                <div className={styles.billModalActions}>
                   <button type="submit" className={styles.billSaveBtn}>Save Bill</button>
                   <button
                     type="button"

@@ -10,7 +10,7 @@ const ManagerNotification = () => {
   const [loading, setLoading] = useState(true); // Optional: Show loading state
   const [error, setError] = useState(null);
 
-  const token = sessionStorage.getItem('authToken') || localStorage.getItem('authToken'); // أو sessionStorage.getItem() إذا مخزن فيه
+  const token = sessionStorage.getItem('authToken') || localStorage.getItem('authToken'); 
 
   useEffect(() => {
     document.title = "Cafe Delights - Manager Notifications";
@@ -64,7 +64,9 @@ const ManagerNotification = () => {
       </h2>
 
       {loading ? (
-        <p className={styles.emptyText}>Loading...</p>
+        <div className={styles.loadingOverlay}>
+          <p className={styles.emptyText}>Loading...</p>
+        </div>
       ) : error ? (
         <p className={styles.emptyText}>{error}</p>
       ) : notifications.length === 0 ? (
@@ -81,7 +83,7 @@ const ManagerNotification = () => {
                 <FontAwesomeIcon icon={notif.seen ? faCheckCircle : faClock} />
               </div>
               <div className={styles.content}>
-              <strong className={styles.title}>{notif.purpose}</strong>
+                <strong className={styles.title}>{notif.purpose}</strong>
                 <p className={styles.message}>{notif.message}</p>
                 <p className={styles.time}>
                   {new Date(notif.createdAt).toLocaleString()}

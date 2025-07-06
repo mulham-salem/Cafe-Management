@@ -7,8 +7,9 @@
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
     width: 325px;
     bottom: 15px;
-    margin-left: 145px;
+    margin-left: 80px;
     border-radius: 6px;
+    justify-content: center;
   }
   
   .custom-toast-body {
@@ -112,18 +113,6 @@
   .custom-toast span {
     line-height: 20px;
   }
-
-  /* .lowStock {  
-    text-align: center;
-    line-height: 1.4;
-    padding: 4px 40px;
-  }
-
-  .lowStock span:nth-child(1) {
-    font-size: 18px;
-    font-weight: bold;
-  } */
-
 
   .custom-confirm-toast {
     background-color: white !important; 

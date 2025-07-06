@@ -6,17 +6,15 @@ import { faPen, faTrash, faCheck, faReceipt, faMugHot } from '@fortawesome/free-
 import { ToastContainer, toast } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
 import "../styles/toastStyles.css";
-import axios from 'axios'; // Import Axios
+import axios from 'axios'; 
 
 
 const UserOrder = () => {
 
-  // Get the token from sessionStorage or localStorage
   const token = sessionStorage.getItem('authToken') || localStorage.getItem('authToken');
 
-  // Configure Axios defaults
   axios.defaults.withCredentials = true;
-  axios.defaults.baseURL = 'http://localhost:8000/api'; // Adjust your API base URL if different
+  axios.defaults.baseURL = 'http://localhost:8000/api'; 
   axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
   axios.defaults.headers.post['Content-Type'] = 'application/json';
   axios.defaults.headers.put['Content-Type'] = 'application/json';
@@ -30,26 +28,23 @@ const UserOrder = () => {
   const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Function to fetch orders from the backend
+  
   const fetchOrders = async () => {
     try {
       const response = await axios.get('/user/customer/myOrders');
-      // Map the backend data structure to match the frontend's expectations
+ 
       const fetchedOrders = response.data.data.map(order => ({
         id: order.order_id,
         status: order.status,
-        createdAt: new Date(order.created_at).toLocaleString(), // Format date
+        createdAt: new Date(order.created_at).toLocaleString(), 
         canShowBill: order.can_show_bill,
-        // Backend's getCustomerOrders doesn't return 'note' or 'items' array directly
-        // We will pass an empty array for items and a placeholder for note
-        // The full items list will be fetched when viewing the invoice.
         itemsCount: order.item_count, 
-        note: order.note, // Placeholder, as note is not in getCustomerOrders response
+        note: order.note, 
       }));
       setOrders(fetchedOrders);
     } catch (error) {
       if (error.response && error.response.status === 404) {
-        setOrders([]); // No orders found
+        setOrders([]); 
       } else {
         toast.error('Failed to load orders. Please try again.');
         console.error('Error fetching orders:', error);
@@ -59,7 +54,6 @@ const UserOrder = () => {
     }
   };
 
-  // Fetch orders on component mount
   useEffect(() => {
     fetchOrders();
   }, []);
@@ -81,16 +75,12 @@ const UserOrder = () => {
           Are you sure you want to cancel this order?
           <div className="toast-buttons-order">
             <button
-              onClick={async () => { // Make async to await API call
+              onClick={async () => { 
                 try {
-                  // Send DELETE request to cancel the order
-                  // Assumes backend route is /user/customer/orders/cancel/{id}
                   await axios.delete(`/user/customer/orders/cancel/${orderId}`);
                   
-                  // If successful, update the local state
                   const updatedOrders = orders.filter((order) => order.id !== orderId);
                   setOrders(updatedOrders);
-                  
                   toast.dismiss(t.id);
                   toast.success('Order cancelled successfully!');
                 } catch (error) {
@@ -125,13 +115,10 @@ const UserOrder = () => {
     
   };
 
-  const handleConfirmOrder = async (orderId) => { // Make async
+  const handleConfirmOrder = async (orderId) => { 
     try {
-      // Send POST request to confirm the order
-      // Assumes backend route is /user/customer/orders/confirm/{id}
       await axios.post(`/user/customer/orders/confirm/${orderId}`);
       
-      // If successful, update the local state to 'processing' (as per backend logic)
       const updatedOrders = orders.map((order) =>
         order.id === orderId ? { ...order, status: 'confirmed' } : order
       );
@@ -144,22 +131,20 @@ const UserOrder = () => {
     }
   };
 
-  const handleShowInvoice = async (order) => { // Make async
+  const handleShowInvoice = async (order) => {
     try {
-      // Fetch invoice details from the backend
       const response = await axios.get(`/user/customer/myOrders/invoice/${order.id}`);
       const invoiceData = response.data;
 
-      // Map backend invoice data to frontend structure
       const mappedInvoice = {
-        id: order.id, // Use order ID from the card
+        id: order.id, 
         customerName: invoiceData.username,
         items: invoiceData.items.map(item => ({
           name: item.menu_item,
           quantity: item.quantity,
-          price: item.price / item.quantity, // Calculate unit price if total price is provided
+          price: item.price / item.quantity, 
         })),
-        totalPrice: invoiceData.total_price, // Use total_price from backend
+        totalPrice: invoiceData.total_price, 
       };
 
       setSelectedInvoice(mappedInvoice);

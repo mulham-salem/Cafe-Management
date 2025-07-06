@@ -5,7 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUtensils } from '@fortawesome/free-solid-svg-icons';
 import { OrderSearchContext } from './EmployeeHome';
-import axios from 'axios'; // Import Axios
+import axios from 'axios'; 
 
 const KitchenOrders = () => {
 
@@ -16,9 +16,9 @@ const KitchenOrders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isSearching, setIsSearching] = useState(false);
+
   const token = sessionStorage.getItem('authToken') || localStorage.getItem('authToken');
 
-  // دالة لجلب الطلبات من الـ API
   const fetchOrders = useCallback(async () => {
   
     try {
@@ -27,9 +27,9 @@ const KitchenOrders = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      // الـ Backend يرجع 'data' كـ array من الطلبات
+ 
       setOrders(response.data.data.map(order => ({
-        id: order.order_id, // تغيير order_id إلى id ليتوافق مع الـ frontend
+        id: order.order_id, 
         status: order.status,
         items: order.orderItems.map(item => ({
           name: item.item_name,
@@ -45,7 +45,7 @@ const KitchenOrders = () => {
     }
   }, []); 
 
-  // جلب الطلبات عند تحميل المكون لأول مرة
+
   useEffect(() => {
     fetchOrders();
   }, [fetchOrders]);
@@ -55,11 +55,9 @@ const KitchenOrders = () => {
     if (newStatus === "") {
       return;
     }
-    const order = orders.find(o => o.id === orderId); // 
-    if (!order) return; // 
+    const order = orders.find(o => o.id === orderId); 
+    if (!order) return;  
 
-    // التحقق من صلاحية الانتقال للحالة بناءً على ترتيب الـ Backend
-    // Backend يسمح بـ: confirmed -> preparing, preparing -> ready, ready -> delivered
     const allowedTransitions = {
       'confirmed': 'preparing',
       'preparing': 'ready',
@@ -67,8 +65,8 @@ const KitchenOrders = () => {
     };
 
     if (allowedTransitions[order.status] !== newStatus) {
-      toast.warning("Cannot move to this status before completing the previous one or this transition is invalid!"); // 
-      return; // 
+      toast.warning("Cannot move to this status before completing the previous one or this transition is invalid!");  
+      return; 
     }
 
     try {
@@ -80,24 +78,21 @@ const KitchenOrders = () => {
         },
       });
 
-      // Backend يرجع 'status' و 'order' عند النجاح
-      if (response.data.status) {
-        toast.success(response.data.status); // استخدم رسالة النجاح من الـ Backend
+      if (response.data.message) {
+        toast.success(response.data.message); 
 
-        // تحديث حالة الطلبات في الواجهة الأمامية
         const updatedOrders = orders.map(o =>
           o.id === orderId ? { ...o, status: newStatus } : o
         );
-        setOrders(updatedOrders); // 
+        setOrders(updatedOrders); 
 
-        if (newStatus === 'ready' && response.data.notifiedCustomer) { // 
-          // Backend يقوم بإرسال الإشعارات للعميل، هذا الـ toast هو مجرد تأكيد للـ employee
+        if (newStatus === 'ready' && response.data.notifiedCustomer) { 
           setTimeout(() => {
             toast.info("The customer has been notified that the order is ready.");
-          }, 5000); // 
+          }, 5000);  
         }
       } else if (response.data.error) {
-          toast.error(response.data.error); // رسالة الخطأ من الـ Backend
+          toast.error(response.data.error); 
       }
 
     } catch (error) {
@@ -107,21 +102,18 @@ const KitchenOrders = () => {
     }
   };
 
-
   const searchTerm = useContext(OrderSearchContext);
-
-  // حالة للتعامل مع الطلبات المفلترة بالبحث
+ 
   const [filteredOrders, setFilteredOrders] = useState([]);
-  const validStatusFlow = ['confirmed', 'preparing', 'ready', 'delivered']; //  أضف 'confirmed' كحالة أولية
+  const validStatusFlow = ['confirmed', 'preparing', 'ready', 'delivered']; 
 
-  // تحديث الطلبات المفلترة عند تغيير الـ searchTerm أو الـ orders
+
   useEffect(() => {
     if (searchTerm.trim() === '') {
       setFilteredOrders(orders);
       setIsSearching(false);
     } else {
       setIsSearching(true);
-      // جلب طلب واحد بالـ ID من الـ API للبحث
       const searchSingleOrder = async () => {
         try {
           const response = await axios.get(`http://localhost:8000/api/user/employee/orders/search?order_id=${searchTerm}&statuses=${validStatusFlow}`, {
@@ -133,13 +125,12 @@ const KitchenOrders = () => {
           setFilteredOrders([{
             id: fetchedOrder.order_id,
             status: fetchedOrder.status,
-            // بيانات الأصناف غير متوفرة في استجابة searchOrder، قد تحتاج لتعديل الـ Backend أو جلبها بشكل منفصل إذا كانت ضرورية هنا
-            items: orders.find(o => o.id === fetchedOrder.order_id)?.items || [] // محاولة جلب الأصناف من الطلبات الموجودة
+            items: orders.find(o => o.id === fetchedOrder.order_id)?.items || [] 
           }]);
         } catch (error) {
           console.error('Error searching order:', error);
           if (error.response && error.response.status === 404) {
-            setFilteredOrders([]); // لا يوجد طلب مطابق
+            setFilteredOrders([]); 
           } else {
             toast.error("Failed to search order. Please try again.");
           }
@@ -156,7 +147,7 @@ const KitchenOrders = () => {
         clearTimeout(handler);
       };
     }
-  }, [searchTerm, orders]); //  يعتمد على searchTerm و orders
+  }, [searchTerm, orders]); 
   
   return (
     <div className={styles.kitchenPage}>

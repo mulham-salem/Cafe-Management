@@ -49,7 +49,7 @@ const PromotionManagement = () => {
       }));
       setPromotions(formattedPromotions);
     } catch (error) {
-      toast.error('Failed to load promotions.');
+      //toast.error('Failed to load promotions.');
     } finally {
       setLoading(false);
     }
@@ -159,14 +159,16 @@ const PromotionManagement = () => {
   return (
     <div className={styles.pageWrapper}>
       <ToastContainer />
-      <h2 className={styles.pageTitle}><FontAwesomeIcon icon={faGift}/> Promotion List</h2>
-
-      <button className={styles.addBtn} onClick={() => setShowModal(true)}>
-        <FontAwesomeIcon icon={faPlus} /> Add Promotion
-      </button>
-
+      <div className={styles.pageHeader}>
+        <h2 className={styles.pageTitle}><FontAwesomeIcon icon={faGift}/> Promotion List</h2>
+        <button className={styles.addBtn} onClick={() => setShowModal(true)}>
+          <FontAwesomeIcon icon={faPlus} /> Add Promotion
+        </button>
+      </div>
       {loading ? (
-        <p className={styles.emptyText}>Loading...</p>
+        <div className={styles.loadingOverlay}>
+          <p className={styles.emptyText}>Loading...</p>
+        </div>
       ) : (
       <div className={styles.cardGrid}>
         {promotions.map((promo) => (

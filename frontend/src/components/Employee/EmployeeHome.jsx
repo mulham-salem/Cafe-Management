@@ -180,7 +180,7 @@ const EmployeeHome = () => {
       <main className={styles.mainContent}>
         <div className={styles.cardsGrid}>
           {cards.map((card, index) => (
-                <motion.div
+            <motion.div
                 key={card.title}
                 custom={index}
                 variants={cardVariants}
@@ -188,11 +188,11 @@ const EmployeeHome = () => {
                 animate="visible"
                 className={styles.cardsGrid}
               >
-            <Link to={card.link} key={index} className={styles.card}>
-              <FontAwesomeIcon icon={card.icon} className={styles.cardIcon} />
-              <h3 className={styles.cardTitle}>{card.title}</h3>
-              <p className={styles.cardDesc}>{card.description}</p>
-            </Link>
+              <Link to={card.link} key={index} className={styles.card}>
+                <FontAwesomeIcon icon={card.icon} className={styles.cardIcon} />
+                <h3 className={styles.cardTitle}>{card.title}</h3>
+                <p className={styles.cardDesc}>{card.description}</p>
+              </Link>
             </motion.div>
           ))}
         </div>

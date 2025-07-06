@@ -11,10 +11,10 @@ import axios from 'axios';
 const EmployeeNotification = () => {
 
   const [notifications, setNotifications] = useState([]);
-  const [loading, setLoading] = useState(true); // Optional: Show loading state
+  const [loading, setLoading] = useState(true); 
   const [error, setError] = useState(null);
 
-  const token = sessionStorage.getItem('authToken') || localStorage.getItem('authToken'); // أو sessionStorage.getItem() إذا مخزن فيه
+  const token = sessionStorage.getItem('authToken') || localStorage.getItem('authToken'); 
 
   useEffect(() => {
      document.title = "Cafe Delights - Employee Notifications";
@@ -26,7 +26,7 @@ const EmployeeNotification = () => {
             Authorization: `Bearer ${token}`,
             Accept: 'application/json',
           },
-          withCredentials: true, // لو بتستخدم Laravel Sanctum مع الكوكيز (optional)
+          withCredentials: true, 
         });
   
         setNotifications(response.data.notifications);
@@ -50,7 +50,6 @@ const EmployeeNotification = () => {
         },
       });
 
-      // تحديث محلي للحالة
       setNotifications((prev) =>
         prev.map((notif) =>
           notif.id === id ? { ...notif, seen: true } : notif

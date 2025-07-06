@@ -1,153 +1,312 @@
 .pageWrapper {
-    padding: 40px 30px;
-    background-color: white;
-    font-family: 'Segoe UI', sans-serif;
-    max-height: 80vh;
-    overflow-y: auto;
-    overflow-x: hidden;  
-    min-height: 91%;
-    min-width: 95%;
+  padding-top: 40px; 
+  background-color: white;
+  font-family: "Segoe UI", sans-serif;
+  max-height: 94vh;
+  min-height: 94vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-width: 96%;
+  box-sizing: border-box; 
+}
 
+.pageWrapper::-webkit-scrollbar {
+  display: none;
+}
+
+.pageTitle {
+  font-size: clamp(22px, 5vw, 28px);
+  font-weight: bold;
+  color: #333;
+  display: flex;
+  gap: clamp(8px, 2vw, 10px);
+  text-align: left;
+  border-bottom: 2px dotted #333;
+  padding-bottom: 2px;
+  margin-bottom: clamp(20px, 5vh, 40px);
+}
+
+.bellIcon {
+  margin-top: 4px;
+  font-size: clamp(20px, 4.5vw, 28px); 
+}
+
+.loadingOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  animation: fadeInDelay 0.3s ease-in both;
+  animation-delay: 0.4s;
+}
+
+.emptyText {
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif;
+  font-size: clamp(14px, 2.5vw, 18px);
+  color: #888;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+@keyframes fadeInDelay {
+  from {
+    opacity: 0;
   }
-  
-  .pageWrapper::-webkit-scrollbar {
-    display: none;
-  } 
+  to {
+    opacity: 1;
+  }
+}
 
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(15px, 3.5vw, 20px); 
+  max-width: clamp(320px, 90vw, 1500px);
+  margin: 0 auto;
+}
+
+.card {
+  display: flex;
+  gap: clamp(10px, 3vw, 18px);
+  background-color: #fff;
+  border-radius: 12px;
+  padding: clamp(15px, 3.5vw, 18px) clamp(18px, 4vw, 22px); 
+  cursor: pointer;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
+  border-left: 6px solid #6c63ff;
+  align-items: flex-start;
+  animation: fadeIn 0.8s ease;
+  transition: background-color 0.4s ease, transform 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: ease-in 0.3s;
+}
+
+.unseen {
+  background-color: #fdfcff;
+}
+
+.seen {
+  background-color: rgb(248, 254, 250);
+  border-left-color: rgb(2, 150, 66);
+}
+
+.icon {
+  font-size: clamp(20px, 4.5vw, 22px); 
+  color: #6c63ff;
+  margin-top: clamp(2px, 1vw, 4px);
+  flex-shrink: 0;
+}
+
+.seen .icon {
+  color: rgb(2, 150, 66);
+}
+
+.content {
+  flex: 1;
+  margin-top: clamp(4px, 1.5vw, 8px);
+}
+
+@font-face {
+  font-family: "Jost";
+  src: url("Fonts/Jost/static/Jost-Light.ttf") format("truetype");
+  font-weight: 510;
+  font-style: normal;
+}
+
+.message {
+  font-family: "Jost";
+  font-size: clamp(15px, 3.5vw, 17px);
+  font-weight: 500;
+  color: #333;
+  margin-bottom: clamp(4px, 1vw, 6px); 
+  white-space: pre-wrap;
+}
+
+.title {
+  font-size: clamp(14px, 1.1vw, 17px);
+  font-weight: bold; 
+  color: rgb(15, 7, 2);
+  margin-bottom: clamp(10px, 2.5vw, 15px); 
+  text-align: center; 
+  text-transform: uppercase;
+}
+
+.time {
+  font-size: clamp(12px, 2.5vw, 13px); 
+  color: #777;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Titillium_Web";
+  src: url("Fonts/Titillium_Web/TitilliumWeb-Italic.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+.sender {
+  font-family: "Titillium_Web";
+  font-size: clamp(0.8rem, 2vw, 0.9rem);
+  color: #666;
+  margin-top: clamp(2px, 1vw, 4px);
+  text-align: right;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(100px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media screen and (min-width: 1600px) {
+  .pageWrapper {
+    padding-top: 60px;
+  }
   .pageTitle {
-    position: relative;
-    bottom: 20px;
     font-size: 28px;
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 25px;
-    display: flex;
-    gap: 10px;
-    text-align: left;
-    border-bottom: 2px dotted #333;
-    padding-bottom: 5px;
   }
-  
   .bellIcon {
-    position: relative;
-    top: 4px;
+    font-size: 28px;
   }
-
-  .emptyText {
-    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-    font-size: 18px;
-    text-align: center;
-    color: #888;
-    margin-top: 100px;
-  }
-  
   .list {
-    display: flex;
-    flex-direction: column;
+    min-width: 99%;
     gap: 20px;
-    max-width: 1500px;
-    margin: 0 auto;
   }
-  
   .card {
-    display: flex;
-    gap: 18px;
-    background-color: #fff;
-    border-radius: 12px;
-    padding: 18px 22px;
-    cursor: pointer;
-    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
-    border-left: 6px solid #6c63ff;
-    align-items: flex-start;
-    animation: fadeIn 0.8s ease;
-    transition: background-color 0.4s ease, transform 0.2s ease;
+    padding: 22px 28px;
+    gap: 20px;
   }
+  .message {
+    font-size: 18px;
+  }
+}
 
-  .card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    transition: ease-in 0.3s;
+@media screen and (max-width: 1280px) {
+  .pageWrapper {
+    padding-top: 55px;
+    max-height: 95vh;
+    min-height: 95vh;
   }
-  
-  .unseen {
-    background-color: #fdfcff;
+  .pageTitle {
+    font-size: 26px;
   }
-  
-  .seen {
-    background-color: rgb(248, 254, 250);
-    border-left-color: rgb(2, 150, 66);
+  .bellIcon {
+    font-size: 26px;
   }
-  
+  .list {
+    gap: 18px;
+    padding: 0;
+  }
+  .card {
+    padding: 20px 25px;
+    gap: 18px;
+  }
+  .message {
+    font-size: 17px;
+  }
+  .title {
+    font-size: 17px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .pageWrapper {
+    padding-top: 50px;
+    min-width: 94%;
+  }
+  .pageTitle {
+    font-size: 24px;
+  }
+  .bellIcon {
+    font-size: 24px;
+  }
+  .list {
+    gap: 15px;
+    padding: 0 20px;
+  }
+  .card {
+    flex-direction: row; 
+    align-items: flex-start;
+    text-align: left;
+    padding: 18px;
+    gap: 15px;
+  }
   .icon {
     font-size: 22px;
-    color: #6c63ff;
-    margin-top: 4px;
   }
-  
-  .seen .icon {
-    color: rgb(2, 150, 66);
-  }
-  
-  .content {
-    flex: 1;
-    margin-top: 8px;
-  }
-  
-  @font-face {
-    font-family: 'Jost';
-    src: url('Fonts/Jost/static/Jost-Light.ttf') format('truetype');
-    font-weight: 510;
-    font-style: normal;
-  }
-
   .message {
-    font-family: 'Jost';
-    font-size: 17px;
-    font-weight: 500;
-    color: #333;
-    margin-bottom: 6px;
-    white-space: pre-wrap;
+    font-size: 16px;
   }
-  
-  .title {
-    font-size: 1em; /* حجم خط كبير نسبياً */
-    font-weight: bold; /* خط عريض */
-    color:  rgb(15, 7, 2);      /* لون نص داكن */
-    margin-bottom: 15px; /* مسافة تحت العنوان */
-    text-align: center; /* توسيط العنوان (اختياري) */
-    /* يمكنك إضافة المزيد من التنسيقات حسب الحاجة */
-    text-transform: uppercase;  
-  }
-
-  .time {
-    font-size: 13px;
-    color: #777;
-    font-style: italic;
-  }
-  
-  @font-face {
-    font-family: 'Titillium_Web';
-    src: url('Fonts/Titillium_Web/TitilliumWeb-Italic.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-  }
-
   .sender {
-    font-family: 'Titillium_Web';
-    font-size: 0.9rem;
-    color: #666;
-    margin-top: 4px;
-    text-align: right;
+    font-size: 0.85rem;
   }
+}
 
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(100px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+@media screen and (max-width: 540px) {
+  .pageWrapper {
+    width: 90%;
+    max-height: 96vh;
+    min-height: 96vh;
   }
-  
+}
+
+@media screen and (max-width: 480px) {
+  .pageWrapper {
+    padding-top: 50px;
+    max-height: 96vh;
+    min-height: 96vh;
+  }
+  .pageTitle {
+    font-size: 20px;
+  }
+  .bellIcon {
+    font-size: 22px;
+  }
+  .list {
+    gap: 10px;
+    padding: 0 15px; 
+  }
+  .card {
+    flex-direction: column; 
+    align-items: center; 
+    text-align: center;
+    padding: 15px;
+    gap: 8px; 
+  }
+  .icon {
+    font-size: 24px; 
+    margin-top: 0; 
+  }
+  .content {
+    margin-top: 0; 
+  }
+  .message {
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+  .time {
+    font-size: 11px;
+  }
+  .sender {
+    font-size: 0.75rem;
+    margin-top: 2px;
+    text-align: center; 
+  }
+}

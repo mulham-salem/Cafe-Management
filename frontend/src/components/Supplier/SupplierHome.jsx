@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHome, faBell, faSignOutAlt,  faKey } from "@fortawesome/free-solid-svg-icons";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { v4 as uuidv4 } from 'uuid'
 import axios from 'axios';
 
 const SupplierHome = () => {
@@ -32,11 +33,11 @@ const SupplierHome = () => {
   const [deliveryDate, setDeliveryDate] = useState("");
   const [note, setNote] = useState("");
   const [items, setItems] = useState([
-    { name: "", quantity: "", unit: "", unitPrice: "" },
+    { id: uuidv4(), name: "", quantity: "", unit: "", unitPrice: "" },
   ]);
 
   const handleAddItem = () => {
-    setItems([...items, { name: "", quantity: "", unit: "", unitPrice: "" }]);
+    setItems([...items, { id: uuidv4(), name: "", quantity: "", unit: "", unitPrice: "" }]);
   };
 
   const handleItemChange = (id, field, value) => {
@@ -83,7 +84,7 @@ const SupplierHome = () => {
       setTitle("");
       setDeliveryDate("");
       setNote("");
-      setItems([{ name: "", quantity: "", unit: "", unitPrice: "" }]);
+      setItems([{ id: uuidv4(), name: "", quantity: "", unit: "", unitPrice: "" }]);
     } catch (error) {
       const errorMessage = error.response?.data?.message || "Failed to submit offer. Please try again.";
       toast.error(errorMessage);
@@ -187,12 +188,10 @@ const SupplierHome = () => {
           n.seen === 0 && n.purpose === 'Supply Request'
         );
   
-        // توست منفصل لكل نوع لو وجد
         if (unseenSupplyOfferResponses.length > 0) {
 
           toast.info(`You received ${unseenSupplyOfferResponses.length} response${unseenSupplyOfferResponses.length > 1 ? 's' : ''} for your supply offer.`);
   
-          // تعليم كمقروءة
           const ids = unseenSupplyOfferResponses.map(n => n.id);
           await Promise.all(
             ids.map(id =>
@@ -207,7 +206,6 @@ const SupplierHome = () => {
 
           toast.info(`You received ${unseenSupplyRequests.length} new supply request${unseenSupplyRequests.length > 1 ? 's' : ''}.`);
   
-          // تعليم كمقروءة
           const ids = unseenSupplyRequests.map(n => n.id);
           await Promise.all(
             ids.map(id =>
@@ -217,7 +215,6 @@ const SupplierHome = () => {
             )
           );
         }
-  
       } catch (err) {
         console.error("Failed to load notifications: ", err);
       }
@@ -296,7 +293,7 @@ const SupplierHome = () => {
             onChange={(e) => setTitle(e.target.value)}
             required
           />
-          <input type="datetime-local" value={deliveryDate}
+          <input type="date" value={deliveryDate}
             onChange={(e) => setDeliveryDate(e.target.value)}
             required
           />
@@ -356,7 +353,7 @@ const SupplierHome = () => {
                 <div key={offer.id} className={styles.offerCard}>
                     <h3>{offer.title}</h3>
                     <p>
-                    <strong>Delivery:</strong> {new Date(offer.delivery_date).toLocaleString()}
+                    <strong>Delivery:</strong> {new Date(offer.delivery_date).toLocaleDateString()}
                     </p>
                
                     <p>

@@ -9,11 +9,16 @@ use Illuminate\Http\Request;
 class NotificationManagementController extends Controller
 {
     //    ....................................................manager notification.......................................................................
+
+    /**
+     * Retrieves all notifications for the authenticated manager, categorized by purpose and sender.
+     *
+     * @return JsonResponse
+     */
     public function getAllManagerNotifications(): JsonResponse
     {
         $managerId = auth('manager')->id();
 
-                   // النوع 1: عروض الموردين
         $offerNotifications = Notification::where('manager_id', $managerId)
             ->where('sent_by', 'supplier')
             ->where('purpose', 'Supply Offer')
@@ -21,15 +26,13 @@ class NotificationManagementController extends Controller
             ->orderByDesc('createdAt')
             ->get();
 
-        // النوع 2: ردود الموردين على الطلبات
         $responseNotifications = Notification::where('manager_id', $managerId)
             ->where('sent_by', 'supplier')
             ->where('purpose', 'Response For Supply Request')
-            ->with('user') // منشان نجيب اسم المورد
+            ->with('user') // من أجل الحصول على اسم المورد
             ->orderByDesc('createdAt')
             ->get();
 
-        // النوع 3: إشعارات عامة للمدير (بدون علاقات)
         $generalNotifications = Notification::where('manager_id', $managerId)
             ->whereNull('user_id')
             ->whereNull('supplyRequest_id')
@@ -37,12 +40,12 @@ class NotificationManagementController extends Controller
             ->with('user')
             ->get();
 
-        // دمج الكل وتنسيقهم
+
         $formatted = collect()
             ->merge($offerNotifications)
             ->merge($responseNotifications)
             ->merge($generalNotifications)
-            ->sortByDesc('createdAt') // ترتيب نهائي مشترك
+            ->sortByDesc('createdAt')
             ->values()
             ->map(function ($notification) {
                 $data = [
@@ -53,7 +56,6 @@ class NotificationManagementController extends Controller
                     'purpose' => $notification->purpose,
                 ];
 
-                // اسم المرسل
                 if ($notification->sent_by === 'system') {
                     $data['sent_by'] = 'System';
                 } elseif ($notification->sent_by === 'supplier' && $notification->user) {
@@ -71,6 +73,11 @@ class NotificationManagementController extends Controller
 
     //    ....................................................supplier notification.......................................................................
 
+    /**
+     * Retrieves all notifications for the authenticated supplier, categorized.
+     *
+     * @return JsonResponse
+     */
     public function getAllSupplierNotifications(): JsonResponse
     {
         $supplier = auth('user')->user();
@@ -93,7 +100,7 @@ class NotificationManagementController extends Controller
                 ];
                 return $data;
             })
-        ->toArray(); // نحوله لـ array عادي
+        ->toArray();
 
         $supplyRequests = Notification::where('user_id', $supplier->id)
             ->where('sent_by', 'manager')
@@ -121,18 +128,27 @@ class NotificationManagementController extends Controller
                 ];
                 return $data;
             })
-            ->toArray(); // نحوله لـ array عادي
+            ->toArray();
 
-        // دمج كل الإشعارات في Collection واحدة
+
         $allNotifications =collect(array_merge($offerResponses, $supplyRequests))
             ->sortByDesc('createdAt')
-            ->values(); // إعادة ترتيب الفهرسة
+            ->values();
 
         return response()->json([
             'notifications' => $allNotifications,
         ]);
     }
 
+    //    ...........................................................................................................................
+
+    /**
+     * Allows a supplier to respond to a supply request notification.
+     *
+     * @param Request $request
+     * @param int $notificationId
+     * @return JsonResponse
+     */
     public function respondToSupplyRequestNotification(Request $request, $notificationId): JsonResponse
     {
         $request->validate([
@@ -184,22 +200,25 @@ class NotificationManagementController extends Controller
 
     //    ....................................................customer && employee notifications.......................................................................
 
+    /**
+     * Retrieves all notifications for the authenticated customer or employee.
+     *
+     * @return JsonResponse
+     */
     public function getAllCustomerNotifications(): JsonResponse
     {
-        // التحقق من أن المستخدم موثق
+
         $user = auth('user')->user();
 
         if (!$user) {
             return response()->json(['message' => 'Unauthorized.'], 401);
         }
 
-        // جلب الإشعارات حيث user_id يطابق id المستخدم الحالي
-        // يمكنك أيضاً جلب الإشعارات التي ليس لها user_id (عامة للنظام) إذا كنت تريد ذلك
         $notifications = Notification::where('user_id', $user->id)
-            ->orderBy('createdAt', 'desc') // ترتيب من الأحدث للأقدم
+            ->orderBy('createdAt', 'desc')
             ->get();
 
-        // يمكنك تحويل البيانات إذا أردت تنسيقاً معيناً
+
         $formattedNotifications = $notifications->map(function ($notification) {
             return [
                 'id' => $notification->id,
@@ -218,6 +237,13 @@ class NotificationManagementController extends Controller
     }
 
     //    ...........................................................................................................................
+
+    /**
+     * Marks a specific notification as seen.
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
     public function markAsSeen($id): JsonResponse
     {
         $notification = Notification::findOrFail($id);
@@ -228,5 +254,7 @@ class NotificationManagementController extends Controller
         return response()->json(['message' => 'Notification marked as seen']);
     }
 }
+
+
 
 
