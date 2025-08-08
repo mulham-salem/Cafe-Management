@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast as toastify, ToastContainer } from 'react-toastify';
+import { toast, Toaster } from 'react-hot-toast';
 import 'react-toastify/dist/ReactToastify.css';
 import styles from './styles/Login.module.css';
 import logo from '/logo_1.png'; 
@@ -17,16 +18,13 @@ function Login() {
     document.title = "Cafe Delights - Login";
   }, []);  
 
-  const [isTextVisible1, setIsTextVisible1] = useState(false);
-  const [isTextVisible2, setIsTextVisible2] = useState(false);
+  const [isTextVisible, setIsTextVisible] = useState(false);
 
   useEffect(() => {
-    const timer1 = setTimeout(() => setIsTextVisible1(true), 1000);
-    const timer2 = setTimeout(() => setIsTextVisible2(true), 200);
+    const timer = setTimeout(() => setIsTextVisible(true), 800);
 
     return () => {
-      clearTimeout(timer1);
-      clearTimeout(timer2);
+      clearTimeout(timer);
     };
   }, []);
 
@@ -72,31 +70,50 @@ function Login() {
         } else if (role === "customer") {
           navigate("/login/customer-home", { state: { successMessage } });
         } else {
-          toast.warning("Unknown role. Please contact support.");
+          toastify.warning("Unknown role. Please contact support.");
         }
 
       } catch (error) {
         const errorMessage = error.response?.data?.message || "Login failed. Please try again.";
-        toast.error(<div dangerouslySetInnerHTML={{ __html: errorMessage }} />);
+        toastify.error(<div dangerouslySetInnerHTML={{ __html: errorMessage }} />);
       }
   };
 
   useEffect(() => {
     if (location.state?.message) {
-      toast.success(location.state.message);
-      window.history.replaceState({}, document.title);
+      setTimeout(() => {
+        toast.custom((t) => (
+          <div className={`${styles.toastCard} ${t.visible ? styles.enter : styles.leave}`}>
+            <div className={styles.textContainer}>
+              <p className={styles.messageTitle}>👋 {location.state.message}</p>
+              <p className={styles.message}>Hope to see you again at Coffee House!</p>
+            </div>
+          </div>
+        ));
+        window.history.replaceState({}, document.title);
+      }, 1500);
     }
   }, [location.state]);
 
+  const [bgLoaded, setBgLoaded] = useState(false);
+
+  useEffect(() => {
+    const image = new Image();
+    image.src = bg;
+    image.onload = () => setBgLoaded(true);
+  }, []);
+
   return (
-    <div className={styles.container} style={{ backgroundImage: `url(${bg})` }}>
+    <div className={`${styles.container} ${bgLoaded ? styles.bgFadeIn : ''}`}
+        style={bgLoaded ? { backgroundImage: `url(${bg})` } : {}}>
       <ToastContainer position="top-center" autoClose={3000} />
-        <div className={ `${styles.leftText} ${isTextVisible1 ? styles.fadeIn : ''}`}>
+      <Toaster/>
+        <div className={ `${styles.leftText} ${isTextVisible ? styles.fadeIn : ''}`}>
           <h1> Start your day with flavor and warmth at <span> Cafe Delights </span> </h1>
         </div>
 
         <div className={styles.card}>
-        <img src={logo} alt="Cafe Logo" className={`${styles.logo} ${isTextVisible2 ? styles.fadeInUp : ''}`} />
+        <img src={logo} alt="Cafe Logo" className={`${styles.logo} ${isTextVisible ? styles.fadeInUp : ''}`} />
         <h2 className={styles.title}>Cafe Delights</h2>
         <form className={styles.form} onSubmit={handleLogin}>
             <input

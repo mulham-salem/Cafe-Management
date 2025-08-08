@@ -7,7 +7,7 @@ import { faBell, faCheckCircle, faClock } from '@fortawesome/free-solid-svg-icon
 const ManagerNotification = () => {
 
   const [notifications, setNotifications] = useState([]);
-  const [loading, setLoading] = useState(true); // Optional: Show loading state
+  const [loading, setLoading] = useState(true); 
   const [error, setError] = useState(null);
 
   const token = sessionStorage.getItem('authToken') || localStorage.getItem('authToken'); 
@@ -22,7 +22,7 @@ const ManagerNotification = () => {
             Authorization: `Bearer ${token}`,
             Accept: 'application/json',
           },
-          withCredentials: true, // لو بتستخدم Laravel Sanctum مع الكوكيز (optional)
+          withCredentials: true,
         });
 
         setNotifications(response.data.notifications);
@@ -46,7 +46,7 @@ const ManagerNotification = () => {
         },
       });
 
-      // تحديث محلي للحالة
+  
       setNotifications((prev) =>
         prev.map((notif) =>
           notif.id === id ? { ...notif, seen: true } : notif

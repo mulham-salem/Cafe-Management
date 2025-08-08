@@ -1,3 +1,12 @@
+:root {
+  --min-font-size: 1rem;    /* 16px */
+  --max-font-size: 1.25rem; /* 20px */
+  --min-heading-size: 2rem; /* 32px */
+  --max-heading-size: 4rem; /* 64px */
+  --fluid-vw: 2.5vw;        /* A good general fluid unit */
+  --fluid-vw-large: 1.5vw;
+}
+
 @font-face {
   font-family: 'Poppins';
   src: url('Fonts/Poppins/Poppins-Regular.ttf') format('truetype');
@@ -21,21 +30,23 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 2rem;
+  padding: clamp(0.75rem, 1.2vw, 1.2rem) clamp(1rem, 3vw, 2rem);
   box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+  position: relative;
+  z-index: 10;
+  white-space: nowrap;
 }
 
 .leftSection {
   display: flex;
   align-items: center;
-  gap: 2px;
-  position: relative;
-  right: 15px;
+  gap: clamp(2px, 0.5vw, 10px); 
+  margin-bottom: 9px;
 }
 
 .logo {
-  width: 60px;
-  height: 60px;
+  width: clamp(45px, 4vw, 60px);
+  height: clamp(45px, 4vw, 60px); 
   scale: 1.2;
 }
 
@@ -46,19 +57,22 @@
 
 .brandName {
   font-family: 'Playfair Display', serif;
-  font-size: 1.5rem;
+  font-size: clamp(1rem, var(--fluid-vw-large), 1.6rem);
   font-weight: 800;
   color: #d4b083;
-  margin-right: 1rem;
+  position: relative;
+  right: clamp(2px, 0.5vw, 10px);
 }
 
 .navLinks {
   list-style: none;
   display: flex;
-  gap: 1rem;
+  gap: clamp(0.5rem, 1.5vw, 1.5rem);
+  margin-bottom: 9px;
 }
 
 .navLinks li a {
+  font-size: clamp(0.8rem, 1vw, 1rem); 
   color: #f0e6d2;
   text-decoration: none;
   background: none;
@@ -77,19 +91,18 @@
   font-weight: 550;
 }
 
-
 .rightSection {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: clamp(10px, 1vw, 20px);
 }
 
 .username {
   font-weight: 500;
-  font-size: 1rem;
+  font-size: clamp(0.9rem, 1vw, 1rem); 
   position: relative;
   cursor: pointer;
-  padding: 8px 8px;
+  padding: clamp(6px, 0.8vw, 8px) clamp(6px, 0.8vw, 8px);
   transition: all 0.3s ease;
   display: inline-flex;
   align-items: center;
@@ -113,12 +126,12 @@
 
 .dropdownButton {
   border: 2px solid #110e0c; 
-  padding: 0.5rem 1rem;
+  padding: clamp(8px, 0.65vw, 12px) clamp(2px, 0.25vw, 8px);
   background-color: white;
   color: #110e0c;
-  font-size: 13px;
+  font-size: clamp(0.7rem, 0.4vw, 0.9rem); 
   display: flex;
-  justify-content: flex-start;
+  justify-content: center;
   cursor: pointer;
   border-radius: 10px;
   width: auto;
@@ -138,16 +151,6 @@
   font-weight: bold;
 }
 
-/* .keyIcon {
-  position: relative;
-  right: 14px;
-} */
-
-/* .dropdown button span {
-  position: relative;
-  right: 20px;
-} */
-
 .username:hover .dropdown {
   opacity: 1;
   visibility: visible;
@@ -156,7 +159,7 @@
 
 .bellIcon {
   color: white;
-  font-size: 1.4rem;
+  font-size: clamp(1.2rem, 1.5vw, 1.6rem);
   transition: color 0.3s ease;
 }
 
@@ -164,21 +167,21 @@
   color: #d4b083;
 }
 
-
 .hero {
   position: relative;
-  height: 65vh;
+  height: clamp(50vh, 60vw, 60vh); 
   display: flex;
   align-items: center;
   justify-content: center;
+  line-height: 1.5;
 }
 
 .overlay {
   background-color: rgba(0, 0, 0, 0.6);
-  padding: 2rem;
+  padding: clamp(1.5rem, 3vw, 3rem); 
   text-align: center;
-  max-width: 800px;
-  border-radius: 12px;
+  max-width: clamp(400px, 70vw, 800px); 
+  border-radius: 20px;
 }
 
 @font-face {
@@ -190,10 +193,9 @@
 
 .title {
   font-family: 'Playfair Display';
-  font-size: 3rem;
+  font-size: clamp(1.5rem, 3vw, 3rem);
   font-weight: 800;
   color: white;
-  margin-bottom: 1rem;
   animation: fadeInDown 1s ease;
 }
 
@@ -206,25 +208,25 @@
 
 .subtitle {
   font-family: 'Poppins2';
-  font-size: 1rem;
+  font-size: clamp(var(--min-font-size), 1.2vw, 1.2rem);
   color: white;
-  line-height: 1.5;
   animation: fadeInUp 1.2s ease;
+  word-break: break-word; 
+  text-wrap: balance;
 }
 
-
 .mainContent {
-  padding: 2rem;
+  padding: clamp(1.5rem, 3vw, 3rem);  
   display: flex;
   justify-content: center;
 }
 
 .cardsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(clamp(200px, 15vw, 300px), 1fr));
+  gap: clamp(1rem, 2vw, 2rem);
   width: 100%;
-  max-width: 1100px;
+  max-width: 1050px;
 }
 
 .card {
@@ -232,14 +234,14 @@
   background-color: #110e0c;
   border-radius: 15px;
   position: relative;
-  bottom: 70px;
-  padding: 1.5rem;
+  bottom: clamp(30px, 3.3vw, 50px); 
+  padding: clamp(1rem, 1.5vw, 2rem);
   text-align: center;
   color: white;
   text-decoration: none;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
-  animation: fadeIn 0.8s ease;
+  animation: fadeIn 1s ease;
 }
 
 .card:hover {
@@ -248,24 +250,23 @@
 }
 
 .cardIcon {
-  font-size: 2.2rem;
+  font-size: clamp(1.8rem, 2.5vw, 2.5rem);
   color: #d4b083;
-  margin-bottom: 0.7rem;
 }
 
 .cardTitle {
-  font-size: 1.2rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
+  font-size: clamp(1rem, 1.2vw, 1.3rem);
+  font-weight: 549;
   color: white;
 }
 
 .cardDesc {
-  font-size: 0.9rem;
+  font-size: clamp(0.8rem, 0.5vw, 1rem); 
   color: #dcd6cf;
+  word-break: break-word; 
+  text-wrap: balance;
+  font-weight: 400;
 }
-
-
 
 @keyframes fadeIn {
   from {
@@ -297,5 +298,524 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+.toastCard {
+  max-width: 90%;
+  width: clamp(260px, 18vw, 360px);
+  background:  #150d02;
+  padding: clamp(8px, 0.5vw, 10px) clamp(8px, 2vw, 12px);
+  border-radius: 18px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+  font-family: 'Georgia', serif;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border: 1px solid #d2b48c;
+  animation-duration: 300ms;
+  animation-fill-mode: forwards;
+  overflow: hidden;
+}
+
+.textContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.messageTitle {
+  font-size: clamp(0.9rem, 1.2vw, 1.3rem);
+  font-weight: bold;
+  color: #d4b083;
+  display: block;
+  text-align: center;
+}
+
+.message {
+  font-size: clamp(0.7rem, 0.9vw, 1rem);
+  color: #f0e6d2;
+  display: block;
+  text-align: center;
+}
+
+@keyframes enterAnimation {
+  from {
+    opacity: 0;
+    transform: translate(40px, -40px) scale(1);
+  }
+  to {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+}
+
+@keyframes leaveAnimation {
+  from {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translate(40px, -40px) scale(0);
+  }
+}
+
+.enter {
+  animation-name: enterAnimation;
+  animation-timing-function: ease-out;
+  animation-fill-mode: forwards;
+}
+
+.leave {
+  animation-name: leaveAnimation;
+  animation-duration: 300ms;
+  animation-timing-function: ease-in;
+  animation-fill-mode: forwards;
+}
+
+@media (min-width: 7680px) {
+  .hero {
+    height: 90vh !important;
+  }
+  .overlay {
+    max-width: 1800px !important;
+    padding: 6rem !important;
+  }
+  .cardsGrid {
+    max-width: 1480px !important;
+    gap: 4rem !important;
+  }
+  .card {
+    top: 0px !important;
+  }
+}
+
+@media (min-width: 5120px) and (max-height: 2880px) {
+  .hero {
+    height: 85vh !important;
+  }
+  .overlay {
+    max-width: 1600px !important;
+    padding: 6rem !important;
+  }
+  .cardsGrid {
+    max-width: 1480px !important;
+    gap: 4rem !important;
+  }
+  .card {
+    top: 0px !important;
+  }
+}
+
+@media (min-width: 3840px) and (max-height: 2160px) {
+  .hero {
+    height: 80vh !important;
+  }
+  .overlay {
+    max-width: 1500px !important;
+    padding: 6rem !important;
+  }
+  .cardsGrid {
+    max-width: 1480px !important;
+    gap: 4rem !important;
+  }
+  .card {
+    top: 0px !important;
+  }
+}
+
+@media (min-width: 2560px) {
+  .navbar {
+    padding: 2rem 6rem;
+  }
+  .navLinks {
+    gap: 2.5rem;
+  }
+  .navLinks li a {
+    font-size: 1.2rem;
+  }
+  .brandName {
+    right: 60px;
+  }
+  .logo {
+    position: relative;
+    right: 50px;
+  }
+  .rightSection {
+    position: relative;
+    left: 40px;
+  }
+  .bellIcon {
+    font-size: 1.8rem;
+  }
+  .username {
+    font-size: 1.1rem;
+    padding: 10px 10px;
+  }
+  .hero {
+    height: 70vh;
+    align-items: center; 
+    justify-content: center; 
+  }
+  .overlay {
+    max-width: 1200px;
+    padding: 5rem;
+  }
+  .title {
+    font-size: 4rem;
+  }
+  .subtitle {
+    font-size: 1.4rem;
+  }
+  .mainContent {
+    padding: 0; 
+  }
+  .cardsGrid {
+    max-width: 1420px;
+    gap: 3rem;
+    margin-top: auto;
+  }
+  .card {
+    justify-content: center;
+    align-items: center;
+    bottom: 0;
+    top: 40px;
+  }
+  .cardIcon {
+    font-size: 3rem;
+  }
+  .cardTitle {
+    font-size: 1.6rem;
+  }
+  .cardDesc {
+    font-size: 1.1rem;
+  }
+}
+
+@media (min-width: 1600px) and (max-height: 1080px) {
+  .navbar {
+    padding: 1.5rem 5rem; 
+  }
+  .navLinks {
+    gap: 2rem;
+  }
+  .navLinks li a {
+    font-size: 1.1rem;
+  }
+  .brandName {
+    right: 60px;
+  }
+  .logo {
+    position: relative;
+    right: 50px;
+  }
+  .rightSection {
+    position: relative;
+    left: 40px;
+  }
+  .hero {
+    height: 70vh; 
+    line-height: 2;
+  }
+  .overlay {
+    max-width: 1000px; 
+    padding: 3rem;
+  }
+  .title {
+    font-size: 3.7rem; 
+  }
+  .subtitle {
+    font-size: 1.2rem; 
+  }
+  .cardsGrid {
+    grid-template-columns: repeat(auto-fit, minmax(clamp(200px, 12vw, 300px), 1fr));
+    max-width: 1400px; 
+    gap: 2.5rem;
+  }
+  .card {
+    padding: 2.5rem;
+    bottom: 90px;
+  }
+  .cardIcon {
+    font-size: 2.8rem;
+  }
+  .cardTitle {
+    font-size: 1.4rem;
+  }
+  .cardDesc {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 1280px) {
+  .hero {
+    height: 63vh;
+  }
+  .cardsGrid {
+    max-width: 980px;
+  }
+  .overlay {
+    max-width: 800px; 
+    padding: 3rem;
+  }
+  .title {
+    font-size: 2.5rem;
+    line-height: 2; 
+  }
+  .subtitle {
+    font-size: 0.9rem; 
+  }
+  .navLinks {
+    margin-bottom: 12px;
+  }
+}
+
+@media (min-height: 1000px) and (max-width: 1280px) {
+  .cardsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    column-gap: clamp(2rem, 5vw, 5rem);
+    row-gap: clamp(2rem, 5vw, 4rem);
+    max-width: 600px;
+  }
+  .hero {
+    height: 60vh;
+  }
+  .overlay {
+    max-width: 700px; 
+    padding: 2rem;
+    border-radius: 25px;
+  }
+  .navLinks {
+    margin-bottom: 15px;
+  }
+  .leftSection {
+    margin-bottom: 5px;
+  }
+}
+
+@media (max-width: 1024px) and (max-height: 600px) {
+  .hero {
+    height: 57vh;
+  }
+  .cardsGrid {
+    max-width: 930px;
+  }
+  .overlay {
+    max-width: 600px; 
+    padding: 2rem;
+  }
+  .title {
+    font-size: 2rem;
+    line-height: 2; 
+  }
+  .subtitle {
+    font-size: 0.8rem; 
+  }
+  .navLinks {
+    margin-bottom: 13px;
+  }
+  .leftSection {
+    margin-bottom: 6px;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero {
+    height: 49vh;
+    padding: clamp(1rem, 6vw, 2rem);
+  }
+  .overlay {
+    max-width: 600px;
+    padding: clamp(1rem, 2.5vw, 2rem);
+  }
+  .title {
+    font-size: 2rem;
+    line-height: 2;
+  }
+  .subtitle {
+    font-size: 0.8rem;
+    word-break: break-word; 
+    text-wrap: balance;
+  }
+  .cardsGrid {
+    max-width: 500px;
+  }
+  .leftSection {
+    margin-bottom: 1px;
+  }
+}
+
+@media (max-width: 540px) {
+  .navbar {
+    padding: 0.1rem 0.5rem;
+    justify-content: flex-start;
+    gap: 0;
+  }
+  .logo {
+    width: 25px;
+    height: 25px;
+  }
+  .brandName {
+    font-size: 0.7rem;
+  }
+  .navLinks {
+    margin-bottom: 20px;
+  }
+  .navLinks li a {
+    font-size: 0.5rem;
+  }
+  .rightSection {
+    margin-left: auto;
+  }
+  .leftSection {
+    right: 0;
+  }
+  .username {
+    font-size: 0.5rem;
+  }
+  .bellIcon {
+    font-size: 0.9rem;
+  }
+  .hero {
+    height: 36vh;
+    padding: clamp(1rem, 6vw, 2rem);
+  }
+  .overlay {
+    max-width: 600px;
+    padding: clamp(1rem, 2.5vw, 2rem);
+  }
+  .title {
+    font-size: 1.5rem;
+    line-height: 2;
+  }
+  .subtitle {
+    font-size: 0.6rem;
+    word-break: break-word; 
+    text-wrap: balance;
+  }
+  .cardsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    column-gap: clamp(2rem, 5vw, 5rem);
+    row-gap: clamp(2rem, 5vw, 4rem);
+    max-width: 400px;
+  }
+  .card {
+    padding: 15px;
+  }
+  .cardTitle {
+    font-size: 0.9rem;
+  }
+  .cardDesc {
+    font-size: 0.6rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar {
+    padding: 0.2rem 0.5rem;
+    justify-content: flex-start;
+    gap: 0;
+  }
+  .leftSection {
+    right: 0;
+    gap: 2px;
+    margin-bottom: 2px;
+  }
+  .logo {
+    width: 25px;
+    height: 25px;
+    display: none;
+  }
+  .brandName {
+    font-size: 0.7rem;
+    display: none;
+    font-weight: 700;
+    min-width: fit-content;
+  }
+  .navLinks {
+    gap: 0.4rem;
+    flex-shrink: 1;
+    position: relative;
+    right: 35px;
+    top: 0;
+  }
+  .navLinks li a {
+    font-size: 0.5rem;
+  }
+  .rightSection {
+    margin-left: auto;
+  }
+  .username {
+    font-size: 0.5rem;
+    padding: clamp(4px, 1.2vw, 6px) clamp(4px, 1.2vw, 6px);
+  }
+  .dropdownButton {
+    font-size: 0.3rem;
+    padding: 3px 4px;
+    border-radius: 4px;
+  }
+  .bellIcon {
+    font-size: 1rem;
+  }
+  .hero {
+    height: 40vh;
+    padding: clamp(0.8rem, 7vw, 1.5rem);
+  }
+  .overlay {
+    padding: 1.5rem;
+  }
+  .title {
+    font-size: 1.1rem;
+    white-space: nowrap;
+  }
+  .subtitle {
+    font-size: 0.4rem;
+    line-height: 1.5;
+  }
+  .cardsGrid {
+    column-gap: 0.6rem;
+    row-gap: 0.6rem;
+    max-width: 300px;
+  }
+  .card {
+    padding: 10px;
+  }
+  .cardIcon {
+    font-size: 1.3rem;
+  }
+  .cardTitle {
+    font-size: 0.9rem;
+  }
+  .cardDesc {
+    font-size: 0.6rem;
+  }
+}
+
+@media (max-width: 480px) and (max-height: 500px) {
+  .container {
+    min-height: 100vh;
+    max-height:100vh;
+    overflow-y: auto;
+  }
+  .overlay {
+    padding: 1rem;
+  }
+  .title {
+    font-size: 0.9rem;
+  }
+  .subtitle {
+    font-size: 0.35rem;
+  }
+  .cardTitle {
+    font-size: 0.7rem;
+  }
+  .cardDesc {
+    font-size: 0.4rem;
+  }
+  .bellIcon {
+    font-size: 0.8rem;
+  }
+  .rightSection {
+    gap: 1px;
   }
 }

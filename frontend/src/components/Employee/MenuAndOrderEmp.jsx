@@ -247,15 +247,27 @@ const MenuAndOrderEmp = () => {
         </div>
       </div>
 
-      <div className={styles.menuTabs}>
-        <button onClick={() => filterMenu('All')} className={selectedCategory === 'All' ? styles.active : ''}>All</button>
-        <button onClick={() => filterMenu('Drinks')} className={selectedCategory === 'Drinks' ? styles.active : ''}>Drinks</button>
-        <button onClick={() => filterMenu('Snacks')} className={selectedCategory === 'Snacks' ? styles.active : ''}>Snacks</button>
-      </div>
+      {filteredMenu.length > 0 && (
+        <div className={styles.menuTabs}>
+          <button onClick={() => filterMenu('All')} className={selectedCategory === 'All' ? styles.active : ''}>All</button>
+          <button onClick={() => filterMenu('Drinks')} className={selectedCategory === 'Drinks' ? styles.active : ''}>Drinks</button>
+          <button onClick={() => filterMenu('Snacks')} className={selectedCategory === 'Snacks' ? styles.active : ''}>Snacks</button>
 
-      <div className={styles.menuContent}>
+          <div className={styles.cartButtonWrapper}>
+            <div className={styles.cartIcon} onClick={() => setShowOverlay(true)}>
+              🛒 {orderItems.length}
+            </div>
+          </div>
+
+      </div>
+      )}
+
+
+<div className={styles.menuContent}>
       {loading ? (
-        <p className={styles.emptyText}>Loading...</p>
+        <div className={styles.loadingOverlay}>
+          <p className={styles.emptyText}>Loading...</p>
+        </div>
       ) : filteredMenu.length === 0 ? (
           <div className={styles.emptyMenu}>No menu items available right now.</div>
         ) : (
@@ -278,11 +290,6 @@ const MenuAndOrderEmp = () => {
         )}
       </div>
 
-      <div className={styles.cartButtonWrapper}>
-        <div className={styles.cartIcon} onClick={() => setShowOverlay(true)}>
-          🛒 {orderItems.length}
-        </div>
-      </div>
 
       {showOverlay && (
         <div className={styles.overlayForm}>

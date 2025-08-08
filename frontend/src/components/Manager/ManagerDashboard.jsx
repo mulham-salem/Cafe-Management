@@ -4,7 +4,8 @@ import styles from '../styles/ManagerDashboard.module.css';
 import logo from '/logo_1.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faUsers, faUtensils, faChair, faBoxes, faBullhorn, faBell, faSignOutAlt, faKey, faHome } from '@fortawesome/free-solid-svg-icons';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast as toastify, ToastContainer } from 'react-toastify';
+import { toast, Toaster } from 'react-hot-toast';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 
@@ -44,8 +45,17 @@ const ManagerDashboard = () => {
 
   useEffect(() => {
     if (location.state && location.state.successMessage) {
-        toast.success(location.state.successMessage);
+      setTimeout(() => {
+      toast.custom((t) => (
+        <div className={`${styles.toastCard} ${t.visible ? styles.enter : styles.leave}`}>
+          <div className={styles.textContainer}>
+            <p className={styles.messageTitle}>☕️ {location.state.successMessage}</p>
+            <p className={styles.message}>Glad to see you again at Coffee House!</p>
+          </div>
+        </div>
+      ), {duration: 4000, position:"top-right"});
         window.history.replaceState({}, document.title);
+      }, 2000);
     }
   }, [location.state])
   
@@ -71,7 +81,7 @@ const ManagerDashboard = () => {
 
     } catch (error) {
         const errorMessage = error.response?.data?.message || "Logout failed. Please try again.";
-        toast.error(errorMessage);
+        toastify.error(errorMessage);
     }
   };
 
@@ -92,7 +102,7 @@ const ManagerDashboard = () => {
       setManagerName(response.data.name || 'Manager');
 
     } catch (error) {
-        //toast.error("Failed to fetch manager name");
+      toastify.error("Failed to fetch manager name");
     }
   };
   
@@ -117,7 +127,7 @@ const ManagerDashboard = () => {
   
         if (unseenSupplyOffers.length > 0) {
 
-          toast.info(`You received ${unseenSupplyOffers.length} new supply offer${unseenSupplyOffers.length > 1 ? 's' : ''}.`);
+          toastify.info(`You received ${unseenSupplyOffers.length} new supply offer${unseenSupplyOffers.length > 1 ? 's' : ''}.`);
   
           const ids = unseenSupplyOffers.map(n => n.id);
           await Promise.all(
@@ -131,7 +141,7 @@ const ManagerDashboard = () => {
   
         if (unseenSupplyResponses.length > 0) {
 
-          toast.info(`You received ${unseenSupplyResponses.length} new response${unseenSupplyResponses.length > 1 ? 's' : ''} for your supply request.`);
+          toastify.info(`You received ${unseenSupplyResponses.length} new response${unseenSupplyResponses.length > 1 ? 's' : ''} for your supply request.`);
   
           const ids = unseenSupplyResponses.map(n => n.id);
           await Promise.all(
@@ -158,6 +168,7 @@ const ManagerDashboard = () => {
   return (
     <div className={styles.dashboard}>
         <ToastContainer/>
+        <Toaster/>
         <header className={styles.header}>
             <div className={styles.leftSection}>
                 <FontAwesomeIcon icon={faBars} className={`${styles.menuIcon} ${sidebarOpen ? styles.open : styles.close}`} onClick={toggleSidebar} />

@@ -72,7 +72,7 @@ const SupplierNotification = () => {
       if (response == 'accepted') {
         toast.success('Supply request accepted successfully!');
       } else {
-        toast.info('Supply request rejected. Manager will be notified.');
+        toast.info(<span>Supply request rejected, <br/> Manager will be notified.</span>);
       }
   
       setNotifications((prev) =>
@@ -96,7 +96,9 @@ const SupplierNotification = () => {
       </h2>
 
       {loading ? (
-        <p className={styles.emptyText}>Loading...</p>
+        <div className={styles.loadingOverlay}>
+          <p className={styles.emptyText}>Loading...</p>
+        </div>
       ) : error ? (
         <p className={styles.emptyText}>{error}</p>
       ) : notifications.length === 0 ? (

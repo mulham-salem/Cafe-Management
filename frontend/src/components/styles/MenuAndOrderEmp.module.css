@@ -1,368 +1,839 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;800&family=Poppins:wght@300;400;600&display=swap');
-
 .menuOrdersPage {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: #222;
-    background-color: #f9f9f9;
-    padding-bottom: 60px;
-    max-height: 82vh;
-    overflow-y: auto;
-    overflow-x: hidden;
-  }
-  
-  .menuOrdersPage::-webkit-scrollbar {
-    display: none;
-} 
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: #222;
+  background-color: #f9f9f9;
+  padding-bottom: clamp(20px, 5vw, 40px);
+  max-height: 84vh;
+  min-height: 84vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
 
-  .menuHero {
-    position: relative;
-    height: 65vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-image: url('/coffee-shop.jpeg'); 
-    background-size: cover;
-    background-position: center;
+.menuOrdersPage::-webkit-scrollbar {
+  display: none;
+}
+
+.menuHero {
+  position: relative;
+  height: 75vh; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-image: url("/coffee-shop.jpeg");
+  background-size: cover;
+  background-position: center;
+}
+
+.menuHero .overlay {
+  background: rgba(0, 0, 0, 0.6);
+  padding: clamp(20px, 8vw, 40px);
+  text-align: center;
+  color: white;
+  width: 100%;
+}
+
+@font-face {
+  font-family: 'Playfair Display';
+  src: url('Fonts/Playfair_Display/static/PlayfairDisplay-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.menuTitle {
+  font-family: "Playfair Display", serif;
+  font-size: clamp(2rem, 6vw, 3rem);
+  font-weight: 800;
+  letter-spacing: clamp(1px, 0.3vw, 2px);
+  animation: fadeInUp 1.2s ease;
+}
+
+.menuSubtitle {
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+  font-size: clamp(1rem, 2.5vw, 1.2rem); 
+  margin-top: clamp(5px, 2vw, 10px);
+  font-weight: 400;
+  color: #ccc;
+  animation: fadeInDown 1s ease;
+}
+
+.menuTabs {
+  display: flex;
+  justify-content: center;
+  margin: clamp(15px, 5vw, 30px) 0 clamp(5px, 4vw, 10px); 
+  gap: clamp(5px, 2vw, 10px); 
+}
+
+.menuTabs button {
+  padding: clamp(8px, 2.5vw, 10px) clamp(15px, 5vw, 25px); 
+  border: none;
+  background-color: #ddd;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: clamp(0.8rem, 1vw, 1rem);
+  font-weight: 600;
+  transition: all 0.3s ease;
+  animation: fadeInDown 1s ease-out;
+}
+
+.menuTabs button.active,
+.menuTabs button:hover {
+  background-color: #4b2c20;
+  color: white;
+}
+
+.menuContent {
+  padding: 0.1% clamp(2%, 5vw, 5%);
+}
+
+.menuGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(clamp(180px, 40vw, 240px), 1fr)); 
+  gap: clamp(15px, 4vw, 25px);
+  margin-top: clamp(10px, 3vw, 22px);
+  max-width: 100%;
+  align-items: stretch;
+}
+
+.menuCard {
+  background-color: white;
+  border-radius: clamp(8px, 2vw, 12px);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease;
+  position: relative;
+  animation: fadeInDown 1.5s ease-in-out;
+}
+
+.menuCard:hover {
+  transform: translateY(-8px);
+}
+
+.menuCard img {
+  width: 100%;
+  height: clamp(120px, 30vw, 180px); 
+  object-fit: cover;
+}
+
+.menuCard h3 {
+  margin: clamp(10px, 3vw, 15px) clamp(8px, 3vw, 10px) clamp(3px, 1vw, 5px); 
+  font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+  text-align: left;
+  min-height: clamp(18px, 5vw, 20px);
+  word-break: break-word;
+  text-wrap: balance;
+}
+
+.menuCard p {
+  margin: 0px clamp(8px, 3vw, 10px) 0px; 
+  font-size: clamp(0.8rem, 2vw, 0.9rem);
+  color: #555;
+  min-height: clamp(25px, 6vw, 30px); 
+  flex-grow: 1;
+  width: 97%;
+  word-break: break-word;
+  text-wrap: balance;
+}
+
+.cardFooter {
+  display: flex;
+  justify-content: space-between;
+  padding: 0px clamp(8px, 2vw, 10px);
+  font-weight: 600;
+  color: #4b2c20;
+  margin-top: auto;
+  font-size: clamp(0.9rem, 2.2vw, 1rem);
+  flex-shrink: 0;
+}
+
+.cardFooter span {
+  margin-top: 8px;
+}
+
+.notAvailable {
+  color: red;
+  font-size: clamp(1rem, 2.5vw, 1.2rem); 
+}
+
+.menuCard button {
+  margin: clamp(10px, 3vw, 15px) 0 0 0; 
+  padding: clamp(8px, 2.5vw, 10px) clamp(10px, 3vw, 15px);
+  width: calc(100% - clamp(20px, 6vw, 30px)); 
+  background-color: #4b2c20;
+  color: white;
+  border: none;
+  border-radius: 0px;
+  font-size: clamp(0.9rem, 0.2vw, 1rem);
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(5px, 1.5vw, 8px); 
+  flex-shrink: 0;  
+}
+
+.menuCard button:hover {
+  background-color: #764935;
+}
+
+.menuCard button:disabled {
+  background-color: #999;
+  cursor: not-allowed;
+}
+
+.emptyMenu {
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif;
+  text-align: center;
+  font-size: clamp(1rem, 1.1vw, 1.3rem); 
+  color: #666;
+  position: fixed;
+  top: 95%;
+  left: 50%;
+  transform: translate(-50%, -95%);
+}
+
+.loadingOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  animation: fadeInDelay 0.3s ease-in both;
+  animation-delay: 0.2s;
+}
+
+.emptyText {
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif;
+  font-size: clamp(14px, 3vw, 18px);
+  color: #888;
+  position: fixed;
+  top: 92%;
+  left: 50%;
+  transform: translate(-50%, -92%);
+}
+
+@keyframes fadeInDelay {
+  from {
+    opacity: 0;
   }
-  
-  .menuHero .overlay {
-    background: rgba(0, 0, 0, 0.6);
-    padding: 40px;
-    text-align: center;
-    color: white;
-    width: 100%;
+  to {
+    opacity: 1;
   }
-  
-  .menuTitle {
-    font-family: 'Playfair Display', serif;
-    font-size: 3rem;
-    font-weight: 800;
-    letter-spacing: 2px;
-    animation: fadeInUp 1.2s ease;
+}
+
+.flyingImage {
+  position: fixed;
+  width: clamp(40px, 10vw, 60px); 
+  height: clamp(40px, 10vw, 60px);
+  background-size: cover;
+  border-radius: 50%;
+  z-index: 9999;
+  transition: all 0.8s ease-in-out;
+  pointer-events: none;
+}
+
+.cartButtonWrapper {
+  position: fixed;
+  bottom: clamp(10px, 4vw, 20px);
+  right: clamp(15px, 4vw, 25px);
+  z-index: 999;
+  animation: fadeIn 1.2s ease-out;
+}
+
+.cartIcon {
+  font-size: clamp(20px, 5vw, 24px);
+  background-color: #4b2c20;
+  color: white;
+  padding: clamp(8px, 2.5vw, 12px) clamp(12px, 4vw, 18px);
+  border-radius: 50px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.cartIcon:hover {
+  transform: scale(1.1);
+}
+
+.overlayForm {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  backdrop-filter: blur(5px);
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.formContainer {
+  background-color: white;
+  padding: clamp(20px, 6vw, 30px);
+  width: 90%;
+  max-width: clamp(300px, 80vw, 500px); 
+  border-radius: clamp(8px, 2vw, 12px); 
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  max-height: 91vh;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  animation: fadeInUp 0.4s ease;
+}
+
+.formContainer::-webkit-scrollbar {
+  display: none;
+}
+
+.formContainer h2 {
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+  font-size: clamp(24px, 6vw, 30px); 
+  margin-bottom: clamp(20px, 8vw, 40px);
+  text-align: center;
+  color: #4b2c20;
+}
+
+.orderItemPreview {
+  font-size: clamp(0.85rem, 2.2vw, 0.95rem); 
+  margin-bottom: clamp(5px, 2vw, 10px); 
+  font-weight: 480;
+}
+
+.orderItemPreview span {
+  color: #4b2c20;
+  font-weight: 500;
+}
+
+textarea {
+  width: clamp(90%, 90vw, 95%);
+  padding: clamp(8px, 2vw, 10px); 
+  margin-top: clamp(10px, 2vw, 15px); 
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  resize: none;
+  font-size: clamp(0.9rem, 0.8vw, 1rem);
+}
+
+.formActions {
+  margin-top: clamp(11px, 2.8vh, 22px); 
+  display: flex;
+  justify-content: space-between;
+  gap: clamp(8px, 2vw, 10px); 
+}
+
+.formActions button {
+  flex: 1;
+  padding: clamp(8px, 2.5vw, 10px); 
+  font-weight: bold;
+  border: none;
+  border-radius: clamp(6px, 1.5vw, 8px);
+  cursor: pointer;
+  display: block;
+  text-align: center;
+  font-size: clamp(0.9rem, 0.8vw, 1rem);
+}
+
+.formActions button:first-child {
+  background-color: #4b2c20;
+  color: white;
+}
+
+.formActions button:first-child:hover {
+  background-color: #794733;
+  transition: ease 0.5s;
+}
+
+.formActions .cancelBtn {
+  background-color: #ccc;
+  color: #333;
+}
+
+.formActions .cancelBtn:hover {
+  background-color: #b8b8b8;
+  transition: ease 0.5s;
+}
+
+.editQty {
+  display: flex;
+  gap: clamp(5px, 2vw, 8px); 
+  position: relative;
+  right: 3px;
+  bottom: clamp(15px, 4vw, 25px); 
+  align-items: center;
+  width: 100%;
+  justify-content: flex-end; 
+}
+
+.editQty button {
+  padding: clamp(4px, 0.5vw, 8px) clamp(8px, 1vw, 16px);
+  background-color: #3e1c04;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: clamp(14px, 3.5vw, 16px); 
+  cursor: pointer;
+  transition: transform 0.15s ease, background-color 0.3s;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.editQty button:hover {
+  background-color: #2e1403;
+  transform: scale(1.1);
+}
+
+.editQty button:active {
+  transform: scale(0.9);
+  background-color: #8a3700;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
   }
-  
-  .menuSubtitle {
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-    font-size: 1.2rem;
-    margin-top: 10px;
-    font-weight: 400;
-    color: #ccc;
-    animation: fadeInDown 1s ease;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
-  
-  .menuTabs {
-    display: flex;
-    justify-content: center;
-    margin: 30px 0 10px;
-    gap: 10px;
-    animation: fadeInDown 1s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
   }
-  
-  .menuTabs button {
-    padding: 10px 25px;
-    border: none;
-    background-color: #ddd;
-    border-radius: 20px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
-  
-  .menuTabs button.active,
-  .menuTabs button:hover {
-    background-color: #4b2c20;
-    color: white;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
   }
-  
-  .menuContent {
-    padding: 0.1% 5%;
+  to {
+    opacity: 1;
   }
-  
+}
+
+
+@media (min-width: 7680px) {
+  .menuOrdersPage {
+    min-height: 97vh;
+  }
   .menuGrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 25px;
-    margin-top: 20px;
-    max-width: 100%;
-    align-items:stretch;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 40px;
+    max-width: 2400px;
+    margin-left: auto;
+    margin-right: auto;
   }
-  
-  .menuCard {
-    background-color: white;
-    border-radius: 12px;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    transition: transform 0.3s ease;
-    position: relative;
-    animation: fadeInDown 1.5s ease-in-out;
+  .menuTitle {
+    font-size: 3rem;
   }
-  
-  .menuCard:hover {
-    transform: translateY(-8px);
-  }
-  
-  .menuCard img {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-  }
-  
-  .menuCard h3 {
-    margin: 20px 15px 5px;
-    font-size: 1.1rem;
-    text-align: left;
-  }
-  
-  .menuCard p {
-    margin: 15px 15px 0px;
-    font-size: 0.9rem;
-    color: #555;
-    min-height: 40px;
-  }
-  
-  .cardFooter {
-    display: flex;
-    justify-content: space-between;
-    padding: 0px 15px 0px;
-    font-weight: 600;
-    color: #4b2c20;
-    margin-top: auto;
-  }
-  
-  .notAvailable {
-    color: red;
+  .menuSubtitle {
     font-size: 1.2rem;
   }
-  
-  .menuCard button {
-    margin: 0 15px 15px;
-    padding: 10px 15px;
-    width: calc(100% - 30px);
-    background-color: #4b2c20;
-    color: white;
-    border: none;
-    border-radius: 0px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background 0.3s ease;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
-    position: relative;
-    right: 15px;
-    top: 15px;
-  }
-  
-  .menuCard button:hover {
-    background-color: #764935;
-  }
-  
-  .menuCard button:disabled {
-    background-color: #999;
-    cursor: not-allowed;
-  }
-  
-  .emptyMenu {
-    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-    text-align: center;
-    font-size: 1.3rem;
-    color: #666;
-    margin-top: 40px;
-  }
-
-  .emptyText {
-    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-    font-size: 18px;
-    text-align: center;
-    color: #888;
-    margin-top: 40px;
-  }
-  
-  .flyingImage {
-    position: fixed;
-    width: 60px;
-    height: 60px;
-    background-size: cover;
-    border-radius: 50%;
-    z-index: 9999;
-    transition: all 0.8s ease-in-out;
-    pointer-events: none;
-  }
-  
-  .cartButtonWrapper {
-    position: fixed;
-    bottom: 25px;
-    right: 25px;
-    z-index: 999;
-  }
-  
   .cartIcon {
-    font-size: 24px;
-    background-color: #4b2c20;
-    color: white;
-    padding: 12px 18px;
-    border-radius: 50px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    cursor: pointer;
-    transition: transform 0.3s ease;
+    font-size: 45px;
   }
-  
-  .cartIcon:hover {
-    transform: scale(1.1);
+  .editQty {
+    bottom: 24px; 
   }
-  
-  .overlayForm {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    backdrop-filter: blur(5px);
-    background-color: rgba(0, 0, 0, 0.4);
-    z-index: 1000;
-    display: flex;
-    align-items: center;
+  .menuHero {
+    height: 95.2vh;
+  }
+  .emptyText {
+    top: 98.5%;
+    transform: translate(-50%, -98.5%);
+  }
+  .emptyMenu {
+    top: 99.1%;
+    transform: translate(-50%, -99.1%);
+  }
+  .cartButtonWrapper {
+    bottom: 10px;
+  }
+}
+
+@media (min-width: 5120px) and (max-height: 2880px) {
+  .menuOrdersPage {
+    min-height: 96vh;
+  }
+  .menuGrid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 40px;
+    max-width: 2400px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .menuTitle {
+    font-size: 3rem;
+  }
+  .menuSubtitle {
+    font-size: 1.2rem;
+  }
+  .cartIcon {
+    font-size: 45px;
+  }
+  .editQty {
+    bottom: 24px; 
+  }
+  .menuHero {
+    height: 93vh;
+  }
+  .emptyText {
+    top: 98%;
+    transform: translate(-50%, -98%);
+  }
+  .emptyMenu {
+    top: 98.8%;
+    transform: translate(-50%, -98.8%);
+  }
+  .cartButtonWrapper {
+    bottom: 10px;
+  }
+}
+
+@media (min-width: 3840px) and (max-height: 2160px) {
+  .menuOrdersPage {
+    min-height: 94vh;
+  }
+  .menuGrid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 40px;
+    max-width: 2400px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .menuTitle {
+    font-size: 3rem;
+  }
+  .menuSubtitle {
+    font-size: 1.2rem;
+  }
+  .cartIcon {
+    font-size: 45px;
+    padding: 12px 22px;
+  }
+  .editQty {
+    bottom: 24px; 
+  }
+  .menuHero {
+    height: 90vh;
+  }
+  .emptyText {
+    top: 97%;
+    transform: translate(-50%, -97%);
+  }
+  .emptyMenu {
+    top: 98%;
+    transform: translate(-50%, -98%);
+  }
+  .cartButtonWrapper {
+    bottom: 10px;
+  }
+}
+
+@media (min-width: 2560px) and (max-height: 1440px) {
+  .menuOrdersPage {
+    min-height: 90vh !important;
+  }
+  .menuGrid {
+    max-width: 2000px !important;
+  }
+  .menuHero {
+    height: 86vh !important;
+  }
+  .emptyText {
+    top: 96% !important;
+    transform: translate(-50%, -96%) !important;
+  }
+  .emptyMenu {
+    top: 97% !important;
+    transform: translate(-50%, -97%) !important;
+  }
+}
+
+@media (min-width: 1600px) and (max-height: 1440px) {
+  .menuOrdersPage {
+    min-height: 88vh;
+  }
+  .menuGrid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 40px;
+    max-width: 1800px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .menuHero {
+    height: 81vh;
+  }
+  .menuTitle {
+    font-size: 3rem;
+  }
+  .menuSubtitle {
+    font-size: 1.2rem;
+  }
+  .cartButtonWrapper {
+    bottom: 18px;
+  }
+  .cartIcon {
+    font-size: 30px;
+  }
+  .editQty {
+    bottom: 24px; 
+  }
+  .emptyText {
+    top: 94%;
+    transform: translate(-50%, -94%);
+  }
+  .emptyMenu {
+    top: 96%;
+    transform: translate(-50%, -96%);
+  }
+}
+
+@media (max-width: 1280px) {
+  .menuOrdersPage {
+    min-height: 88vh;
+  }
+  .menuTabs {
+    margin-top: 28px;
+  }
+  .menuHero {
+    height: 78vh;
+  }
+  .menuTitle {
+    font-size: 3rem;
+  }
+  .menuSubtitle {
+    font-size: 1.3rem;
+  }
+  .cartButtonWrapper {
+    bottom: 20px;
+  }
+  .cartIcon {
+    font-size: 20px;
+  }
+  .emptyText {
+    top: 93%;
+    transform: translate(-50%, -93%);
+    font-size: 15px;
+  }
+  .emptyMenu {
+    top: 96%;
+    transform: translate(-50%, -97%);
+  }
+}
+
+@media screen and (max-height: 600px) and (max-width: 1024px) {
+  .menuOrdersPage {
+    min-height: 85vh;
+  }
+  .menuHero {
+    height: 75vh;
+  }
+  .menuTitle {
+    font-size: 2rem;
+  }
+  .menuSubtitle {
+    font-size: 1rem;
+  }
+  .cartButtonWrapper {
+    bottom: 15px;
+  }
+  .cartIcon {
+    font-size: 16px;
+    padding: 8px 15px;
+  }
+  .menuTabs {
+    margin-top: 15px;
+  }
+}
+
+@media screen and (min-height: 1000px) and (max-width: 1280px) {
+  .menuOrdersPage {
+    min-height: 92vh;
+  }
+  .menuTabs {
+    margin-top: 25px;
+  }
+  .menuTabs button {
+    padding: 10px 20px;
+    font-size: 16px;
+  }
+  .menuGrid {
+    width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .menuHero {
+    height: 50vh;
+  }
+  .cartButtonWrapper {
+    bottom: clamp(5px, 1.5vw, 20px);
+    right: clamp(5px, 1.5vw, 20px);
+  }
+  .emptyText {
+    top: 96%;
+    transform: translate(-50%, -96%);
+  }
+  .emptyMenu {
+    top: 97.8%;
+    transform: translate(-50%, -97%);
+  }
+}
+
+@media (max-width: 768px) {
+  .menuGrid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 30px;
+  }
+  .menuHero {
+    height: 48vh;
+  }
+  .menuTitle {
+    font-size: 2.5rem;
+  }
+  .menuSubtitle {
+    font-size: 1rem;
+  }
+  .cartButtonWrapper {
+    right: 1px;
+  }
+  .emptyText,
+  .emptyMenu {
+    top: 80%;
+    transform: translate(-50%, -80%);
+  }
+}
+
+@media (max-width: 540px) {
+  .menuTitle {
+    font-size: 2rem;
+  }
+  .menuSubtitle {
+    font-size: 0.9rem;
+  }
+  .cartButtonWrapper {
+    bottom: 5px;
+  }
+}
+
+@media (max-width: 480px) {
+  .menuOrdersPage {
+    min-height: 92vh;
+  }
+  .menuHero {
+    height: 48vh;
+  }
+  .menuTitle {
+    font-size: 1.8rem;
+    white-space: nowrap;
+  }
+  .menuSubtitle {
+    font-size: 0.9rem;
+  }
+  .menuTabs button {
+    padding: 8px 15px;
+    font-size: 12px;
+  }
+  .cartButtonWrapper {
+    bottom: 2px;
+  }
+  .cartIcon {
+    font-size: 14px;
+  }
+  .menuGrid {
+    grid-template-columns: repeat(2, minmax(180px, 1fr));
+    column-gap: 10px;
+    row-gap: 15px;
     justify-content: center;
   }
-  
-  .formContainer {
-    background-color: white;
-    padding: 30px;
-    width: 90%;
-    max-width: 500px;
-    border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-    max-height: 90vh;
-    overflow-y: auto;
-    scroll-behavior: smooth;
+  .menuCard button {
+    padding: 7px 20px;
+    font-size: 12px;
   }
-
-  .formContainer::-webkit-scrollbar {
-    display: none;
-  } 
-
-  
-  .formContainer h2 {
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-    font-size: 30px;
-    margin-bottom: 40px;
-    text-align: center;
-    color: #4b2c20;
+  .menuCard h3 {
+    font-size: 14px;
   }
-  
-  .orderItemPreview {
-    font-size: 0.95rem;
+  .menuCard p {
+    font-size: 12px;
+    color: #555;
     margin-bottom: 10px;
-    font-weight: 480;
   }
-  
-  .orderItemPreview span {
-    color: #4b2c20;
-    font-weight: 500;
+  .cardFooter {
+    font-size: 12px;
+  }  
+  .cardFooter span {
+    margin-top: 0;
+  }
+  .formContainer h2 {
+    font-size: 22px; 
+  }
+  .formActions button {
+    font-size: 12px;
+    padding: 8px;
   }
   textarea {
-    width: 95%;
+    font-size: 14px;
+  }
+}
+
+@media screen and (max-width: 376px) and (min-height: 600px) and (max-height: 750px) {
+  .menuOrdersPage {
+    min-height: 90vh;
+  }
+  .menuGrid {
+    grid-template-columns: repeat(1, 200px);
+    column-gap: 2px;
+  }
+}
+
+@media (max-width: 344px) and (max-height: 883px) {
+  .menuOrdersPage {
+    min-height: 94vh;
+  }
+  .menuGrid {
+    grid-template-columns: repeat(1, 200px);
+    column-gap: 2px;
+  }
+}
+
+@media screen and (max-width: 480px) and (max-height: 500px) {
+  .menuGrid {
+    grid-template-columns: repeat(1, 200px);
+    column-gap: 2px;
+  }
+  .menuHero .overlay { 
     padding: 10px;
-    margin-top: 15px;
-    position: relative;
-    right: 0px;
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    resize: none;
   }
-  
-  .formActions {
-    margin-top: 20px;
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
+  .menuTitle {
+    font-size: 1.5rem;
   }
-  
-  .formActions button {
-    flex: 1;
-    padding: 10px;
-    font-weight: bold;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    display: block;
-    text-align: center;
+  .menuSubtitle {
+    font-size: 0.5rem;
   }
-  
-  .formActions button:first-child {
-    background-color: #4b2c20;
-    color: white;
+  .menuTabs button {
+    padding: 8px 15px;
+    font-size: 10px;
   }
-  
-  .formActions button:first-child:hover {
-    background-color: #794733;
-    transition: ease 0.5s;
+  .cartIcon {
+    padding: 4px 8px;
+    font-size: 13px;
   }
-
-  .formActions .cancelBtn {
-    background-color: #ccc;
-    color: #333;
-  }
-
-  .formActions .cancelBtn:hover {
-    background-color: #b8b8b8;
-    transition: ease 0.5s;
-  }
-
-  .editQty {
-    display: flex;
-    gap: 8px;
-    position: relative;
-    left: 350px;
-    bottom: 25px;
-    align-items: center;
-  }
-  
-  .editQty button {
-    background-color: #3e1c04;
-    color: white;
-    border: none;
-    border-radius: 20px;
-    font-weight: bold;
-    font-size: 16px;
-    cursor: pointer;
-    transition: transform 0.15s ease, background-color 0.3s;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-  }
-  
-  .editQty button:hover {
-    background-color: #2e1403;
-    transform: scale(1.1);
-  }
-  
-  .editQty button:active {
-    transform: scale(0.9);
-    background-color: #8a3700;
-  }
-  
-  @keyframes fadeInDown {
-    from {
-      opacity: 0;
-      transform: translateY(-20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
-  @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
+}

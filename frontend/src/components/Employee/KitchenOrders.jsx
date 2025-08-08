@@ -15,6 +15,7 @@ const KitchenOrders = () => {
 
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [filteredOrders, setFilteredOrders] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
 
   const token = sessionStorage.getItem('authToken') || localStorage.getItem('authToken');
@@ -50,7 +51,9 @@ const KitchenOrders = () => {
     fetchOrders();
   }, [fetchOrders]);
 
-  const handleStatusChange = async (orderId, newStatus) => {
+  const handleStatusChange = async (e, orderId, newStatus) => {
+
+    e.preventDefault();
 
     if (newStatus === "") {
       return;
@@ -84,7 +87,15 @@ const KitchenOrders = () => {
         const updatedOrders = orders.map(o =>
           o.id === orderId ? { ...o, status: newStatus } : o
         );
-        setOrders(updatedOrders); 
+        setOrders(updatedOrders);
+
+        if (searchTerm.trim() != '') {
+          setFilteredOrders(prevFiltered =>
+            prevFiltered.map(o =>
+              o.id === orderId ? { ...o, status: newStatus } : o
+            )
+          );
+        }
 
         if (newStatus === 'ready' && response.data.notifiedCustomer) { 
           setTimeout(() => {
@@ -103,10 +114,7 @@ const KitchenOrders = () => {
   };
 
   const searchTerm = useContext(OrderSearchContext);
- 
-  const [filteredOrders, setFilteredOrders] = useState([]);
   const validStatusFlow = ['confirmed', 'preparing', 'ready', 'delivered']; 
-
 
   useEffect(() => {
     if (searchTerm.trim() === '') {
@@ -147,16 +155,20 @@ const KitchenOrders = () => {
         clearTimeout(handler);
       };
     }
-  }, [searchTerm, orders]); 
+  }, [searchTerm]); 
   
   return (
     <div className={styles.kitchenPage}>
       <ToastContainer />
       <h1 className={styles.pageTitle}>Active Kitchen Orders</h1>
       {loading ? (
-        <p className={styles.emptyText}>Loading...</p>
+        <div className={styles.loadingOverlay}>
+          <p className={styles.emptyText}>Loading...</p>
+        </div>
       ) : isSearching ? (
-        <p className={styles.emptyText}>Searching...</p>
+        <div className={styles.loadingOverlay}>
+          <p className={styles.emptyText}>Searching...</p>
+        </div>
       ) : searchTerm.trim() !== '' ? (
         filteredOrders.length > 0 ? (
           <div className={styles.ordersGrid}>
@@ -186,7 +198,7 @@ const KitchenOrders = () => {
                   <span className={styles.statusLabel}>Status: </span>
                   <select
                     value={order.status}
-                    onChange={(e) => handleStatusChange(order.id, e.target.value)}
+                    onChange={(e) => handleStatusChange(e, order.id, e.target.value)}
                     className={styles.statusSelect}
                   >
                     <option value=""> ⚙️ Update Status </option>
@@ -231,7 +243,7 @@ const KitchenOrders = () => {
                 <span className={styles.statusLabel}>Status: </span>
                 <select
                   value={order.status}
-                  onChange={(e) => handleStatusChange(order.id, e.target.value)}
+                  onChange={(e) => handleStatusChange(e, order.id, e.target.value)}
                   className={styles.statusSelect}
                 >
                   <option value=""> ⚙️ Update Status </option>

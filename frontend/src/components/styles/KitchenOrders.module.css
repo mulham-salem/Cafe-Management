@@ -1,202 +1,503 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap');
-
 .kitchenPage {
-    min-height: 100vh;
-    padding: 60px 40px;
-    background: linear-gradient(145deg, #0d0d0d, #1a1a1a);
-    color: #fff;
-    font-family: 'Segoe UI', sans-serif;
-    min-height: 73vh;
-    max-height: 75vh;
-    overflow-y: auto;
-    scroll-behavior: smooth;
-  }
-  
-  .kitchenPage::-webkit-scrollbar {
-    display: none;
-  } 
+  padding: clamp(30px, 3vw, 60px) clamp(20px, 3vw, 40px);
+  background: linear-gradient(145deg, #0d0d0d, #1a1a1a);
+  color: #fff;
+  font-family: "Segoe UI", sans-serif;
+  min-height: 80vh;
+  max-height: 80vh;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
 
-  
-  .pageTitle {
-    font-family: 'Playfair Display', serif;
-    font-size: 2.8rem;
-    text-align: center;
-    position: relative;
-    bottom: 30px;
-    background: linear-gradient(90deg, #ff7e5f, #feb47b);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
+.kitchenPage::-webkit-scrollbar {
+  display: none;
+}
+
+@font-face {
+  font-family: "Playfair Display";
+  src: url("Fonts/Playfair_Display/static/PlayfairDisplay-Regular.ttf")
+    format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+.pageTitle {
+  font-family: "Playfair Display", serif;
+  font-size: clamp(2rem, 5vw, 2.8rem);
+  text-align: center;
+  position: relative;
+  bottom: clamp(15px, 4vw, 30px);
+  background: linear-gradient(90deg, #ff7e5f, #feb47b);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.noOrders {
+  text-align: center;
+  font-size: clamp(1rem, 2.5vw, 1.2rem); 
+  color: #ccc;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-style: italic;
+  font-weight: 400;
+}
+
+.ordersGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax( clamp(200px, 30vw, 280px), 1fr ));
+  grid-auto-rows: clamp(250px, 40vw, 300px); 
+  gap: clamp(15px, 3vw, 25px); 
+}
+
+.orderCard {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  opacity: 0;
+  background: #222;
+  border-radius: 14px;
+  padding: clamp(15px, 3.5vw, 25px) clamp(10px, 3vw, 20px);
+  box-shadow: 0 4px 20px rgba(255, 126, 95, 0.2);
+  transform: translateY(40px);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  animation: slideUp 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes slideUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
-  
-  .noOrders {
-    text-align: center;
-    font-size: 1.2rem;
-    color: #ccc;
-    margin-top: 80px;
-    font-style: italic;
-    font-weight: 400;
-  }
-  
-  .ordersGrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    grid-auto-rows: 300px;
-    gap: 25px;
-  }
-  
-  .orderCard {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+}
+
+.orderCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 25px rgba(255, 126, 95, 0.35);
+}
+
+.orderHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: clamp(5px, 2vw, 10px); 
+  font-size: clamp(1.2rem, 3vw, 1.4rem); 
+  margin-bottom: clamp(10px, 2.5vw, 16px);
+  color: #ffb46a;
+}
+
+.orderHeader h3 {
+  color: #feb47b;
+  position: relative;
+  bottom: 4px; 
+}
+
+.icon {
+  color: #ffa260;
+  font-size: clamp(1.2rem, 3.5vw, 1.5rem);
+}
+
+.itemList {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 clamp(10px, 3vw, 20px);
+  color: #f2f2f2;
+  max-height: clamp(80px, 15vh, 140px);
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+.itemList::-webkit-scrollbar {
+  width: 6px;
+}
+
+.itemList::-webkit-scrollbar-track {
+  background: #333;
+  border-radius: 10px;
+}
+
+.itemList::-webkit-scrollbar-thumb {
+  background: #ffb46a;
+  border-radius: 10px;
+}
+
+.itemList::-webkit-scrollbar-thumb:hover {
+  background: #888;
+}
+
+.itemList li {
+  padding: clamp(2px, 1vw, 4px) 0; 
+  border-bottom: 1px dashed #444;
+  font-size: clamp(0.85rem, 2vw, 0.95rem);
+}
+
+.statusRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.statusLabel {
+  font-weight: bold;
+  font-size: clamp(0.9rem, 2.2vw, 1rem); 
+  color: #ffd280;
+}
+
+.statusSelect {
+  width: clamp(150px, 35vw, 250px); 
+  background: #111;
+  color: #fff;
+  padding: clamp(4px, 1.5vw, 6px) clamp(8px, 2vw, 12px);
+  font-size: clamp(0.85rem, 2vw, 0.95rem);
+  border-radius: 8px;
+  border: 1px solid #444;
+  transition: all 0.4s ease;
+  cursor: pointer;
+  text-align: center;
+  margin-left: 10px;
+}
+
+.statusSelect:hover {
+  border-color: #ffb46a;
+  box-shadow: 0 0 6px #ffb46a55;
+}
+
+.statusSelect:focus {
+  outline: none;
+  border-color: #feb47b;
+  box-shadow: 0 0 8px #ff7e5f99;
+}
+
+.status {
+  padding: clamp(0.3rem, 1.5vw, 0.4rem) clamp(0.6rem, 2.5vw, 0.8rem);
+  border-radius: 2rem;
+  text-transform: capitalize;
+  font-size: clamp(0.8rem, 1.8vw, 0.9rem);
+  font-weight: bold;
+  color: #fff;
+}
+
+.status.confirmed {
+  background-color: white;
+  color: black;
+  border: 2px solid black;
+}
+
+.status.preparing {
+  background-color: rgb(255, 255, 0);
+  color: black;
+  border: 2px solid black;
+}
+
+.status.delivered {
+  background-color: blue;
+  color: white;
+  border: 1px solid black;
+}
+
+.status.ready {
+  background-color: brown;
+  color: white;
+  border: 1px solid black;
+}
+
+.noResults {
+  color: #555;
+  font-size: clamp(1rem, 2.5vw, 1.2rem);
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-weight: bold;
+  font-family: "Courier New", Courier, monospace;
+}
+
+.loadingOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  animation: fadeInDelay 0.3s ease-in both;
+  animation-delay: 0.4s;
+}
+
+@keyframes fadeInDelay {
+  from {
     opacity: 0;
-    background: #222;
-    border-radius: 14px;
-    padding: 25px 20px;
-    box-shadow: 0 4px 20px rgba(255, 126, 95, 0.2);
-    transform: translateY(40px);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    animation: slideUp 1.0s cubic-bezier(.22,1,.36,1) forwards;
   }
-  
-  @keyframes slideUp {
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+  to {
+    opacity: 1;
   }
+}
 
-  .orderCard:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 25px rgba(255, 126, 95, 0.35);
+.emptyText {
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif;
+  font-size: clamp(14px, 2.5vw, 18px);
+  color: #888;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+@media screen and (min-width: 7680px) {
+  .kitchenPage {
+    min-height: 95vh !important; 
   }
-  
+  .ordersGrid {
+    grid-template-columns: repeat(auto-fit, minmax(clamp(450px, 10vw, 550px), 1fr)) !important;
+    grid-auto-rows: clamp(450px, 10vw, 500px) !important;
+    max-width: 50% !important;
+  }
+}
+
+@media screen and (max-width: 5120px) and (min-height: 2880px) {
+  .kitchenPage {
+    min-height: 92vh !important; 
+  }
+  .ordersGrid {
+    grid-template-columns: repeat(auto-fit, minmax(clamp(400px, 12vw, 480px), 1fr)) !important;
+    grid-auto-rows: clamp(400px, 12vw, 450px) !important;
+    max-width: 65% !important;
+}
+}
+
+@media screen and (max-width: 3840px) and (min-height: 2160px) {
+  .kitchenPage {
+    min-height: 90vh !important; 
+  }
+}
+
+@media screen and (min-width: 1600px) {
+  .kitchenPage {
+    padding: clamp(60px, 4vw, 80px) clamp(40px, 3vw, 60px); 
+    min-height: 84vh; 
+  }
+  .pageTitle {
+    font-size: clamp(3rem, 4vw, 3.5rem); 
+    bottom: clamp(20px, 3vw, 40px);
+  }
+  .noOrders {
+    font-size: clamp(1.4rem, 2vw, 1.6rem);
+  }
+  .ordersGrid {
+    grid-template-columns: repeat(auto-fit, minmax(clamp(300px, 20vw, 360px), 1fr)); 
+    grid-auto-rows: clamp(300px, 20vw, 350px); 
+    gap: clamp(30px, 2vw, 40px); 
+    margin: 0 auto; 
+  }
+  .orderCard {
+    padding: clamp(30px, 2vw, 40px); 
+  }
   .orderHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 10px;
-    font-size: 1.4rem;
-    margin-bottom: 16px;
-    color: #ffb46a;
+    font-size: clamp(1.6rem, 2vw, 1.8rem); 
+    gap: clamp(15px, 1.5vw, 20px);
   }
-  
-  .orderHeader h3 {
-    color: #feb47b;
-    position: relative;
-    top: 2px;
-  }
-  
   .icon {
-    color: #ffa260;
-    font-size: 1.5rem;
-    position: relative;
-    top: 5px;
+    font-size: clamp(1.8rem, 2.5vw, 2rem); 
   }
-  
-  .itemList {
-    list-style: none;
-    padding: 0;
-    margin: 0 0 20px;
-    color: #f2f2f2;
-  }
-  
   .itemList li {
-    padding: 4px 0;
-    border-bottom: 1px dashed #444;
-    font-size: 0.95rem;
+    font-size: clamp(1rem, 1.5vw, 1.1rem); 
+    padding: clamp(5px, 0.8vw, 6px) 0;
   }
-  
-  .statusRow {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    
+  .itemList {
+    max-height: 10vh;
   }
-  
   .statusLabel {
-    font-weight: bold;
-    font-size: 1rem;
-    color: #ffd280;
-    position: relative;
-    bottom: 3px;
+    font-size: clamp(1.1rem, 1.8vw, 1.2rem); 
   }
-  
   .statusSelect {
-    width: 250px;
-    background: #111;
-    color: #fff;
-    padding: 6px 12px;
-    font-size: 0.95rem;
-    border-radius: 8px;
-    border: 1px solid #444;
-    transition: all 0.4s ease;
-    cursor: pointer;
-    text-align: center;
+    width: clamp(250px, 15vw, 300px); 
+    font-size: clamp(1rem, 1.5vw, 1.1rem);
   }
-  
-  .statusSelect:hover {
-    border-color: #ffb46a;
-    box-shadow: 0 0 6px #ffb46a55;
-  }
-  
-  .statusSelect:focus {
-    outline: none;
-    border-color: #feb47b;
-    box-shadow: 0 0 8px #ff7e5f99;
-  }
-  
   .status {
-    padding: 0.4rem 0.8rem;
-    border-radius: 2rem;
-    text-transform: capitalize;
-    font-size: 0.9rem;
-    font-weight: bold;
-    color: #fff;
+    font-size: clamp(0.9rem, 1.4vw, 1rem); 
   }
-  
-  .status.confirmed {
-    background-color: white;
-    color: black;
-    border: 2px solid black;
-  }
-  
-  .status.preparing {
-    background-color: rgb(255, 255, 0);
-    color: black;
-    border: 2px solid black;
-  }
-  
-  .status.delivered {
-    background-color: blue;
-    color: white;
-    border: 1px solid black;
-  }
+}
 
-  .status.ready {
-    background-color: brown;
-    color: white;
-    border: 1px solid black;
+@media screen and (max-width: 1280px) {
+  .kitchenPage {
+    padding: clamp(40px, 4vw, 50px) clamp(25px, 3vw, 35px); 
   }
+  .pageTitle {
+    font-size: clamp(2.5rem, 4.5vw, 3rem);
+    bottom: clamp(20px, 3.5vw, 25px);
+  }
+  .noOrders {
+    font-size: clamp(1.2rem, 2.2vw, 1.4rem);
+  }
+  .ordersGrid {
+    grid-template-columns: repeat(auto-fit, minmax(clamp(250px, 30vw, 320px), 1fr)); 
+    grid-auto-rows: clamp(280px, 35vw, 320px);
+    gap: clamp(20px, 2.5vw, 30px);
+  }
+  .orderCard {
+    padding: clamp(20px, 3vw, 30px);
+  }
+  .orderHeader {
+    font-size: clamp(1.3rem, 3.5vw, 1.5rem);
+  }
+  .icon {
+    font-size: clamp(1.4rem, 4vw, 1.6rem);
+  }
+  .itemList li {
+    font-size: clamp(0.9rem, 2.2vw, 1rem);
+  }
+  .statusLabel {
+    font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+  }
+  .statusSelect {
+    width: clamp(200px, 25vw, 280px);
+    font-size: clamp(0.9rem, 2.2vw, 1rem);
+  }
+  .status {
+    font-size: clamp(0.85rem, 2vw, 0.95rem);
+  }
+}
 
+@media screen and (min-height: 1000px) and (max-width: 1280px) {
+  .kitchenPage {
+    max-height: 90vh;
+    min-height: 90vh;
+  }
+}
+
+@media screen and (max-width: 1024px) and (max-height: 600px) {
+  .kitchenPage {
+    max-height: 75vh;
+    min-height: 75vh;
+  }
+  .emptyText,
+  .noOrders,
   .noResults {
-    color: #555;
-    font-size: 1.2rem;
-    position: relative;
-    left: 38rem;
-    top: 6rem;
-    font-weight: bold;
-    font-family: 'Courier New', Courier, monospace;
+    margin-top: 70px;
   }
+}
 
-  .emptyText {
-    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-    font-size: 20px;
-    text-align: center;
-    /* position: relative;
-    left: 700px; */
-    color: #888;
-    margin-top: 150px;
+@media screen and (max-width: 768px) {
+  .kitchenPage {
+    padding: clamp(20px, 3vw, 30px) clamp(15px, 2.5vw, 25px); 
+    max-height: 88vh;
+    min-height: 88vh;
   }
+  .pageTitle {
+    font-size: clamp(1.8rem, 5vw, 2.2rem); /* Smaller font for title */
+    bottom: clamp(10px, 3vw, 20px);
+  }
+  .noOrders {
+    font-size: clamp(1.2rem, 2.5vw, 1.4rem);
+  }
+  .ordersGrid {
+    grid-auto-rows: clamp(220px, 35vw, 280px); 
+    gap: clamp(10px, 2vw, 20px); 
+  }
+  .orderCard {
+    padding: clamp(15px, 4vw, 20px);
+  }
+  .orderHeader {
+    font-size: clamp(1.1rem, 3.5vw, 1.3rem);
+  }
+  .icon {
+    font-size: clamp(1.1rem, 3vw, 1.3rem);
+  }
+  .itemList {
+    max-height: 8vh;
+  }
+  .itemList li {
+    font-size: clamp(0.8rem, 1.8vw, 0.9rem);
+  }
+  .statusLabel {
+    font-size: clamp(0.85rem, 2vw, 0.95rem);
+  }
+  .statusSelect {
+    width: clamp(120px, 40vw, 200px); 
+    font-size: clamp(0.8rem, 1.8vw, 0.9rem);
+    padding: clamp(4px, 1.2vw, 5px) clamp(6px, 1.8vw, 10px);
+  }
+  .status {
+    font-size: clamp(0.75rem, 1.6vw, 0.85rem);
+  }
+}
 
+@media screen and (max-width: 540px) {
+  .kitchenPage {
+    max-height: 88vh;
+    min-height: 88vh;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .kitchenPage {
+    padding: clamp(15px, 2.5vw, 20px) clamp(10px, 2vw, 15px);
+    min-height: 90vh;
+  }
+  .pageTitle {
+    font-size: clamp(1.5rem, 4.5vw, 1.8rem);
+    bottom: clamp(5px, 2vw, 10px);
+  }
+  .noOrders {
+    font-size: clamp(1rem, 2.2vw, 1.2rem);
+  }
+  .ordersGrid {
+    grid-template-columns: 1fr; 
+    grid-auto-rows: clamp(180px, 30vw, 240px);
+    gap: clamp(8px, 1.5vw, 15px);
+  }
+  .orderCard {
+    padding: clamp(10px, 3.5vw, 15px);
+  }
+  .orderHeader {
+    font-size: clamp(1rem, 3vw, 1.2rem);
+  }
+  .icon {
+    font-size: clamp(1rem, 2.5vw, 1.2rem);
+  }
+  .itemList {
+    max-height: 8vh;
+  }
+  .itemList li {
+    font-size: clamp(0.75rem, 1.6vw, 0.85rem);
+  }
+  .statusLabel {
+    font-size: clamp(0.8rem, 1.8vw, 0.9rem);
+  }
+  .statusSelect {
+    width: clamp(100px, 35vw, 150px);
+    font-size: clamp(0.75rem, 1.6vw, 0.85rem);
+    padding: clamp(3px, 1vw, 4px) clamp(5px, 1.5vw, 8px);
+  }
+  .status {
+    font-size: clamp(0.7rem, 1.5vw, 0.8rem);
+  }
+}
+
+@media screen and (max-width: 480px) and (max-height: 500px) {
+  .kitchenPage {
+    min-height: 77vh;
+    max-height: 77vh;
+  }
+  .itemList {
+    max-height: 18vh;
+  }
+}
+
+@media screen and (max-width: 376px) and (min-height: 600px) and (max-height: 750px) {
+  .kitchenPage {
+    min-height: 88vh !important;
+  }
+}
+
+@media (max-width: 350px) {
+  .kitchenPage {
+    min-height: 94vh !important;
+  }
+}

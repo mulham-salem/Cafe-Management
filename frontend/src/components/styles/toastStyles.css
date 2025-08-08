@@ -7,7 +7,7 @@
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
     width: 325px;
     bottom: 15px;
-    margin-left: 80px;
+    margin-left: auto;
     border-radius: 6px;
     justify-content: center;
   }
@@ -22,7 +22,19 @@
     flex-direction: column;
     gap: 10px;
   }
+
+  .custom-toast span {
+    word-break: break-word;
+    text-wrap: balance;
+    padding: 10px;
+  }
   
+  .purchase-custom-toast {
+    word-break: break-word;
+    text-wrap: balance;
+    line-height: 1.2;
+  }
+
   .toast-buttons {
     display: flex;
     justify-content: center;
@@ -40,8 +52,8 @@
   .toast-buttons button:first-child {
     background-color: #dc3545;
     color: white;
-    padding-left: 19px;
-    padding-right: 19px;
+    padding-left: 20px;
+    padding-right: 20px;
   }
   
   .toast-buttons button:last-child {
@@ -129,6 +141,21 @@
     left: 360px !important;
   }
   
+  .custom-confirmEmp-toast {
+    background-color: white !important; 
+    color: #110e0c !important; 
+    padding: 15px !important;
+    width: 80% !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+    border-left: 6px solid #e6d5b8 !important;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif !important;
+    font-weight: bold !important;
+    position: relative !important;
+    bottom: 16px !important;
+    left: 300px !important;
+  }
+
   .toast-buttons-order {
     margin-top: 15px;
     display: flex;
@@ -198,10 +225,11 @@
   background-color: #dc3545;
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
   display: inline;
-  font-size: 12px;
+  font-size: 12.5px;
+  font-weight: bold;
   transition: background-color 0.3s ease;
 }
 
@@ -216,11 +244,12 @@
   background-color: #6c757d;
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
   display: block;
   text-align: center;
-  font-size: 12px;
+  font-size: 12.5px;
+  font-weight: bold;
   position: relative;
   top: 0.5px;
   transition: background-color 0.3s ease;
@@ -257,4 +286,58 @@
 .confirm-table-toast span {
   position: relative;
   top: 10px;
+}
+
+.reservation-toast-wrapper {
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  border: none !important;
+  margin: 0 !important;
+  width: auto !important;
+  max-width: unset !important;
+}
+
+.reservation-toast {
+  padding: 1rem 1.2rem;
+  border-radius: 16px;
+  background: #fffaf5;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-left: 5px solid #a58c6f;
+  font-family: "Segoe UI", sans-serif;
+  animation: fadeToastIn 0.5s ease-out;
+  color: #3b1e0a;
+  text-align: left;
+}
+
+.reservation-toast-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #3b1e0a;
+  margin-bottom: 0.6rem;
+  border-bottom: 2px solid #a58c6f;
+  display: inline-block;
+  padding-bottom: 2px;
+}
+
+.reservation-toast-details {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: #5a4e45;
+}
+
+.reservation-toast-details span {
+  font-weight: 600;
+  color: #3b1e0a;
+}
+
+@keyframes fadeToastIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }

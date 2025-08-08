@@ -1,222 +1,446 @@
 .pageWrapper {
-    padding: 40px 30px;
-    font-family: 'Segoe UI', sans-serif;
-    min-height: 100vh;
-    overflow-y: auto;
-    overflow-x: hidden;  
-    min-width: 140%;
-    position: relative;
-    right: 230px;
-  }
-  
-  .pageWrapper::-webkit-scrollbar {
-    display: none;
-  } 
+  padding: 40px;
+  font-family: "Segoe UI", sans-serif;
+  min-height: 100vh;
+  overflow-y: auto;
+  background-color: white;
+}
 
+.pageWrapper::-webkit-scrollbar {
+  display: none;
+}
+
+.pageTitle {
+  position: relative;
+  bottom: clamp(10px, 2.5vh, 20px);
+  font-size: clamp(22px, 5vw, 28px);
+  font-weight: bold;
+  color: #333;
+  display: flex;
+  gap: clamp(8px, 2vw, 10px);
+  border-bottom: 2px dotted #333;
+  padding-bottom: 5px;
+}
+
+.bellIcon {
+  margin-top: 4px;
+  font-size: clamp(20px, 4.5vw, 28px); 
+}
+
+.loadingOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  animation: fadeInDelay 0.2s ease-in both;
+  animation-delay: 0.4s;
+}
+
+.emptyText {
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif;
+  font-size: clamp(14px, 2.5vw, 18px);
+  color: #888;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+@keyframes fadeInDelay {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(15px, 3.5vw, 20px); 
+  margin: 0 auto;
+}
+
+.card {
+  display: flex;
+  gap: clamp(10px, 3vw, 18px);
+  background-color: #fff;
+  border-radius: 12px;
+  padding: clamp(15px, 3.5vw, 18px) clamp(18px, 4vw, 22px); 
+  cursor: pointer;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
+  border-left: 6px solid #6c63ff;
+  align-items: flex-start;
+  animation: fadeIn 0.8s ease;
+  transition: background-color 0.4s ease, transform 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: ease-in 0.3s;
+}
+
+.unseen {
+  background-color: #fdfcff;
+}
+
+.seen {
+  background-color: rgb(248, 254, 250);
+  border-left-color: rgb(2, 150, 66);
+}
+
+.icon {
+  font-size: clamp(20px, 4.5vw, 22px); 
+  color: #6c63ff;
+  margin-top: clamp(2px, 1vw, 4px);
+}
+
+.seen .icon {
+  color: rgb(2, 150, 66);
+}
+
+.content {
+  flex: 1;
+  margin-top: clamp(4px, 1.5vw, 8px);
+}
+
+@font-face {
+  font-family: "Jost";
+  src: url("Fonts/Jost/static/Jost-Light.ttf") format("truetype");
+  font-weight: 510;
+  font-style: normal;
+}
+
+.message {
+  font-family: "Jost";
+  font-size: clamp(15px, 3.5vw, 17px);
+  font-weight: 500;
+  color: #333;
+  margin-bottom: clamp(4px, 1vw, 6px); 
+  white-space: pre-wrap;
+}
+
+.status {
+  font-weight: bold;
+  color: #6c63ff;
+  font-size: clamp(14px, 3vw, 16px); 
+  position: relative;
+  top: clamp(3px, 1vw, 5px);
+}
+
+.rejectionNote {
+  margin-top: clamp(8px, 1vw, 12px);
+  color: #c0392b;
+  font-style: italic;
+  font-size: clamp(13px, 2.8vw, 15px);
+  font-weight: 500;
+}
+
+.note {
+  position: relative;
+  bottom: clamp(5px, 2vw, 10px); 
+  font-size: clamp(13px, 2.8vw, 15px); 
+}
+
+.itemsSection {
+  position: relative;
+  bottom: clamp(5px, 2vw, 10px); 
+  padding: clamp(8px, 2.5vw, 12px);
+}
+
+.itemsSection h4 {
+  margin: auto;
+  position: relative;
+  right: clamp(5px, 2vw, 12px);
+  font-size: clamp(15px, 3.2vw, 17px);
+  color: #333;
+}
+
+.itemsSection ul {
+  margin: clamp(3px, 1vw, 5px) auto auto auto;
+  padding-left: 0px;
+  list-style: none; 
+}
+
+.itemsSection ul li {
+  margin-bottom: clamp(3px, 1vw, 5px); /* Responsive spacing between list items */
+  font-size: clamp(12px, 2.2vw, 14px); /* Responsive font size for list items */
+  color: #555;
+  font-weight: 400;
+}
+
+.title {
+  font-size: clamp(14px, 1.1vw, 17px);
+  font-weight: bold;
+  color: rgb(15, 7, 2); 
+  margin-bottom: clamp(10px, 2.5vw, 15px); 
+  text-align: center; 
+  text-transform: uppercase;
+}
+
+.time {
+  font-size: clamp(12px, 2.5vw, 13px); 
+  color: #777;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Titillium_Web";
+  src: url("Fonts/Titillium_Web/TitilliumWeb-Italic.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+.sender {
+  font-family: "Titillium_Web";
+  font-size: clamp(0.8rem, 2vw, 0.9rem);
+  color: #666;
+  margin-top: clamp(2px, 1vw, 4px);
+  text-align: right;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(100px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.responseSection {
+  margin-top: clamp(10px, 3vw, 15px); 
+  display: flex;
+  gap: clamp(8px, 2vw, 10px);
+  position: relative; /* Keep relative positioning for potential adjustments */
+  top: clamp(10px, 2vw, 15px);
+}
+
+.acceptButton,
+.rejectButton {
+  border: none;
+  padding: clamp(5px, 1.5vw, 6px) clamp(10px, 3vw, 12px);
+  cursor: pointer;
+  font-size: clamp(13px, 2.8vw, 15px); 
+  white-space: nowrap; 
+}
+
+.acceptButton {
+  background-color: #4caf50; 
+  color: white;
+}
+
+.rejectButton {
+  background-color: #f44336;
+  color: white;
+}
+
+.responseSection button:hover {
+  transform: translateY(-2px);
+  transition: all ease 0.2s;
+}
+
+@media screen and (min-width: 1600px) {
   .pageTitle {
-    position: relative;
-    bottom: 20px;
     font-size: 28px;
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 25px;
-    display: flex;
-    gap: 10px;
-    text-align: left;
-    border-bottom: 2px dotted #333;
-    padding-bottom: 5px;
   }
-  
   .bellIcon {
-    position: relative;
-    top: 4px;
+    font-size: 28px;
   }
-
-  .emptyText {
-    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-    font-size: 18px;
-    text-align: center;
-    color: #888;
-    margin-top: 100px;
-  }
-  
   .list {
-    display: flex;
-    flex-direction: column;
+    min-width: 99%;
     gap: 20px;
-    max-width: 1500px;
-    margin: 0 auto;
   }
-  
   .card {
-    display: flex;
-    gap: 18px;
-    background-color: #fff;
-    border-radius: 12px;
-    padding: 18px 22px;
-    cursor: pointer;
-    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
-    border-left: 6px solid #6c63ff;
-    align-items: flex-start;
-    animation: fadeIn 0.8s ease;
-    transition: background-color 0.4s ease, transform 0.2s ease;
+    padding: 22px 28px;
+    gap: 20px;
   }
-
-  .card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    transition: ease-in 0.3s;
+  .message {
+    font-size: 18px;
   }
-  
-  .unseen {
-    background-color: #fdfcff;
+  .responseSection {
+    margin-top: 20px;
+    gap: 15px;
+    top: 20px;
   }
-  
-  .seen {
-    background-color: rgb(248, 254, 250);
-    border-left-color: rgb(2, 150, 66);
+  .status {
+    font-size: 17px;
+    top: 6px;
   }
-  
-  .icon {
-    font-size: 22px;
-    color: #6c63ff;
-    margin-top: 4px;
+  .rejectionNote {
+    margin-top: 15px;
+    font-size: 16px;
   }
-  
-  .seen .icon {
-    color: rgb(2, 150, 66);
+  .note {
+    bottom: 12px;
+    font-size: 16px;
   }
-  
-  .content {
-    flex: 1;
+  .itemsSection {
+    padding: 14px;
+    bottom: 12px;
+  }
+  .itemsSection h4 {
+    font-size: 18px;
+    right: 15px;
+  }
+  .itemsSection ul {
     margin-top: 8px;
   }
-  
-  @font-face {
-    font-family: 'Jost';
-    src: url('Fonts/Jost/static/Jost-Light.ttf') format('truetype');
-    font-weight: 510;
-    font-style: normal;
-  }
-
-  .responseSection {
-    margin-top: 15px;
-    display: flex;
-    gap: 10px;
-  }
-
-  .message {
-    font-family: 'Jost';
-    font-size: 17px;
-    font-weight: 500;
-    color: #333;
+  .itemsSection ul li {
+    font-size: 16px;
     margin-bottom: 6px;
-    white-space: pre-wrap;
   }
-  
-  .status {
-    font-weight: bold;
-    color: #6c63ff;
+  .acceptButton,
+  .rejectButton {
+    padding: 6px 14px;
   }
-  
-  .rejectionNote {
-    margin-top: 12px;
-    color: #c0392b;
-    font-style: italic;
-    font-weight: 500;
-  }
-  
-  .note {
-    position: relative;
-    bottom: 10px;
-  }
+}
 
-  .itemsSection {
-    position: relative;
-    bottom: 10px;
-    padding: 12px;
-    border-radius: 8px;
+@media screen and (max-width: 1280px) {
+  .pageTitle {
+    font-size: 26px;
   }
-
-  .itemsSection h4 {
-    margin: auto;
-    position: relative;
-    right: 12px;
+  .bellIcon {
+    font-size: 26px;
   }
-
-  .itemsSection ul {
-    margin: 5px auto auto auto;
-    padding-left: 0px;
+  .list {
+    gap: 18px;
+    padding: 0;
   }
-
+  .card {
+    padding: 20px 25px;
+    gap: 18px;
+  }
+  .message {
+    font-size: 17px;
+  }
   .title {
-    font-size: 1em; /* حجم خط كبير نسبياً */
-    font-weight: bold; /* خط عريض */
-    color:  rgb(15, 7, 2);      /* لون نص داكن */
-    margin-bottom: 15px; /* مسافة تحت العنوان */
-    text-align: center; /* توسيط العنوان (اختياري) */
-    /* يمكنك إضافة المزيد من التنسيقات حسب الحاجة */
-    text-transform: uppercase;  
+    font-size: 17px;
   }
+}
 
-  .time {
-    font-size: 13px;
-    color: #777;
-    font-style: italic;
+@media screen and (max-width: 768px) {
+  .pageTitle {
+    font-size: 24px;
   }
-  
-  @font-face {
-    font-family: 'Titillium_Web';
-    src: url('Fonts/Titillium_Web/TitilliumWeb-Italic.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
+  .bellIcon {
+    font-size: 24px;
   }
-
+  .list {
+    gap: 15px;
+    padding: 0 20px;
+  }
+  .card {
+    flex-direction: row; 
+    align-items: flex-start;
+    text-align: left;
+    padding: 18px;
+    gap: 15px;
+  }
+  .icon {
+    font-size: 22px;
+  }
+  .message {
+    font-size: 16px;
+  }
   .sender {
-    font-family: 'Titillium_Web';
-    font-size: 0.9rem;
-    color: #666;
-    margin-top: 4px;
-    text-align: right;
+    font-size: 0.85rem;
   }
-
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(100px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+  .itemsSection ul li {
+    font-size: 14px;
+    margin-bottom: 3px;
   }
+  .acceptButton,
+  .rejectButton {
+    font-size: 14px;
+    margin-bottom: 5px; 
+  }
+}
 
-  .responseSection {
+@media screen and (max-width: 480px) {
+  .pageTitle {
+    font-size: 20px;
+  }
+  .bellIcon {
+    font-size: 22px;
+  }
+  .list {
+    gap: 10px;
+    padding: 0 15px; 
+  }
+  .card {
+    flex-direction: column; 
+    align-items: center; 
+    text-align: center;
+    padding: 15px;
+    gap: 8px; 
+  }
+  .icon {
+    font-size: 24px; 
+    margin-top: 0; 
+  }
+  .content {
+    margin-top: 0; 
+  }
+  .message {
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+  .time {
+    font-size: 11px;
+  }
+  .sender {
     position: relative;
-    top: 15px;
-    display: flex;
+    font-size: 0.75rem;
+    top: 20px;
+    text-align: center; 
+  }
+  .responseSection {
+    margin-top: 8px;
+  }
+  .status {
+    font-size: 13px;
+  }
+  .rejectionNote {
+    margin-top: 6px;
+    font-size: 12px;
+  }
+  .note {
+    bottom: 3px;
+    font-size: 12px;
+  }
+  .itemsSection {
+    padding: 8px;
+    bottom: 3px;
+  }
+  .itemsSection h4 {
+    font-size: 14px;
+    right: 5px;
+  }
+  .itemsSection ul {
+    margin-top: 2px;
+  }
+  .itemsSection ul li {
+    font-size: 13px;
+    margin-bottom: 2px;
+  }
+  .responseSection {
+    justify-content: center;
     gap: 10px;
   }
-  
-  .acceptButton {
-    background-color: #4caf50;
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 6px;
-    cursor: pointer;
-  }
-  
+  .acceptButton,
   .rejectButton {
-    background-color: #f44336;
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 6px;
-    cursor: pointer;
+    padding: 3px 8px;
+    font-size: 13px;
   }
-  
-  .responseSection button:hover {
-    transform: translateY(-2px);
-    transition: all ease 0.2s;
-  }
+}

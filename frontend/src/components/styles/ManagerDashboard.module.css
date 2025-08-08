@@ -173,7 +173,7 @@
   height: calc(100% - 60px);
   background-color: #301c03;
   color: white;
-  transition: left 0.5s ease;
+  transition: left 0.6s ease;
   opacity: 0;
   z-index: 1001;
 }
@@ -181,7 +181,7 @@
 .sidebar.fadeIn {
   opacity: 1;
   transform: translateX(0);
-  animation: fadeIn 0.6s ease-in forwards;
+  animation: fadeIn 0.7s ease-in forwards;
 }
 
 @keyframes fadeIn {
@@ -241,12 +241,12 @@
   justify-content: center;
   align-items: center;
   height: calc(100vh - 60px);
-  transition: margin-left 0.4s ease;
+  transition: margin-left 0.6s ease;
 }
 
 .sidebar.open ~ .mainContent {
   margin-left: clamp(140px, 15vw, 260px);
-  transition: margin-left 0.4s ease;
+  transition: margin-left 0.6s ease;
 }
 
 
@@ -270,7 +270,7 @@
 .mainText.fadeIn {
   opacity: 1;
   transform: translateX(0);
-  animation: fadeIn 1s ease-in;
+  animation: fadeIn 0.8s ease-in;
 }
 
 .mainText .highlight {
@@ -352,6 +352,78 @@
   white-space: nowrap;
   margin-bottom: -1.39vh;
   margin-top: -1.39vh;
+}
+
+.toastCard {
+  max-width: 90%;
+  background: #321d01;
+  width: clamp(260px, 18vw, 360px);
+  padding: clamp(8px, 0.5vw, 10px) clamp(8px, 2vw, 12px);
+  border-radius: 18px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+  font-family: 'Georgia', serif;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border: 1px solid #d2b48c;
+  animation-duration: 300ms;
+  animation-fill-mode: forwards;
+  overflow: hidden;
+}
+
+.textContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.messageTitle {
+  font-size: clamp(0.9rem, 1.2vw, 1.3rem);
+  font-weight: bold;
+  color: white;
+  display: block;
+  text-align: center;
+}
+
+.message {
+  font-size: clamp(0.7rem, 0.9vw, 1rem);
+  color: cornsilk;
+  display: block;
+  text-align: center;
+}
+
+@keyframes enterAnimation {
+  from {
+    opacity: 0;
+    transform: translate(40px, -40px) scale(1);
+  }
+  to {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+}
+
+@keyframes leaveAnimation {
+  from {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translate(40px, -40px) scale(0);
+  }
+}
+
+.enter {
+  animation-name: enterAnimation;
+  animation-timing-function: ease-out;
+  animation-fill-mode: forwards;
+}
+
+.leave {
+  animation-name: leaveAnimation;
+  animation-duration: 300ms;
+  animation-timing-function: ease-in;
+  animation-fill-mode: forwards;
 }
 
 @media screen and (min-width: 7680px) and (max-height: 4320px){

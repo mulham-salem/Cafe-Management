@@ -4,10 +4,27 @@ import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBell, faUtensils, faClipboardList, faChair, faKey } from '@fortawesome/free-solid-svg-icons';
 import styles from '../styles/CustomerHome.module.css';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast as toastify, ToastContainer } from 'react-toastify';
+import { toast, Toaster } from 'react-hot-toast';
 import 'react-toastify/dist/ReactToastify.css';
 import "../styles/toastStyles.css";
 import axios from 'axios';
+import { motion } from 'framer-motion';
+
+const cardVariants = {
+  hidden: { opacity: 0, scale: 0.5, rotate: -5, x: 100 },
+  visible: (i) => ({
+    opacity: 1,
+    scale: 1,
+    rotate: 0,
+    x: 0,
+    transition: {
+      delay: i * 0.2,
+      duration: 0.6,
+      ease: [0.4, 0, 0.2, 1],
+    },
+  }),
+};
 
 const cards = [
   {
@@ -48,8 +65,17 @@ const CustomerHome = () => {
 
   useEffect(() => {
     if (location.state && location.state.successMessage) {
-        toast.success(location.state.successMessage);
+      setTimeout(() => {
+      toast.custom((t) => (
+        <div className={`${styles.toastCard} ${t.visible ? styles.enter : styles.leave}`}>
+          <div className={styles.textContainer}>
+            <p className={styles.messageTitle}>☕️ {location.state.successMessage}</p>
+            <p className={styles.message}>Glad to see you again at Coffee House!</p>
+          </div>
+        </div>
+      ), {duration: 4000, position:"top-right"});
         window.history.replaceState({}, document.title);
+      }, 1500);
     }
   }, [location.state])
   
@@ -74,7 +100,7 @@ const CustomerHome = () => {
 
     } catch (error) {
         const errorMessage = error.response?.data?.message || "Logout failed. Please try again.";
-        toast.error(errorMessage);
+        toastify.error(errorMessage);
     }
   };
 
@@ -95,13 +121,14 @@ const CustomerHome = () => {
       setUserName(response.data.name || 'User');
 
     } catch (error) {
-        toast.error("Failed to fetch user name");
+      toastify.error("Failed to fetch user name");
     }
   };
 
   return (
     <div className={styles.container}>
       <ToastContainer />
+      <Toaster/>
       <nav className={styles.navbar}>
         <div className={styles.leftSection}>
           <img src={logo} alt="Cafe Delights Logo" className={styles.logo} />
@@ -137,7 +164,7 @@ const CustomerHome = () => {
         <div className={styles.overlay}>
           <h1 className={styles.title}>TIME TO DISCOVER COFFEE HOUSE</h1>
           <p className={styles.subtitle}>
-            The coffee is brewed by first roasting the green coffee beans over hot coals in a brazier<br/> given an opportunity to sample.
+            The coffee is brewed by first roasting the green coffee beans over hot coals in a brazier given an opportunity to sample.
           </p>
         </div>
       </header>
@@ -147,11 +174,19 @@ const CustomerHome = () => {
       <main className={styles.mainContent}>
         <div className={styles.cardsGrid}>
           {cards.map((card, index) => (
-            <Link to={card.link} key={index} className={styles.card}>
-              <FontAwesomeIcon icon={card.icon} className={styles.cardIcon} />
-              <h3 className={styles.cardTitle}>{card.title}</h3>
-              <p className={styles.cardDesc}>{card.description}</p>
-            </Link>
+              <Link to={card.link} key={index} className={styles.card}>
+                <motion.div
+                  key={index}
+                  custom={index}
+                  variants={cardVariants}
+                  initial="hidden"
+                  animate="visible"
+                >
+                  <FontAwesomeIcon icon={card.icon} className={styles.cardIcon} />
+                  <h3 className={styles.cardTitle}>{card.title}</h3>
+                  <p className={styles.cardDesc}>{card.description}</p>
+                </motion.div>
+              </Link>
           ))}
         </div>
       </main>

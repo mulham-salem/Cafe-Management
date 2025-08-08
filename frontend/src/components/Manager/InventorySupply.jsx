@@ -49,7 +49,6 @@ const InventorySupply = () => {
   const [loadingInventory, setLoadingInventory] = useState(true);
   const [loadingOffer, setLoadingOffer] = useState(true);
 
-    // دالة لجلب المخزون من الـ API
     const fetchInventory = async () => {
       try {
         const response = await axios.get('/manager/inventory');
@@ -195,7 +194,7 @@ const InventorySupply = () => {
           })),
         })));
       } catch (error) {
-        //toast.error("Failed to fetch initial data.");
+        toast.error("Failed to fetch initial data.");
         console.error("Error fetching initial data:", error);
       } finally {
         setLoadingOffer(false);
@@ -390,7 +389,7 @@ const InventorySupply = () => {
         itemCalculatedPrices: itemCalculatedPricesString,
       };
       setBills([...bills, newBill]);  
-      toast.success(<>🧾 Purchase Bill Saved! <br/> and Inventory Updated</>);  
+      toast.success(<div className="purchase-custom-toast">🧾 Purchase Bill Saved! and Inventory Updated</div>);  
       setShowBillModal(false);  
       setSelectedOfferId('');  
       setBillDate(''); 

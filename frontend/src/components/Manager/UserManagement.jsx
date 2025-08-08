@@ -31,7 +31,7 @@ const UserManagement = () => {
     "Menu Management",
     "Table Management",
     "Inventory & Supply",
-    "Promotions Management",
+    "Promotion Management",
     "Manager's Notifications",
   ];
 

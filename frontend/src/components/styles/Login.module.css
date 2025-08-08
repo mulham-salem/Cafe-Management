@@ -11,6 +11,14 @@
   padding: 0 clamp(20px, 5vw, 80px);
   position: relative;
   color: white;
+  filter: blur(10px);
+  opacity: 0;
+  transition: opacity 0.4s ease, filter 0.4s ease;
+}
+
+.bgFadeIn {
+  opacity: 1;
+  filter: blur(0);
 }
 
 body,
@@ -48,7 +56,7 @@ html {
   font-size: clamp(1.3rem, 1.7vw, 2.3rem);
   text-wrap: balance;
   opacity: 0;
-  transition: opacity 0.5s ease-in;
+  transition: opacity 0.6s ease-in;
 }
 
 .leftText span {
@@ -64,7 +72,7 @@ html {
 .card {
   z-index: 1;
   background: #fff;
-  padding: clamp(25px, 3vw, 100px) clamp(25px, 2.5vw, 80px);
+  padding: clamp(25px, 3vw, 100px) clamp(25px, 3vw, 100px);
   border-radius: clamp(25px, 2vw, 40px);
   border: 2.5px solid #6e4c2e;
   width: 100%;
@@ -172,23 +180,90 @@ a {
 }
 
 .form button {
-  padding: clamp(8px, 1vh, 14px);
+  padding: clamp(8px, 1.3vh, 14px);
   position: relative;
   top: 2vh;
   background-color: #4b2e2e;
   color: white;
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   cursor: pointer;
   font-size: clamp(0.85rem, 0.9vw, 1rem);
   font-weight: bold;
-  display: block;
-  text-align: center;
+  display: flex;
+  justify-content: center;
   transition: background 0.3s ease;
 }
 
 .form button:hover {
   background-color: #7a451c;
+}
+
+.toastCard {
+  max-width: 90%;
+  width: clamp(280px, 8vw + 150px, 360px);
+  background: rgb(248, 238, 223);
+  padding: clamp(8px, 0.5vw, 10px) clamp(8px, 2vw, 12px);
+  border-radius: 16px;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.15);
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border: 1px solid #ffb700;
+  animation-fill-mode: forwards;
+  overflow: hidden;
+}
+
+.messageTitle {
+  font-size: clamp(1rem, 1.2vw, 1.3rem);
+  font-weight: bold;
+  color: #9f5d21;
+  display: block;
+  text-align: center;
+}
+
+.message {
+  font-size: clamp(0.9rem, 0.8vw, 1rem);
+  color: #5a2c2c;
+  display: block;
+  text-align: center;
+}
+
+.enter {
+  animation-name: enterFromTop;
+  animation-duration: 0.4s;
+  animation-timing-function: ease-out;
+  animation-fill-mode: forwards;
+}
+
+.leave {
+  animation-name: leaveToTop;
+  animation-duration: 300ms;
+  animation-timing-function: ease-in;
+  animation-fill-mode: forwards;
+}
+
+@keyframes enterFromTop {
+  from {
+    opacity: 0;
+    transform: translateY(-40px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes leaveToTop {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.6);
+  }
 }
 
 @media screen and (min-width: 3840px) {

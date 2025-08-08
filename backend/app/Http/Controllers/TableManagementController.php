@@ -135,13 +135,13 @@ class TableManagementController extends Controller
 
         if ($table->status === 'reserved' && ! $request->boolean('confirm')) {
             return response()->json([
-                'message' => 'This table is currently reserved.',
+                'message' => 'This table is currently reserved, Are you sure you want to proceed?',
             ], 409);
         }
 
         if ($hasActiveReservations && ! $request->boolean('confirm')) {
             return response()->json([
-                'message' => 'This table is currently reserved.',
+                'message' => 'This table is currently reserved, Are you sure you want to proceed?',
             ], 409);
         }
 

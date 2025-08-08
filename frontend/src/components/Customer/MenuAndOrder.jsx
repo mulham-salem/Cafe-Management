@@ -6,7 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import "../styles/toastStyles.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCartPlus, faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
-import axios from 'axios'; // Import axios
+import axios from 'axios'; 
 
 const MenuAndOrder = () => {
   
@@ -244,16 +244,27 @@ const MenuAndOrder = () => {
           <p className={styles.menuSubtitle}>Explore the finest drinks & snacks made just for you.</p>
         </div>
       </div>
+      
+      {filteredMenu.length > 0 && (
+        <div className={styles.menuTabs}>
+          <button onClick={() => filterMenu('All')} className={selectedCategory === 'All' ? styles.active : ''}>All</button>
+          <button onClick={() => filterMenu('Drinks')} className={selectedCategory === 'Drinks' ? styles.active : ''}>Drinks</button>
+          <button onClick={() => filterMenu('Snacks')} className={selectedCategory === 'Snacks' ? styles.active : ''}>Snacks</button>
 
-      <div className={styles.menuTabs}>
-        <button onClick={() => filterMenu('All')} className={selectedCategory === 'All' ? styles.active : ''}>All</button>
-        <button onClick={() => filterMenu('Drinks')} className={selectedCategory === 'Drinks' ? styles.active : ''}>Drinks</button>
-        <button onClick={() => filterMenu('Snacks')} className={selectedCategory === 'Snacks' ? styles.active : ''}>Snacks</button>
+          <div className={styles.cartButtonWrapper}>
+            <div className={styles.cartIcon} onClick={() => setShowOverlay(true)}>
+              🛒 {orderItems.length}
+            </div>
+          </div>
+
       </div>
+      )}
 
       <div className={styles.menuContent}>
       {loading ? (
-        <p className={styles.emptyText}>Loading...</p>
+        <div className={styles.loadingOverlay}>
+          <p className={styles.emptyText}>Loading...</p>
+        </div>
       ) : filteredMenu.length === 0 ? (
           <div className={styles.emptyMenu}>No menu items available right now.</div>
         ) : (
@@ -276,11 +287,7 @@ const MenuAndOrder = () => {
         )}
       </div>
 
-      <div className={styles.cartButtonWrapper}>
-        <div className={styles.cartIcon} onClick={() => setShowOverlay(true)}>
-          🛒 {orderItems.length}
-        </div>
-      </div>
+
 
       {showOverlay && (
         <div className={styles.overlayForm}>

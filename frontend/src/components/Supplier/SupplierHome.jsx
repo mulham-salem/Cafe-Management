@@ -4,7 +4,8 @@ import logo from '/logo_1.png';
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHome, faBell, faSignOutAlt,  faKey } from "@fortawesome/free-solid-svg-icons";
-import { toast, ToastContainer } from "react-toastify";
+import { toast as toastify, ToastContainer } from 'react-toastify';
+import { toast, Toaster } from 'react-hot-toast';
 import "react-toastify/dist/ReactToastify.css";
 import { v4 as uuidv4 } from 'uuid'
 import axios from 'axios';
@@ -50,13 +51,13 @@ const SupplierHome = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!title.trim() || !deliveryDate.trim()) {
-      toast.error("Please fill in all required fields.");
+      toastify.error("Please fill in all required fields.");
       return;
     }
 
     for (let item of items) {
       if (!item.name.trim() || !item.quantity || !item.unitPrice) {
-        toast.error("Please complete all item fields.");
+        toastify.error("Please complete all item fields.");
         return;
       }
     }
@@ -80,14 +81,14 @@ const SupplierHome = () => {
         },
       });
 
-      toast.success("Supply offer submitted successfully.");
+      toastify.success("Supply offer submitted successfully.");
       setTitle("");
       setDeliveryDate("");
       setNote("");
       setItems([{ id: uuidv4(), name: "", quantity: "", unit: "", unitPrice: "" }]);
     } catch (error) {
       const errorMessage = error.response?.data?.message || "Failed to submit offer. Please try again.";
-      toast.error(errorMessage);
+      toastify.error(errorMessage);
     }
   };
 
@@ -110,7 +111,7 @@ const SupplierHome = () => {
       setMyOffers(response.data.offers);
     } catch (error) {
       const errorMessage = error.response?.data?.message || "Failed to fetch offers.";
-      toast.error(errorMessage);
+      toastify.error(errorMessage);
     } finally {
         setLoading(false);
     }
@@ -118,8 +119,17 @@ const SupplierHome = () => {
 
   useEffect(() => {
     if (location.state && location.state.successMessage) {
-        toast.success(location.state.successMessage);
+      setTimeout(() => {
+      toast.custom((t) => (
+        <div className={`${styles.toastCard} ${t.visible ? styles.enter : styles.leave}`}>
+          <div className={styles.textContainer}>
+            <p className={styles.messageTitle}>☕️ {location.state.successMessage}</p>
+            <p className={styles.message}>Glad to see you again at Coffee House!</p>
+          </div>
+        </div>
+      ), {duration: 4000, position:"top-right"});
         window.history.replaceState({}, document.title);
+      }, 1500);
     }
   }, [location.state])
   
@@ -144,7 +154,7 @@ const SupplierHome = () => {
 
     } catch (error) {
         const errorMessage = error.response?.data?.message || "Logout failed. Please try again.";
-        toast.error(errorMessage);
+        toastify.error(errorMessage);
     }
   };
 
@@ -165,7 +175,7 @@ const SupplierHome = () => {
       setUserName(response.data.name || 'User');
 
     } catch (error) {
-        toast.error("Failed to fetch user name");
+      toastify.error("Failed to fetch user name");
     }
   };
 
@@ -190,7 +200,7 @@ const SupplierHome = () => {
   
         if (unseenSupplyOfferResponses.length > 0) {
 
-          toast.info(`You received ${unseenSupplyOfferResponses.length} response${unseenSupplyOfferResponses.length > 1 ? 's' : ''} for your supply offer.`);
+          toastify.info(`You received ${unseenSupplyOfferResponses.length} response${unseenSupplyOfferResponses.length > 1 ? 's' : ''} for your supply offer.`);
   
           const ids = unseenSupplyOfferResponses.map(n => n.id);
           await Promise.all(
@@ -204,7 +214,7 @@ const SupplierHome = () => {
   
         if (unseenSupplyRequests.length > 0) {
 
-          toast.info(`You received ${unseenSupplyRequests.length} new supply request${unseenSupplyRequests.length > 1 ? 's' : ''}.`);
+          toastify.info(`You received ${unseenSupplyRequests.length} new supply request${unseenSupplyRequests.length > 1 ? 's' : ''}.`);
   
           const ids = unseenSupplyRequests.map(n => n.id);
           await Promise.all(
@@ -226,9 +236,12 @@ const SupplierHome = () => {
     return () => clearInterval(interval);
   }, []);
 
+  const isFullWidthPage = location.pathname === '/login/supplier-home/supplier-notification';
+
   return (
     <div className={styles.container}>
       <ToastContainer />
+      <Toaster/>
       <nav className={styles.navbar}>
         <Link to="/login/supplier-home" className={styles.navIcon}>
           <FontAwesomeIcon icon={faHome} title="Home"/>
@@ -262,7 +275,6 @@ const SupplierHome = () => {
 
       {currentPath === "/login/supplier-home" && (
         <div className={styles.heroText}>
-        
             <h1>Welcome, dear supplier!</h1>
             <p>Manage your supply offers and stay updated.</p>
         </div>
@@ -285,7 +297,7 @@ const SupplierHome = () => {
         </div>
       )}   
 
-      <main className={styles.mainContent}>
+      <main className={isFullWidthPage ? styles.fullWidthPageWrapper :  styles.mainContent}>
       {currentPath === "/login/supplier-home" && activeTab === "send" && (
         
         <form className={styles.offerForm} onSubmit={handleSubmit}>
@@ -347,7 +359,9 @@ const SupplierHome = () => {
       {currentPath === "/login/supplier-home"  && activeTab === "view" && (
           <div className={styles.offersList}>
             {loading ? (
-              <p className={styles.emptyText}>Loading...</p>
+              <div className={styles.loadingOverlay}>
+                <p className={styles.emptyText}>Loading...</p>
+              </div>
             ) : myOffers.length > 0 ? (
                 myOffers.map((offer) => (
                 <div key={offer.id} className={styles.offerCard}>
@@ -378,28 +392,28 @@ const SupplierHome = () => {
    
                     <h4>Items:</h4>
                     <table className={styles.itemsTable}>
-                    <thead>
-                        <tr>
-                        <th>Name</th>
-          
-                        <th>Qty</th>
-                        <th>Unit</th>
-                        <th>Unit Price</th>
-                        </tr>
-                    </thead>
-     
-                    <tbody>
-                        {offer.items.map((item, i) => (
-                        <tr key={i}>
-                            <td>{item.name}</td>
-                 
-                            <td>{item.quantity}</td>
-                            <td>{item.unit}</td>
-                            <td>${item.unit_price}</td>
-                        </tr>
-                        ))}
-   
-                    </tbody>
+                      <thead>
+                          <tr>
+                          <th>Name</th>
+            
+                          <th>Qty</th>
+                          <th>Unit</th>
+                          <th>Unit Price</th>
+                          </tr>
+                      </thead>
+      
+                      <tbody>
+                          {offer.items.map((item, i) => (
+                          <tr key={i}>
+                              <td>{item.name}</td>
+                  
+                              <td>{item.quantity}</td>
+                              <td>{item.unit}</td>
+                              <td>${item.unit_price}</td>
+                          </tr>
+                          ))}
+    
+                      </tbody>
                     </table>
                 </div>
                 ))

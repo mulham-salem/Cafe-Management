@@ -66,7 +66,9 @@ const EmployeeNotification = () => {
       <h2 className={styles.pageTitle}><FontAwesomeIcon icon={faBell} className={styles.bellIcon}/> Notifications</h2>
 
       {loading ? (
-        <p className={styles.emptyText}>Loading...</p>
+        <div className={styles.loadingOverlay}>
+          <p className={styles.emptyText}>Loading...</p>
+        </div>
       ) : error ? (
         <p className={styles.emptyText}>{error}</p>
       ) : notifications.length === 0 ? (

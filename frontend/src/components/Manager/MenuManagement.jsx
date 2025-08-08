@@ -67,7 +67,7 @@ const MenuManagement = () => {
       }));
       setMenuItems(formattedItems);
     } catch (error) {
-      //toast.error('Failed to load menu items. Please ensure you are logged in.');
+      toast.error('Failed to load menu items. Please ensure you are logged in.');
     } finally {
       setLoading(false);
     }

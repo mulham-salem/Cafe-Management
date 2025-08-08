@@ -1,36 +1,88 @@
+### System Actors:
+
+Customer 
+Employee
+Manager
+Supplier
+Delivery Worker
+
+**********************************************
+
+
 ### System Features:
 
-Login
-Logout 
-Change password 
-View menu 
-Manage menu 
-Create order 
-Edit order 
-Cancel order
-Confirm order
-Search order
-Track order status
-Add notes to order
-Reserve table
-Edit/Cancel Table reservation
-Manage Tables
-Send Order to Kitchen
-Update Order Status
-Notify Order Ready
-Generate Invoice
-Create User
-Edit User Info
-Delete User
-Assign User Roles
-Manage Inventory
-Low Stock Alert
-Manage Promotions
-Send Supply Request
-Send Supply Offer
-Accept Supply Offer
-Create Purchase Invoice
+1- Login
+2- Logout 
+3- Change password 
+4- View menu 
+5- Manage menu 
+6- Create order 
+7- Edit order 
+8- Cancel order
+9- Confirm order
+10- Search order
+11- Track order status
+12- Add notes to order
+13- Reserve table
+14- Edit/Cancel Table reservation
+15- Manage Tables
+16- Send Order to Kitchen
+17- Update Order Status
+18- Notify Order Ready
+19- Generate Invoice
+20- Create User
+21- Edit User Info
+22- Delete User
+23- Assign User Roles
+24- Manage Inventory
+25- Low Stock Alert
+26- Manage Promotions
+27- Send Supply Request
+28- Send Supply Offer
+29- Accept Supply Offer
+30- Create Purchase Invoice
 
+**********************************************
+
+31- View Sales Reports
+32- Generate Financial Reports
+33- Send Internal Messages
+34- Notify New Promotion 
+35- View Promotions
+36- Submit Complaint
+37- Rate Order
+38- Manage Favorites
+39- View Favorites
+40- View Purchase Invoice
+41- View Supply History
+42- View Supply Offers
+43- Use Loyalty Points
+44- Set Order Pickup Time
+45- Search Menu 
+46- View Top Selling Items
+47- Request Order Repreparation
+48- Put Order On Hold
+49- Select Order Pickup Method
+50- Enter Delivery Info
+51- View Delivery Cost
+52- Set Estimated Delivery Time
+53- Rate Delivery Service
+54- View Delivery Orders
+55- Update Delivery Status
+56- Confirm Delivery Received
+57- Confirm Order Delivered
+58- Contact Customer
+59- View Delivery Details
+60- Update Live Location
+61- Reorder
+62- Pause Order Receiving
+63- Load Permissions
+64- Edit Account Info
+65- Reset Password
+66- Visual Table Map
+67- Process Online Payment
+
+**********************************************
 
 ### Drinks:
 

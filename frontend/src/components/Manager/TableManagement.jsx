@@ -52,7 +52,7 @@ const TableManagement = () => {
       const response = await axiosInstance.get('/manager/table');
       setTables(response.data.tables); 
     } catch (error) {
-      //toast.error('Failed to load tables.');
+        toast.error('Failed to load tables.');
     } finally {
       setLoading(false);
     }
@@ -186,7 +186,7 @@ const TableManagement = () => {
                     toast.warn(
                       ({ closeToast }) => (
                       <div className="custom-toast">
-                        <p>{error.response.data.message} <br/> <span>Are you sure you want to proceed?</span></p>
+                        <span> This table is currently reserved, are you sure you want to proceed?</span>
                         <div className="toast-buttons">
                           <button
                             onClick={async () => {
@@ -203,7 +203,7 @@ const TableManagement = () => {
                               closeToast(); 
                             }}
                           >
-                            Yes, delete
+                            Yes
                           </button>
                           <button onClick={() => toast.dismiss()}>Cancel</button>
                         </div>

@@ -167,59 +167,60 @@ const UserOrder = () => {
       <h1 className={styles.pageTitle}><FontAwesomeIcon icon={faMugHot} className={`${styles.icon} ${styles.floatingIcon}`}/>
         My Orders
       </h1>
-      <div className={styles.ordersGrid}>
-        {loading ? (
-          <p className={styles.emptyText}>Loading...</p>
-        ) :
-        orders.length > 0 ? (
-          orders.map((order) => (
-            <div key={order.id} className={styles.orderCard}>
-              <div className={styles.orderHeader}>
-                <span>Order #{order.id}</span>
-                <span className={`${styles.status} ${styles[order.status]}`}>
-                  {order.status}
-                </span>
-              </div>
+      {loading ? (
+          <div className={styles.loadingOverlay}>
+            <p className={styles.emptyText}>Loading...</p>
+          </div>
+        ) : orders.length > 0 ? (
+        <div className={styles.ordersGrid}>
+          {orders.map((order) => (
+              <div key={order.id} className={styles.orderCard}>
+                <div className={styles.orderHeader}>
+                  <span>Order #{order.id}</span>
+                  <span className={`${styles.status} ${styles[order.status]}`}>
+                    {order.status}
+                  </span>
+                </div>
 
-              <div className={styles.orderBody}>
-                <p><strong>Date:</strong> {order.createdAt}</p>
-                <p><strong>Note:</strong> {order.note}</p> {/* Note is a placeholder now */}
-                <p><strong>Items:</strong> {order.itemsCount}</p> {/* This will be 0 initially unless you fetch full order details */}
-              </div>
+                <div className={styles.orderBody}>
+                  <p><strong>Date:</strong> {order.createdAt}</p>
+                  <p><strong>Note:</strong> {order.note}</p> {/* Note is a placeholder now */}
+                  <p><strong>Items:</strong> {order.itemsCount}</p> {/* This will be 0 initially unless you fetch full order details */}
+                </div>
 
-              <div className={styles.actions}>
-                {order.status === 'pending' && (
-                <button className={styles.editBtn} onClick={() => handleEditOrder(order)}>
-                  <FontAwesomeIcon icon={faPen} /> Edit
-                </button>
-                )}
-
-                {order.status === 'pending' && (
-                <button className={styles.cancelBtn} onClick={() => handleCancelOrder(order.id)}>
-                  <FontAwesomeIcon icon={faTrash} /> Cancel
-                </button>
-                )}
-
-                {order.status === 'pending' && (
-                  <button className={styles.confirmBtn} onClick={() => handleConfirmOrder(order.id)}>
-                    <FontAwesomeIcon icon={faCheck} /> Confirm
+                <div className={styles.actions}>
+                  {order.status === 'pending' && (
+                  <button className={styles.editBtn} onClick={() => handleEditOrder(order)}>
+                    <FontAwesomeIcon icon={faPen} /> Edit
                   </button>
-                )}
+                  )}
 
-                {/* Only show invoice button if canShowBill is true */}
-                {order.canShowBill && ( 
-                  <button className={styles.invoiceBtn} onClick={() => handleShowInvoice(order)}>
-                    <FontAwesomeIcon icon={faReceipt} /> Invoice
+                  {order.status === 'pending' && (
+                  <button className={styles.cancelBtn} onClick={() => handleCancelOrder(order.id)}>
+                    <FontAwesomeIcon icon={faTrash} /> Cancel
                   </button>
-                )}
+                  )}
+
+                  {order.status === 'pending' && (
+                    <button className={styles.confirmBtn} onClick={() => handleConfirmOrder(order.id)}>
+                      <FontAwesomeIcon icon={faCheck} /> Confirm
+                    </button>
+                  )}
+
+                  {/* Only show invoice button if canShowBill is true */}
+                  {order.canShowBill && ( 
+                    <button className={styles.invoiceBtn} onClick={() => handleShowInvoice(order)}>
+                      <FontAwesomeIcon icon={faReceipt} /> Invoice
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
-          ))
+            ))}
+        </div>
         ) : (
           <p className={styles.emptyOrderList}>No orders to display.</p>
         )}
-      </div>
-
+      
       {showInvoiceOverlay && selectedInvoice && (
        <div className={styles.invoiceOverlay}>
          <div className={styles.invoiceContent}>

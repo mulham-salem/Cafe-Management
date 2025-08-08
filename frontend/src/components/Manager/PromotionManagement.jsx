@@ -49,7 +49,7 @@ const PromotionManagement = () => {
       }));
       setPromotions(formattedPromotions);
     } catch (error) {
-      //toast.error('Failed to load promotions.');
+        toast.error('Failed to load promotions.');
     } finally {
       setLoading(false);
     }

@@ -82,7 +82,11 @@ const UserOrderEmp = () => {
                   
                   const updatedOrders = orders.filter((order) => order.id !== orderId);
                   setOrders(updatedOrders);
-                  
+
+                  if (searchTerm.trim() !== '') {
+                      setFilteredOrders(prev => prev.filter(order => order.id !== orderId));
+                    }
+                    
                   toast.dismiss(t.id);
                   toast.success('Order cancelled successfully!');
                 } catch (error) {
@@ -111,7 +115,7 @@ const UserOrderEmp = () => {
         autoClose: false,
         draggable: false,
         closeButton: false,
-        className: 'custom-confirm-toast',
+        className: 'custom-confirmEmp-toast',
       }
     );
   };
@@ -124,6 +128,14 @@ const UserOrderEmp = () => {
         order.id === orderId ? { ...order, status: 'confirmed' } : order
       );
       setOrders(updatedOrders);
+
+      if (searchTerm.trim() !== '') {
+        setFilteredOrders(prev =>
+          prev.map(order =>
+            order.id === orderId ? { ...order, status: 'confirmed' } : order
+          )
+        );
+      }  
       toast.success('Order confirmed successfully!');
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Failed to confirm order.';
@@ -207,7 +219,7 @@ const UserOrderEmp = () => {
         clearTimeout(handler);
       };
     }
-  }, [searchTerm, orders]); 
+  }, [searchTerm]); 
   
   
   return (
@@ -216,66 +228,22 @@ const UserOrderEmp = () => {
       <h1 className={styles.pageTitle}><FontAwesomeIcon icon={faMugHot} className={`${styles.icon} ${styles.floatingIcon}`}/>
         My Orders
       </h1>
-      
-      <div className={styles.ordersGrid}>
+    
       {loading ? (
-        <p className={styles.emptyText}>Loading...</p>
+        <div className={styles.loadingOverlay}>
+          <p className={styles.emptyText}>Loading...</p>
+        </div>
       ) : isSearching ? (
         <p className={styles.emptyText}>Searching...</p>
-      ) : searchTerm.trim() !== '' ? (
-        filteredOrders.length > 0 ? (
-          filteredOrders.map((order) => (
+      ) : searchTerm.trim() !== '' && filteredOrders.length === 0 ? (
+        <p className={styles.noResults}>No matching orders found.</p>
+      ) : orders.length === 0 ? (
+        <p className={styles.emptyOrderList}>No orders to display.</p>
+      ) : (
+        <div className={styles.ordersGrid}>
+          {(searchTerm.trim() !== '' ? filteredOrders : orders).map((order) => (
             <div key={order.id} className={styles.orderCard}>
-              <div className={styles.orderHeader}>
-                <span>Order #{order.id}</span>
-                <span className={`${styles.status} ${styles[order.status]}`}>
-                  {order.status}
-                </span>
-              </div>
 
-              <div className={styles.orderBody}>
-                <p><strong>Date:</strong> {order.createdAt}</p>
-                <p><strong>Note:</strong> {order.note || '—'}</p>
-                <p><strong>Items:</strong> {order.itemsCount}</p>
-              </div>
-
-              <div className={styles.actions}>
-
-                {order.status === 'pending' && (
-                <button className={styles.editBtn} onClick={() => handleEditOrder(order)}>
-                  <FontAwesomeIcon icon={faPen} /> Edit
-                </button>
-                )}
-
-                {order.status === 'pending' && (
-                <button className={styles.cancelBtn} onClick={() => handleCancelOrder(order.id)}>
-                  <FontAwesomeIcon icon={faTrash} /> Cancel
-                </button>
-                )}
-
-                {order.status === 'pending' && (
-                  <button className={styles.confirmBtn} onClick={() => handleConfirmOrder(order.id)}>
-                    <FontAwesomeIcon icon={faCheck} /> Confirm
-                  </button>
-                )}
-
-                {/* Only show invoice button if canShowBill is true */}
-                {order.canShowBill && ( 
-                    <button className={styles.invoiceBtn} onClick={() => handleShowInvoice(order)}>
-                      <FontAwesomeIcon icon={faReceipt} /> Invoice
-                    </button>
-                )}
-              </div>
-            </div>
-          ))
-        ) : (
-          <p className={styles.noResults}>No matching orders found.</p>
-        )
-        ) : orders.length === 0 ? (
-          <p className={styles.emptyOrderList}>No orders to display.</p>
-        ) : (
-          orders.map((order) => (
-            <div key={order.id} className={styles.orderCard}>
               <div className={styles.orderHeader}>
                 <span>Order #{order.id}</span>
                 <span className={`${styles.status} ${styles[order.status]}`}>
@@ -310,10 +278,9 @@ const UserOrderEmp = () => {
                 )}
               </div>
             </div>
-          ))
-        )}
+        ))}
       </div>
-
+      )}
 
       {showInvoiceOverlay && selectedInvoice && (
        <div className={styles.invoiceOverlay}>

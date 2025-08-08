@@ -4,7 +4,8 @@ import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBell, faUtensils, faClipboardList, faFire, faKey, faSearch } from '@fortawesome/free-solid-svg-icons';
 import styles from '../styles/EmployeeHome.module.css';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast as toastify, ToastContainer } from 'react-toastify';
+import { toast, Toaster } from 'react-hot-toast';
 import 'react-toastify/dist/ReactToastify.css';
 import "../styles/toastStyles.css";
 import { createContext } from 'react';
@@ -66,8 +67,17 @@ const EmployeeHome = () => {
 
   useEffect(() => {
     if (location.state && location.state.successMessage) {
-        toast.success(location.state.successMessage);
+      setTimeout(() => {
+      toast.custom((t) => (
+        <div className={`${styles.toastCard} ${t.visible ? styles.enter : styles.leave}`}>
+          <div className={styles.textContainer}>
+            <p className={styles.messageTitle}>☕️ {location.state.successMessage}</p>
+            <p className={styles.message}>Glad to see you again at Coffee House!</p>
+          </div>
+        </div>
+      ), {duration: 4000, position:"top-right"});
         window.history.replaceState({}, document.title);
+      }, 1500);
     }
   }, [location.state])
   
@@ -92,7 +102,7 @@ const EmployeeHome = () => {
 
     } catch (error) {
         const errorMessage = error.response?.data?.message || "Logout failed. Please try again.";
-        toast.error(errorMessage);
+        toastify.error(errorMessage);
     }
   };
 
@@ -113,13 +123,14 @@ const EmployeeHome = () => {
       setUserName(response.data.name || 'User');
 
     } catch (error) {
-        toast.error("Failed to fetch user name");
+      toastify.error("Failed to fetch user name");
     }
   };
 
   return (
     <div className={styles.container}>
       <ToastContainer />
+      <Toaster/>
       <nav className={styles.navbar}>
         <div className={styles.leftSection}>
           <img src={logo} alt="Cafe Delights Logo" className={styles.logo} />
@@ -134,21 +145,18 @@ const EmployeeHome = () => {
           </ul>
         </div>
         <div className={styles.rightSection}>
-
-        {(location.pathname.includes('/user-order') || location.pathname.includes('/kitchen-order')) && (
-            <div className={styles.searchContainer}>
-            <FontAwesomeIcon icon={faSearch} className={styles.searchIcon} />
-            <input
-              type="text"
-              placeholder="Search Order ID"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className={styles.searchInput}
-            />
-          </div>
-        )}
-
-
+          {(location.pathname.includes('/user-order') || location.pathname.includes('/kitchen-order')) && (
+              <div className={styles.searchContainer}>
+              <FontAwesomeIcon icon={faSearch} className={styles.searchIcon} />
+              <input
+                type="text"
+                placeholder="Search Order ID"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className={styles.searchInput}
+              />
+            </div>
+          )}
           <div className={styles.username}>
           {userName}
             <div className={styles.dropdown}>
@@ -170,7 +178,7 @@ const EmployeeHome = () => {
         <div className={styles.overlay}>
           <h1 className={styles.title}>WELCOME TO THE KITCHEN COMMAND</h1>
           <p className={styles.subtitle}>
-            Here is where culinary magic begins. Focus on precision, flavor,<br/> and delivering perfection one plate at a time.
+            Here is where culinary magic begins. Focus on precision, flavor, and delivering perfection one plate at a time.
           </p>
         </div>
       </header>

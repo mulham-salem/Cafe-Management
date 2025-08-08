@@ -6,6 +6,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
 import "../styles/toastStyles.css";
 import axios from 'axios'; 
+import { motion } from 'framer-motion';
 
 const TableReservation = () => {
 
@@ -21,7 +22,7 @@ const TableReservation = () => {
 
   const [reservationDate, setReservationDate] = useState('');
   const [reservationTime, setReservationTime] = useState('');
-  const [guestCount, setGuestCount] = useState('');
+  const [guestCount, setGuestCount] = useState('1');
   const [selectedTableId, setSelectedTableId] = useState(null);
 
   const [isEditing, setIsEditing] = useState(false);
@@ -59,7 +60,7 @@ const TableReservation = () => {
     if (guests) {
       fetchAvailableTables(guests);
     } else {
-      setTables([]); 
+      fetchAvailableTables(guestCount);
     }
   };
 
@@ -75,7 +76,7 @@ const TableReservation = () => {
       });
       setTables(response.data);
     } catch (error) {
-      toast.error('Failed to load available tables.');
+        toast.error('Failed to load available tables.');
     } finally {
       setLoadingTables(false);
     }
@@ -86,7 +87,7 @@ const TableReservation = () => {
       const response = await axios.get('/user/customer/table-reservation');
       setReservations(response.data);
     } catch (error) {
-      toast.error('Failed to load your reservations.');
+        toast.error('Failed to load your reservations.');
     } finally {
       setLoadingReser(false);
     }
@@ -110,15 +111,20 @@ const TableReservation = () => {
       const response = await axios.post('/user/customer/table-reservation', newReservation);
 
       toast.success(
-        <span style={{ display: 'block', textAlign: 'center' }}>
-          🎉<strong style={{ color: '#110e0c', borderBottom: '2px solid #110e0c' }}>Reservation Confirmed!</strong><br /><br />
-          <small>
-            📅 Date: {reservationDate} <br />
-            🕒 Time: {reservationTime} <br />
-            👥 Guests: {guestCount} <br />
-            🍽️ Table: {selectedTableId}
-          </small>
-        </span>
+        <div className="reservation-toast">
+          <div className="reservation-toast-title">🎉 Reservation Confirmed!</div>
+          <div className="reservation-toast-details">
+            <div>📅<span>Date:</span> {reservationDate} </div>
+            <div>🕒<span>Time:</span> {reservationTime} </div>
+            <div>👥<span>Guests:</span> {guestCount} </div>
+            <div>🍽️<span>Table:</span> {selectedTableId} </div>
+          </div>
+        </div>,
+        {
+          className: 'reservation-toast-wrapper',
+          icon: false,
+          hideProgressBar: true,
+        }
       );
       fetchReservations();
       fetchAvailableTables(guestCount);
@@ -284,7 +290,7 @@ const TableReservation = () => {
       <div className={styles.tabContent}>
         {activeTab === 'new' && (
           <div className={`${styles.newReservation} ${styles.fadeInTab}`}>
-            <div className={styles.formColumn}>
+            <div className={`${styles.formColumn} ${styles.fadeInTab}`}>
               <h2>Reserve a Table</h2>
               <div className={styles.formGroup}>
                 <label>Date:</label>
@@ -297,7 +303,7 @@ const TableReservation = () => {
               <div className={styles.formGroup}>
                 <label>Guests:</label>
                 <select value={guestCount} onChange={handleGuestsChange}>
-                  <option value="">select guests</option>
+                  <option value="1">select guests</option>
                   {[...Array(10).keys()].map(n => (
                     <option key={n + 1} value={n + 1}>{n + 1}</option>
                   ))}
@@ -319,21 +325,38 @@ const TableReservation = () => {
               <h3>Available Tables</h3>
               <div className={styles.tableGrid}>
                 {loadingTables ? (
-                  <p className={styles.emptyText}>Loading...</p>
+                  <div className={styles.loadingOverlay}>
+                    <p className={styles.emptyText}>Loading...</p>
+                  </div>
                 ) :
                   tables
                   .filter((table) => table.status === 'available' && table.capacity >= Number(guestCount))
                   .map((table) => (
-                    <div
+                    <motion.div
                       key={table.id}
-                      className={`${styles.tableCard} ${selectedTableId === table.id ? styles.selected : ''}`}
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{
+                        opacity: 1,
+                        scale: selectedTableId === table.id ? [1, 1.08, 1] : 1,
+                        boxShadow: selectedTableId === table.id
+                          ? '0 0 20px rgba(165, 140, 111, 0.6)'
+                          : '0 2px 10px rgba(0, 0, 0, 0.2)'
+                      }}
+                      transition={{
+                        duration: 0.6,
+                        repeat: selectedTableId === table.id ? Infinity : 0,
+                        repeatType: "loop",
+                        repeatDelay: 1,
+                        ease: 'easeInOut',
+                      }}
+                      className={`${styles.tableCard} ${selectedTableId === table.id ? styles.selected : ''} ${styles.fadeInTable}`}
                       onClick={() => handleTableSelect(table.id)} 
                     >
                       <FontAwesomeIcon icon={faChair} className={styles.icon} />
                       <p>Table #{table.id}</p> 
                       <p>Capacity: {table.capacity}</p>
                       <p>Status: {table.status}</p>
-                    </div>
+                    </motion.div>
                   ))}
               </div>
             </div>
@@ -345,10 +368,14 @@ const TableReservation = () => {
             <h2>My Reservations</h2>
             <div className={styles.reservationList}>
               { loadingReser ? (
-                <p className={styles.emptyText2}>Loading...</p>
+                <div className={styles.loadingOverlay}>
+                  <p className={styles.emptyText2}>Loading...</p>
+                </div>
               ) :  
               !loadingReser && reservations.length === 0 ? (
+                <div className={styles.loadingOverlay}>
                   <p className={styles.noReservationsMessage}> You have no active reservations at the moment. </p>
+                </div>
               ) : (
               reservations.map(res => (
                 <div key={res.id} className={styles.reservationCard}>
