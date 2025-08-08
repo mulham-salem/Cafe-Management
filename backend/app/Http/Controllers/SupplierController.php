@@ -8,9 +8,16 @@ use App\Models\Supplier;
 use App\Models\SupplyOffer;
 use App\Models\SupplyOfferItem;
 use Exception;
+use Illuminate\Http\JsonResponse;
 
 class SupplierController extends Controller
 {
+    /**
+     * Stores a new supply offer submitted by an authenticated supplier.
+     *
+     * @param StoreSupplyOfferRequest $request
+     * @return JsonResponse
+     */
     public function store(StoreSupplyOfferRequest $request)
     {
         $user = auth('user')->user();
@@ -46,14 +53,14 @@ class SupplierController extends Controller
                     return response()->json("Error inserting item #$index: ".$e->getMessage());
                 }
             }
-            $managerIds = [3, 4];
+            $managerIds = [1, 2];
             foreach ($managerIds as $index => $managerId) {
                 Notification::create([
                     'manager_id' => $managerId,
                     'user_id' => $user->id,
                     'sent_by' => 'supplier',
-                    'purpose' => 'SupplyOffers',
-                    'message' => "Supplier {$user->name} submitted a new supply offer (#{$supplyOffer->id})",
+                    'purpose' => 'Supply Offer',
+                    'message' => "Supplier '{$user->name}' submitted a new supply offer (#{$supplyOffer->id})",
                     'createdAt' => now(),
                     'seen' => false,
                 ]);
@@ -67,11 +74,17 @@ class SupplierController extends Controller
         }
     }
 
+
+    /**
+     * Retrieves all supply offers submitted by the authenticated supplier.
+     *
+     * @return JsonResponse
+     */
     public function viewMyOffers()
     {
         $supplier = auth('user')->user();
 
-        $supplyOffers = SupplyOffer::with('supplyofferitems')
+        $supplyOffers = SupplyOffer::with('supplyOfferItems')
             ->where('supplier_id', $supplier->id)
             ->orderByDesc('created_at')
             ->get();
@@ -79,13 +92,16 @@ class SupplierController extends Controller
         return response()->json([
             'offers' => $supplyOffers->map(function ($offer) {
                 return [
+                    'id' => $offer->id,
                     'title' => $offer->title,
                     'delivery_date' => $offer->delivery_date,
                     'total_price' => $offer->total_price,
                     'status' => $offer->status,
-                    'note' => $offer->status === 'rejected' ? $offer->note : null,
+                    'note' => $offer->note,
+                    'rejection_reason' => $offer->rejection_reason ?? null,
                     'items' => $offer->supplyofferitems->map(function ($item) {
                         return [
+                            'id' => $item->id,
                             'name' => $item->name,
                             'quantity' => $item->quantity,
                             'unit' => $item->unit,
@@ -97,3 +113,6 @@ class SupplierController extends Controller
         ]);
     }
 }
+
+
+

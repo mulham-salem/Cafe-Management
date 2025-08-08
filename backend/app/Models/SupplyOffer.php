@@ -37,5 +37,5 @@ class SupplyOffer extends Model
         ];
     }
 
-    protected $fillable = ['supplier_id', 'title', 'total_price', 'delivery_date', 'note', 'status'];
+    protected $fillable = ['supplier_id', 'title', 'total_price', 'delivery_date', 'note', 'status', 'rejection_reason'];
 }

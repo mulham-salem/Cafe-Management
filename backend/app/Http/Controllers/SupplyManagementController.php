@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\InventoryItem;
 use App\Models\Notification;
 use App\Models\PurchaseBill;
-use App\Models\Supplier;
 use App\Models\SupplyOffer;
 use App\Models\SupplyRequest;
 use App\Models\SupplyRequestItem;
@@ -15,6 +14,11 @@ use Illuminate\Http\Request;
 
 class SupplyManagementController extends Controller
 {
+    /**
+     * Display a listing of supply offers with their related data.
+     *
+     * @return JsonResponse
+     */
     public function index()
     {
         $offers = SupplyOffer::with([
@@ -47,8 +51,11 @@ class SupplyManagementController extends Controller
         return response()->json($data);
     }
 
-    //    ................................................................................................................................................
-
+    /**
+     * Get a list of suppliers associated with the authenticated manager.
+     *
+     * @return JsonResponse
+     */
     public function getSuppliers(): JsonResponse
     {
         $managerId = auth('manager')->id();
@@ -62,8 +69,12 @@ class SupplyManagementController extends Controller
         return response()->json($suppliers);
     }
 
-    //    ................................................................................................................................................
-
+    /**
+     * Accept a pending supply offer.
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
     public function acceptOffer($id)
     {
         $supplyOffer = SupplyOffer::with('supplier.user', 'supplyOfferItems.inventoryItem')->findOrFail($id);
@@ -79,16 +90,22 @@ class SupplyManagementController extends Controller
             'manager_id' => auth('manager')->user()->id,
             'user_id' => $supplyOffer->supplier_id,
             'sent_by' => 'manager',
-            'purpose' => 'responseForOffers',
-            'message' => "Offer has been accepted '{$supplyOffer->title}'",
+            'purpose' => 'Supply Offer Response',
+            'message' => "'{$supplyOffer->title}' Offer has been accepted",
             'createdAt' => now(),
             'seen' => false,
         ]);
 
         return response()->json(['message' => 'Supply offer accepted and waiting to pay the bill.']);
     }
-    //    ................................................................................................................................................
 
+    /**
+     * Reject a pending supply offer.
+     *
+     * @param Request $request
+     * @param int $id
+     * @return JsonResponse
+     */
     public function rejectOffer(Request $request, $id)
     {
         $supplyOffer = SupplyOffer::with('supplier.user', 'supplyOfferItems.inventoryItem')->findOrFail($id);
@@ -97,31 +114,33 @@ class SupplyManagementController extends Controller
             'reason' => 'nullable|string|max:1000',
         ]);
 
-        $offer = SupplyOffer::findOrFail($id);
-
-        if ($offer->status !== 'pending') {
+        if ($supplyOffer->status !== 'pending') {
             return response()->json(['message' => 'This offer has already been processed.'], 400);
         }
 
-        $offer->status = 'rejected';
-        $offer->note = $request->reason ?? 'Rejected without reason';
-        $offer->save();
+        $supplyOffer->status = 'rejected';
+        $supplyOffer->rejection_reason = $request->reason ?? 'Rejected without reason';
+        $supplyOffer->save();
 
-        $supplyOffer->note = $offer->note;
         Notification::create([
             'manager_id' => auth('manager')->user()->id,
             'user_id' => $supplyOffer->supplier_id,
             'sent_by' => 'manager',
-            'purpose' => 'responseForOffers',
-            'message' => "Offer has been rejected '{$supplyOffer->title}'. note: {$supplyOffer->note}",
+            'purpose' => 'Supply Offer Response',
+            'message' => "Offer '{$supplyOffer->title}' has been rejected\nReason: {$supplyOffer->rejection_reason}",
             'createdAt' => now(),
             'seen' => false,
         ]);
 
         return response()->json(['message' => 'Supply offer rejected successfully.']);
     }
-    //    ................................................................................................................................................
 
+    /**
+     * Store a new supply request.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
@@ -164,7 +183,7 @@ class SupplyManagementController extends Controller
             'user_id' => $validated['supplier_id'],
             'supplyRequest_id' => $supplyRequest->id,
             'sent_by' => 'manager',
-            'purpose' => 'supplyRequestFromManager',
+            'purpose' => 'Supply Request',
             'message' => "You have received a new supply request: '{$supplyRequest->title}'",
             'createdAt' => now(),
             'seen' => false,
@@ -176,7 +195,12 @@ class SupplyManagementController extends Controller
         ]);
     }
 
-    //    ................................................................................................................................................
+    /**
+     * Store a new purchase bill and update inventory based on an accepted supply offer.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function storePurchaseBill(Request $request)
     {
         $request->validate([
@@ -188,7 +212,6 @@ class SupplyManagementController extends Controller
 
         $supplyOffer = SupplyOffer::with('supplyOfferItems.inventoryItem')->findOrFail($request->supply_offer_id);
 
-        // التحقق الجديد: هل توجد فاتورة شراء لهذا العرض بالفعل؟
         $existingPurchaseBill = PurchaseBill::where('supply_offer_id', $request->supply_offer_id)->first();
         if ($existingPurchaseBill) {
             return response()->json(['message' => 'A purchase bill already exists for this supply offer.'], 409); // 409 Conflict
@@ -244,9 +267,10 @@ class SupplyManagementController extends Controller
         ], 201);
     }
 
+
     public function show(string $id) {}
-
     public function update(Request $request, string $id) {}
-
     public function destroy(string $id) {}
 }
+
+

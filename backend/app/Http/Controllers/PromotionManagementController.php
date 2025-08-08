@@ -9,6 +9,11 @@ use Illuminate\Http\JsonResponse;
 
 class PromotionManagementController extends Controller
 {
+    /**
+     * Display a listing of promotions managed by the authenticated manager.
+     *
+     * @return JsonResponse
+     */
     public function index(): JsonResponse
     {
         $managerId = auth('manager')->id();
@@ -32,8 +37,12 @@ class PromotionManagementController extends Controller
         return response()->json($formatted);
     }
 
-    //................................................................................................................................................
-
+    /**
+     * Store a newly created promotion in storage.
+     *
+     * @param PromotionRequest $request
+     * @return JsonResponse
+     */
     public function store(PromotionRequest $request): JsonResponse
     {
         $managerId = auth('manager')->id();
@@ -61,7 +70,13 @@ class PromotionManagementController extends Controller
             'products' => $request->product_names,
         ], 201);
     }
-    //................................................................................................................................................
+
+    /**
+     * Display the specified promotion.
+     *
+     * @param  string  $id
+     * @return JsonResponse
+     */
     public function show(string $id): JsonResponse
     {
         $promotion = Promotion::with(['menuItems:id,name,promotion_id'])
@@ -80,8 +95,13 @@ class PromotionManagementController extends Controller
         ]);
     }
 
-    //    ................................................................................................................................................
-
+    /**
+     * Update the specified promotion in storage.
+     *
+     * @param PromotionRequest $request
+     * @param  mixed  $id
+     * @return JsonResponse
+     */
     public function update(PromotionRequest $request, $id): JsonResponse
     {
         $promotion = Promotion::findOrFail($id);
@@ -113,8 +133,12 @@ class PromotionManagementController extends Controller
         ]);
     }
 
-    //    ................................................................................................................................................
-
+    /**
+     * Remove the specified promotion from storage.
+     *
+     * @param  string  $id
+     * @return JsonResponse
+     */
     public function destroy(string $id): JsonResponse
     {
         $promotion = Promotion::where('id', $id)

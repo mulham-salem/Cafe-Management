@@ -13,7 +13,7 @@ return new class extends Migration
             $table->unsignedBigInteger('customer_id')->nullable();
             $table->unsignedBigInteger('employee_id')->nullable();
             $table->dateTime('createdAt');
-            $table->dateTime('confirmedAt');
+            $table->dateTime('confirmedAt')->nullable();
             $table->string('status');
             $table->text('note')->nullable();
             $table->timestamps();

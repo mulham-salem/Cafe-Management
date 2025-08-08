@@ -16,7 +16,7 @@ return new class extends Migration
             $table->dateTime('delivery_date');
             $table->text('note')->nullable();
             $table->string('status');
-
+            $table->text('rejection_reason')->nullable();
             $table->timestamps();
             $table->foreign('supplier_id')->references('id')->on('suppliers')->onDelete('cascade');
         });

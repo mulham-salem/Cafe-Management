@@ -9,6 +9,11 @@ use Illuminate\Support\Facades\Validator;
 
 class TableManagementController extends Controller
 {
+    /**
+     * Display a listing of all tables with their associated manager.
+     *
+     * @return JsonResponse
+     */
     public function index(): JsonResponse
     {
         $tables = Table::with('manager')->get();
@@ -16,8 +21,12 @@ class TableManagementController extends Controller
         return response()->json(['tables' => $tables]);
     }
 
-    //    ................................................................................................................................................
-
+    /**
+     * Store a newly created table in storage.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function store(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
@@ -43,7 +52,12 @@ class TableManagementController extends Controller
         return response()->json(['message' => 'Table created successfully', 'table' => $table], 201);
     }
 
-    //    ................................................................................................................................................
+    /**
+     * Display the specified table with its associated manager.
+     *
+     * @param  string  $id
+     * @return JsonResponse
+     */
     public function show(string $id): JsonResponse
     {
         $table = Table::with('manager')->find($id);
@@ -54,8 +68,14 @@ class TableManagementController extends Controller
 
         return response()->json(['table' => $table]);
     }
-    // ................................................................................................................................................
 
+    /**
+     * Update the specified table's status in storage.
+     *
+     * @param Request $request
+     * @param  string  $id
+     * @return JsonResponse
+     */
     public function update(Request $request, string $id): JsonResponse
     {
         $table = Table::find($id);
@@ -96,10 +116,15 @@ class TableManagementController extends Controller
         return response()->json(['message' => 'Table status updated successfully', 'table' => $table]);
     }
 
-    //    ............................................................................................................................................
+    /**
+     * Remove the specified table from storage.
+     *
+     * @param Request $request
+     * @param  mixed  $id
+     * @return JsonResponse
+     */
     public function destroy(Request $request, $id): JsonResponse
     {
-
         $table = Table::with('reservations')->find($id);
 
         if (! $table) {
@@ -107,16 +132,16 @@ class TableManagementController extends Controller
         }
 
         $hasActiveReservations = $table->reservations()->where('status', 'active')->exists();
-        // this is if the manager tried to delete table in status = > reserved ..this method showing message could be passed by enter confirm =1
+
         if ($table->status === 'reserved' && ! $request->boolean('confirm')) {
             return response()->json([
-                'message' => 'This table is currently reserved.',
+                'message' => 'This table is currently reserved, Are you sure you want to proceed?',
             ], 409);
         }
 
         if ($hasActiveReservations && ! $request->boolean('confirm')) {
             return response()->json([
-                'message' => 'This table is currently reserved.',
+                'message' => 'This table is currently reserved, Are you sure you want to proceed?',
             ], 409);
         }
 

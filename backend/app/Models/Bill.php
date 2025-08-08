@@ -14,4 +14,10 @@ class Bill extends Model
     {
         return $this->belongsTo(Order::class, 'order_id');
     }
+    protected $fillable = [
+        'order_id',
+        'total_amount',
+        'payment_method',
+        'date_issued',
+    ];
 }
