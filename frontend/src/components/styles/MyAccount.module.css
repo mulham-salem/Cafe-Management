@@ -1,0 +1,576 @@
+:global(.profilePage) {
+  --cafe-primary: #44180b;
+  --cafe-secondary: #8d6e63;
+  --cafe-light: #cfb9b2;
+  --cafe-bg: #f5f1ee;
+  --cafe-card: #ffffff;
+  --cafe-accent: #ffcebc;
+  --cafe-text: #3e2723;
+  --cafe-error: #c62828;
+  --cafe-success: #2e7d32;
+  --cafe-muted: #9e9e9e;
+  --cafe-shadow: rgba(94, 64, 55, 0.15);
+}
+
+@font-face {
+  font-family: "Ubuntu";
+  src: url("Fonts/Ubuntu/Ubuntu-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+:global(.profilePage) {
+  min-height: calc(100vh - 60px);
+  width: 100%;
+  background-color: white;
+  padding: 2rem; 
+  font-family: "Ubuntu";
+  display: flex;
+  flex-direction: column;
+}
+
+:global(.header) {
+  padding: 0.2rem;
+  border-bottom: 2px solid var(--cafe-light);
+  width: 90%;
+  margin: auto;
+}
+
+:global(.profileTitle) {
+  font-size: 2.5rem;
+  color: var(--cafe-primary);
+  padding: 6rem 0 0 0; 
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.subtitle {
+  font-size: 1.25rem;
+  color: var(--cafe-secondary);
+  width: 100%;
+  line-height: 0;
+  font-family: "Ubuntu";
+}
+
+:global(.cardContainer) {
+  width: 86%;
+  height: auto;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 2.5rem;
+  padding-top: 1rem;
+}
+
+:global(.profileCard),
+:global(.editSection) {
+  height: 75.5%;
+  display: flex;
+  flex-direction: column;
+  background: var(--cafe-bg);
+  border-radius: 16px;
+  box-shadow: 0 8px 30px var(--cafe-shadow);
+  border: 1px solid var(--cafe-light);
+  transition: all 0.4s ease;
+  position: relative;
+}
+
+:global(.profileCard) {
+  background: var(--cafe-card);
+  border-radius: 20px;
+  padding: 2.5rem;
+  box-shadow: 0 8px 30px var(--cafe-shadow);
+  border: 1px solid var(--cafe-light);
+  transition: all 0.4s ease;
+  position: relative;
+  overflow: hidden;
+  height: 73%;
+}
+
+:global(.profileCard::before) {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 20px;
+  background: linear-gradient(90deg, #443029, #6e3720, #8d3d1d);
+}
+
+:global(.avatarWrap) {
+  width: 160px;
+  height: 150px;
+  margin: 0 auto 0;
+  border-radius: 50%;
+  text-align: center;
+  overflow: hidden;
+  border: 4px solid var(--cafe-primary);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+:global(.avatarWrap:hover) {
+  transform: scale(1.03);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.avatarWrap:hover .avatar {
+  transform: scale(1.05);
+}
+
+.info {
+  text-align: center;
+}
+
+.name {
+  font-size: 1.8rem;
+  color: var(--cafe-primary);
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.username {
+  color: var(--cafe-primary);
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+  font-family: "Ubuntu";
+}
+
+.email {
+  color: var(--cafe-primary);
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+  font-family: "Ubuntu";
+}
+
+.loyaltyInfo {
+  width: 65%;
+  margin: 1rem auto;
+  background: #fff8f0;
+  padding: 0.6rem 0.8rem;
+  border: 1px dashed var(--cafe-primary);
+  border-radius: 1rem;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+}
+
+.points, .tier {
+  margin: 0.4rem 0;
+  font-size: 0.95rem;
+  color: #4a2e1f;
+}
+
+.points strong, .tier strong {
+  color: #2c1b10;
+}
+
+:global(.actionsRow) {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  position: relative;
+  top: 15px;
+}
+
+.changePassBtn {
+  background-color: var(--cafe-primary);
+  color: white;
+  padding: 1rem;
+  border-radius: 10px;
+  text-align: center;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  font-family: "Ubuntu";
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 12px rgba(93, 64, 55, 0.25);
+}
+
+.changePassBtn:hover {
+  background-color: rgb(108, 56, 4);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(93, 64, 55, 0.3);
+}
+
+.refreshBtn {
+  background-color: transparent;
+  border: 1px solid var(--cafe-light);
+  color: var(--cafe-primary);
+  padding: 0.9rem;
+  border-radius: 10px;
+  cursor: pointer;
+  display: block;
+  text-align: center;
+  transition: all 0.3s ease;
+  font-family: "Ubuntu";
+  letter-spacing: 0.5px;
+}
+
+.refreshBtn:hover {
+  background-color: rgba(141, 110, 99, 0.1);
+  transform: translateY(-2px);
+}
+
+:global(.editSection) {
+  background: var(--cafe-card);
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 8px 30px var(--cafe-shadow);
+  border: 1px solid var(--cafe-light);
+  transition: all 0.4s ease;
+}
+
+:global(.editSection:hover) {
+  box-shadow: 0 12px 35px rgba(94, 64, 55, 0.18);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.8rem;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.8rem;
+}
+
+.label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  color: var(--cafe-text);
+  font-weight: 600;
+  font-family: "Ubuntu";
+  font-size: 1.05rem;
+}
+
+.input {
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--cafe-light);
+  border-radius: 10px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background-color: rgba(215, 204, 200, 0.1);
+  font-family: "Ubuntu";
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--cafe-secondary);
+  box-shadow: 0 0 0 3px rgba(141, 110, 99, 0.2);
+}
+
+.error {
+  color: var(--cafe-error);
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding-top: 0.3rem;
+}
+
+/* New styles for redesigned image upload section */
+.imageUploadContainer {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+  min-height: 160px;
+}
+
+.uploadColumn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* This centers the content vertically */
+  height: 100%;
+}
+
+.previewColumn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+}
+
+.fileInputWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.fileInput {
+  display: none;
+}
+
+.fileInputLabel {
+  background: linear-gradient(to right, #5d4037, #8d6e63);
+  color: white;
+  padding: 0.8rem 1.2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.3s ease;
+  font-size: 0.95rem;
+  font-weight: 500;
+  display: inline-block;
+  width: fit-content;
+}
+
+.fileInputLabel:hover {
+  transform: translateY(-2px);
+}
+
+.fileName {
+  font-size: 0.9rem;
+  color: var(--cafe-text);
+  padding-left: 0.3rem;
+}
+
+.fileHint {
+  color: var(--cafe-muted);
+  font-size: 0.85rem;
+  display: block;
+  margin-top: 0.5rem;
+}
+
+.circularPreview {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid var(--cafe-light);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  margin-top: 0.8rem;
+  background-color: #f5f1ee; /* Same as --cafe-bg */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.previewImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: all 0.3s ease;
+}
+
+.previewImage:hover {
+  transform: scale(1.08);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.12);
+}
+
+.emptyPreview {
+  width: 100%;
+  height: 100%;
+  background-color: #f5f1ee;
+}
+
+.previewLabel {
+  color: var(--cafe-secondary);
+  font-weight: 600;
+  font-size: 1rem;
+  margin-top: 0.5rem;
+}
+
+.formFooter {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 5rem;
+  padding-top: 1rem;
+  border-top: 2px solid var(--cafe-light);
+}
+
+.saveBtn {
+  background: linear-gradient(to right, #5d4037, #8d6e63);
+  color: white;
+  padding: 1.1rem 1.8rem;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex: 1;
+  font-family: "Ubuntu";
+  font-size: 1rem;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 15px rgba(93, 64, 55, 0.3);
+  position: relative;
+  overflow: hidden;
+  display: block;
+  text-align: center;
+}
+
+.saveBtn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: 0.5s;
+}
+
+.saveBtn:hover::before {
+  left: 100%;
+}
+
+.saveBtn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(93, 64, 55, 0.4);
+}
+
+.saveBtn[aria-busy="true"] {
+  position: relative;
+  color: transparent;
+}
+
+.saveBtn[aria-busy="true"]::after {
+  content: "";
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  top: 50%;
+  left: 50%;
+  margin: -10px 0 0 -10px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 0.8s linear infinite;
+}
+
+.resetBtn {
+  background-color: transparent;
+  border: 2px solid var(--cafe-light);
+  color: var(--cafe-primary);
+  padding: 1rem 1.8rem;
+  border-radius: 10px;
+  cursor: pointer;
+  display: block;
+  text-align: center;
+  transition: all 0.3s ease;
+  flex: 1;
+  font-family: "Ubuntu";
+  font-size: 1rem;
+  letter-spacing: 0.5px;
+}
+
+.resetBtn:hover {
+  background-color: rgba(141, 110, 99, 0.08);
+  transform: translateY(-3px);
+  border-color: var(--cafe-secondary);
+}
+
+:global(.center) {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+.loader {
+  width: 60px;
+  height: 60px;
+  border: 4px solid var(--cafe-light);
+  border-radius: 50%;
+  border-top-color: var(--cafe-primary);
+  animation: spin 1.2s ease-in-out infinite;
+}
+
+:global(.center p) {
+  font-family: "Ubuntu";
+  font-size: 1.3rem;
+  color: var(--cafe-secondary);
+  font-weight: 500;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 1024px) {
+  .container {
+    grid-template-columns: 1fr;
+  }
+
+  :global(.profileCard) {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 768px) {
+  :global(.profilePage) {
+    padding: 2rem 1.5rem;
+  }
+
+  :global(.profileTitle) {
+    font-size: 2.3rem;
+  }
+
+  .row {
+    grid-template-columns: 1fr;
+  }
+
+  .formFooter {
+    flex-direction: column;
+  }
+
+  :global(.profileCard),
+  :global(.editSection) {
+    padding: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  :global(.profilePage) {
+    padding: 1.5rem 1rem;
+    min-height: 90vh;
+  }
+
+  :global(.profileTitle) {
+    font-size: 2rem;
+  }
+
+  .subtitle {
+    font-size: 1.1rem;
+  }
+
+  .avatarWrap {
+    width: 160px;
+    height: 160px;
+  }
+
+  .name {
+    font-size: 1.7rem;
+  }
+
+  :global(.profileCard),
+  :global(.editSection) {
+    padding: 1.8rem 1.5rem;
+  }
+
+  .formFooter button {
+    padding: 1rem;
+    font-size: 1rem;
+  }
+}

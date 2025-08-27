@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { toast as toastify, ToastContainer } from 'react-toastify';
 import { toast, Toaster } from 'react-hot-toast';
 import 'react-toastify/dist/ReactToastify.css';
@@ -131,16 +131,16 @@ function Login() {
               required
             />
             <div className={styles.options}>
-            <label>
-              <input 
-                type="checkbox"
-                id="remember"
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
-              />
-              Remember me
-            </label>
-            <a href="#">Forgot Password?</a>
+              <label>
+                <input 
+                  type="checkbox"
+                  id="remember"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                />
+                Remember me
+              </label>
+              <Link to="/login/reset-password"> Forgot Password? </Link>
             </div>
             <button type="submit">Login</button>
         </form>

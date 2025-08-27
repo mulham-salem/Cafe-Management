@@ -1,202 +1,203 @@
 .custom-toast-container {
-    background-color: white;
-    border-left: 6px solid #dc3545;
-    padding: 10px 15px;
-    color: #333;
-    font-weight: bold;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-    width: 325px;
-    bottom: 15px;
-    margin-left: auto;
-    border-radius: 6px;
-    justify-content: center;
-  }
-  
-  .custom-toast-body {
-    padding: 0;
-    text-align: center;
-  }
-  
-  .custom-toast {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
+  background-color: white;
+  border-left: 6px solid #dc3545;
+  padding: 10px 15px;
+  color: #333;
+  font-weight: bold;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  width: 325px;
+  bottom: 15px;
+  margin-left: auto;
+  border-radius: 6px;
+  justify-content: center;
+}
 
-  .custom-toast span {
-    word-break: break-word;
-    text-wrap: balance;
-    padding: 10px;
-  }
-  
-  .purchase-custom-toast {
-    word-break: break-word;
-    text-wrap: balance;
-    line-height: 1.2;
-  }
+.custom-toast-body {
+  padding: 0;
+  text-align: center;
+}
 
-  .toast-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-  }
-  
-  .toast-buttons button {
-    padding: 5px 10px;
-    border: none;
-    border-radius: 6px;
-    font-weight: bold;
-    cursor: pointer;
-  }
+.custom-toast {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
 
-  .toast-buttons button:first-child {
-    background-color: #dc3545;
-    color: white;
-    padding-left: 20px;
-    padding-right: 20px;
-  }
-  
-  .toast-buttons button:last-child {
-    background-color: #6c757d;
-    color: white;
-  }
-  
-  .toast-buttons button:first-child:hover {
-    transform: scale(1.1);
-    transition: transform 0.3s;
-  }
+.custom-toast span {
+  word-break: break-word;
+  text-wrap: balance;
+  padding: 10px;
+}
 
-  .toast-buttons button:last-child:hover {
-    transform: scale(1.1);
-    transition: transform 0.3s;
-  }
+.purchase-custom-toast {
+  word-break: break-word;
+  text-wrap: balance;
+  line-height: 1.2;
+}
 
-  .toastButton {
-    background-color: #2196f3;
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 4px;
-    margin-right: 8px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background-color 0.2s;
-  }
-  
-  .toastButton:hover {
-    background-color: #0d8ddb;
-  }
+.toast-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
 
-  .toastConfirmBtn {
-    margin-top: 0.1rem;
-    padding: 0.4rem 0.8rem;
-    background-color: #dc3545;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
-    display: block;
-    text-align: center;
-    transition: background-color 0.3s ease;
-  }
-  
-  .toastConfirmBtn:hover {
-    background-color: #811822;
-  }
+.toast-buttons button {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+}
 
-  .toastCancelBtn {
-    padding: 0.4rem 0.8rem;
-    background-color: #6c757d;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
-    display: block;
-    text-align: center;
-    transition: background-color 0.3s ease;
-  }
+.toast-buttons button:first-child {
+  background-color: #dc3545;
+  color: white;
+  padding-left: 20px;
+  padding-right: 20px;
+}
 
-  .toastCancelBtn:hover {
-    background-color: #4d4d4d;
-  }
+.toast-buttons button:last-child {
+  background-color: #6c757d;
+  color: white;
+}
 
-  .custom-toast span {
-    line-height: 20px;
-  }
+.toast-buttons button:first-child:hover {
+  transform: scale(1.1);
+  transition: transform 0.3s;
+}
 
-  .custom-confirm-toast {
-    background-color: white !important; 
-    color: #110e0c !important; 
-    padding: 15px !important;
-    width: 80% !important;
-    border-radius: 8px !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
-    border-left: 6px solid #e6d5b8 !important;
-    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif !important;
-    font-weight: bold !important;
-    position: relative !important;
-    bottom: 16px !important;
-    left: 360px !important;
-  }
-  
-  .custom-confirmEmp-toast {
-    background-color: white !important; 
-    color: #110e0c !important; 
-    padding: 15px !important;
-    width: 80% !important;
-    border-radius: 8px !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
-    border-left: 6px solid #e6d5b8 !important;
-    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif !important;
-    font-weight: bold !important;
-    position: relative !important;
-    bottom: 16px !important;
-    left: 300px !important;
-  }
+.toast-buttons button:last-child:hover {
+  transform: scale(1.1);
+  transition: transform 0.3s;
+}
 
-  .toast-buttons-order {
-    margin-top: 15px;
-    display: flex;
-    gap: 12px;
-    justify-content: center;
-    position: relative;
-    top: 10px;
-  }
-  
-  .toast-btn-order {
-    padding: 5px 15px;
-    border-radius: 8px;
-    font-weight: 600;
-    font-family: 'Montserrat', sans-serif;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    border: none;
-    letter-spacing: 0.5px;
-  }
-  
-  .confirm-btn-order {
-    background-color: #351c08; 
-    color: white;
-  }
-  
-  .confirm-btn-order:hover {
-    background-color: #5b381a;
-    transform: translateY(-2px);
-  }
-  
-  .cancel-btn-order {
-    padding: 5px 19px;
-    background-color: #e6d5b8;
-    color: #351c08;
-  }
-  
-  .cancel-btn-order:hover {
-    background-color: #f1e6d0;
-    transform: translateY(-2px);
-  }
-  
+.toastButton {
+  background-color: #2196f3;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  margin-right: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+
+.toastButton:hover {
+  background-color: #0d8ddb;
+}
+
+.toastConfirmBtn {
+  margin-top: 0.1rem;
+  padding: 0.4rem 0.8rem;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  display: block;
+  text-align: center;
+  transition: background-color 0.3s ease;
+}
+
+.toastConfirmBtn:hover {
+  background-color: #811822;
+}
+
+.toastCancelBtn {
+  padding: 0.4rem 0.8rem;
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  display: block;
+  text-align: center;
+  transition: background-color 0.3s ease;
+}
+
+.toastCancelBtn:hover {
+  background-color: #4d4d4d;
+}
+
+.custom-toast span {
+  line-height: 20px;
+}
+
+.custom-confirm-toast {
+  background-color: white !important;
+  color: #110e0c !important;
+  padding: 15px !important;
+  width: 80% !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+  border-left: 6px solid #e6d5b8 !important;
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif !important;
+  font-weight: bold !important;
+  position: relative !important;
+  bottom: 16px !important;
+  left: 360px !important;
+}
+
+.custom-confirmEmp-toast {
+  background-color: white !important;
+  color: #110e0c !important;
+  padding: 15px !important;
+  width: 80% !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+  border-left: 6px solid #e6d5b8 !important;
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif !important;
+  font-weight: bold !important;
+  position: relative !important;
+  bottom: 16px !important;
+  left: 300px !important;
+}
+
+.toast-buttons-order {
+  margin-top: 15px;
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  position: relative;
+  top: 10px;
+}
+
+.toast-btn-order {
+  padding: 5px 15px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-family: "Montserrat", sans-serif;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  letter-spacing: 0.5px;
+}
+
+.confirm-btn-order {
+  background-color: #351c08;
+  color: white;
+}
+
+.confirm-btn-order:hover {
+  background-color: #5b381a;
+  transform: translateY(-2px);
+}
+
+.cancel-btn-order {
+  padding: 5px 19px;
+  background-color: #e6d5b8;
+  color: #351c08;
+}
+
+.cancel-btn-order:hover {
+  background-color: #f1e6d0;
+  transform: translateY(-2px);
+}
 
 .ready-custom-toast {
   background: linear-gradient(135deg, #fff8f0, #fbe9e7) !important;
@@ -205,7 +206,7 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
   border-radius: 12px !important;
   padding: 30px 50px !important;
-  font-family: 'Poppins', sans-serif !important;
+  font-family: "Poppins", sans-serif !important;
   display: block !important;
   text-align: center !important;
   white-space: nowrap !important;
@@ -217,7 +218,6 @@
   font-weight: 520 !important;
   letter-spacing: 0.5px !important;
 }
-
 
 .toastTableConfirmBtn {
   margin-top: 0.1rem;
@@ -339,5 +339,100 @@
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
+  }
+}
+.receipt-toast-wrapper {
+  background-color: #ffffff !important;
+  border-radius: 12px;
+  padding: 0;
+  box-shadow: 0 5px 20px rgba(92, 75, 55, 0.15);
+  color: #442807;
+  border: 1px solid #e8e0d4;
+  overflow: hidden;
+  position: relative;
+}
+
+.receipt-toast-wrapper::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(to right, #deb378, #442807);
+}
+
+.receipt-toast {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  font-size: 0.95rem;
+  color: #442807;
+}
+
+.receipt-toast p {
+  margin: 10px 0 0 0;
+  line-height: 1.3;
+  text-align: center;
+  font-weight: 500;
+}
+
+.receipt-toast-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.receipt-confirm-btn,
+.receipt-cancel-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  padding: 0.4rem 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  line-height: 1.2;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.2s ease;
+}
+
+.receipt-confirm-btn {
+  background-color: #442807;
+  color: white;
+}
+
+.receipt-confirm-btn:hover {
+  background-color: #7a5c40;
+  transform: translateY(-2px);
+}
+
+.receipt-cancel-btn {
+  background-color: #f1e9e0;
+  color: #8b6b4c;
+}
+
+.receipt-cancel-btn:hover {
+  background-color: #e8e0d4;
+  transform: translateY(-2px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .receipt-toast-buttons {
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  .receipt-confirm-btn,
+  .receipt-cancel-btn {
+    width: 100%;
+    justify-content: center;
   }
 }

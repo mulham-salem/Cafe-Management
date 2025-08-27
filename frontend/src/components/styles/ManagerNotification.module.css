@@ -1,4 +1,4 @@
-.pageWrapper {
+:global(.mngNotPageWrapper) {
   padding-top: 40px; 
   background-color: white;
   font-family: "Segoe UI", sans-serif;
@@ -10,11 +10,11 @@
   box-sizing: border-box; 
 }
 
-.pageWrapper::-webkit-scrollbar {
+:global(.mngNotPageWrapper::-webkit-scrollbar) {
   display: none;
 }
 
-.pageTitle {
+:global(.pageTitle) {
   font-size: clamp(22px, 5vw, 28px);
   font-weight: bold;
   color: #333;
@@ -65,12 +65,12 @@
   }
 }
 
-.list {
+:global(.list) {
   display: flex;
   flex-direction: column;
   gap: clamp(15px, 3.5vw, 20px); 
   max-width: clamp(320px, 90vw, 1500px);
-  margin: 0 auto;
+  margin: auto;
 }
 
 .card {
@@ -176,16 +176,16 @@
 }
 
 @media screen and (min-width: 1600px) {
-  .pageWrapper {
+  :global(.mngNotPageWrapper) {
     padding-top: 60px;
   }
-  .pageTitle {
+  :global(.pageTitle) {
     font-size: 28px;
   }
   .bellIcon {
     font-size: 28px;
   }
-  .list {
+  :global(.list) {
     min-width: 99%;
     gap: 20px;
   }
@@ -199,18 +199,18 @@
 }
 
 @media screen and (max-width: 1280px) {
-  .pageWrapper {
+  :global(.mngNotPageWrapper) {
     padding-top: 55px;
     max-height: 95vh;
     min-height: 95vh;
   }
-  .pageTitle {
+  :global(.pageTitle) {
     font-size: 26px;
   }
   .bellIcon {
     font-size: 26px;
   }
-  .list {
+  :global(.list) {
     gap: 18px;
     padding: 0;
   }
@@ -227,17 +227,17 @@
 }
 
 @media screen and (max-width: 768px) {
-  .pageWrapper {
+  :global(.mngNotPageWrapper) {
     padding-top: 50px;
     min-width: 94%;
   }
-  .pageTitle {
+  :global(.pageTitle) {
     font-size: 24px;
   }
   .bellIcon {
     font-size: 24px;
   }
-  .list {
+  :global(.list) {
     gap: 15px;
     padding: 0 20px;
   }
@@ -260,7 +260,7 @@
 }
 
 @media screen and (max-width: 540px) {
-  .pageWrapper {
+  :global(.mngNotPageWrapper) {
     width: 90%;
     max-height: 96vh;
     min-height: 96vh;
@@ -268,18 +268,18 @@
 }
 
 @media screen and (max-width: 480px) {
-  .pageWrapper {
+  :global(.pageWrapper) {
     padding-top: 50px;
     max-height: 96vh;
     min-height: 96vh;
   }
-  .pageTitle {
+  :global(.pageTitle) {
     font-size: 20px;
   }
   .bellIcon {
     font-size: 22px;
   }
-  .list {
+  :global(.list) {
     gap: 10px;
     padding: 0 15px; 
   }

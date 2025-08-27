@@ -1,4 +1,4 @@
-:root {
+.container {
   --min-font-size: 0.8rem;
   --max-font-size: 1.1rem;
   --min-heading-size: 1.8rem;
@@ -8,20 +8,20 @@
 }
 
 @font-face {
-  font-family: 'Poppins';
-  src: url('Fonts/Poppins/Poppins-Bold.ttf') format('truetype');
+  font-family: "Poppins";
+  src: url("Fonts/Poppins/Poppins-Bold.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
 }
 
 .container {
   min-height: 100vh;
-  max-height: 0;
+  max-height: 100vh;
   display: flex;
   flex-direction: column;
   background-color: #f8f1e7;
-  font-family: 'Poppins';
-  background-image: url('/stylish-coffee-shop-with-latte-art.png'); 
+  font-family: "Poppins";
+  background-image: url("/stylish-coffee-shop-with-latte-art.png");
   background-size: cover;
   background-position: center;
 }
@@ -33,8 +33,11 @@
   background-color: #2e2e2e;
   color: white;
   padding: clamp(0.75rem, 1.2vw, 1.2rem) clamp(1rem, 3vw, 2rem);
-  position: relative;
-  z-index: 10;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
   white-space: nowrap;
 }
 
@@ -44,36 +47,36 @@
 }
 
 .logo {
-  width: clamp(40px, 4vw, 60px); 
-  height: clamp(40px, 4vw, 60px); 
+  width: clamp(40px, 4vw, 60px);
+  height: clamp(40px, 4vw, 60px);
   scale: 1.1;
 }
 
 .brandName {
-  font-size: clamp(1rem, 1.5vw, 1.3rem); 
+  font-size: clamp(1rem, 1.5vw, 1.3rem);
   margin-right: clamp(1rem, 2vw, 2rem);
   color: #f4c063;
   font-weight: bold;
 }
 
 @font-face {
-  font-family: 'Poppins2';
-  src: url('Fonts/Poppins/Poppins-Regular.ttf') format('truetype');
+  font-family: "Poppins2";
+  src: url("Fonts/Poppins/Poppins-Regular.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
 }
 
 .navLinks {
-  font-family: 'Poppins2';
+  font-family: "Poppins2";
   display: flex;
-  justify-content: flex-start; 
-  gap: clamp(1rem, 1.5vw, 1.5rem); 
+  justify-content: flex-start;
+  gap: clamp(1rem, 1.5vw, 1.5rem);
   list-style: none;
 }
 
 .navLinks a {
   color: white;
-  font-size: clamp(0.85rem, 1vw, 1rem); 
+  font-size: clamp(0.85rem, 1vw, 1rem);
   text-decoration: none;
   font-weight: 500;
   transition: color 0.4s ease;
@@ -89,21 +92,22 @@
 }
 
 .rightSection {
-  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif;
   display: flex;
   align-items: center;
-  gap: clamp(10px, 1.5vw, 15px); 
+  gap: clamp(10px, 1.5vw, 15px);
 }
 
 .username {
   display: inline-flex;
   align-items: center;
   position: relative;
-  font-size: clamp(0.9rem, 1vw, 1rem); 
+  font-size: clamp(0.9rem, 1vw, 1rem);
   cursor: pointer;
   font-weight: bold;
   color: #f4c063;
-  padding: clamp(6px, 0.8vw, 8px) clamp(6px, 0.8vw, 8px);
+  padding: clamp(6px, 1.5vw, 8px);
   transition: all 0.4s ease;
 }
 
@@ -111,17 +115,17 @@
   position: absolute;
   top: 100%;
   left: 50%;
-  background: #444;
   border-radius: 8px;
   opacity: 0;
   visibility: hidden;
-  transform: translateX(-50%) translateY(20px);
+  transform: translateX(-50%) translateY(20%);
   transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
   z-index: 1000;
   min-width: fit-content;
   width: auto;
+  gap: clamp(3px, 1vw, 5px);
 }
 
 .username:hover .dropdown {
@@ -131,9 +135,10 @@
 }
 
 .dropdownButton {
-  width: auto;
-  padding: clamp(0.4rem, 0.8vw, 0.5rem) clamp(0.8rem, 0.5vw, 1rem);
+  width: 65%;
+  padding: clamp(6px, 0.5vw, 12px) clamp(6px, 0.8vw, 16px);
   color: white;
+  background: #444;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -152,7 +157,7 @@
   font-weight: bold;
 }
 
-.keyIcon {
+.icon {
   font-size: clamp(0.8rem, 0.6vw, 0.9rem);
   color: #f4c063;
 }
@@ -168,16 +173,16 @@
 }
 
 @font-face {
-  font-family: 'Poppins3';
-  src: url('Fonts/Ubuntu/Ubuntu-Regular.ttf') format('truetype');
+  font-family: "Poppins3";
+  src: url("Fonts/Ubuntu/Ubuntu-Regular.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
 }
 
 .hero {
-  font-family: 'Poppins3';
+  font-family: "Poppins3";
   position: relative;
-  height: clamp(60vh, 75vw, 90vh); 
+  height: clamp(60vh, 75vw, 90vh);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -198,10 +203,11 @@
 
 .overlay {
   background: rgba(0, 0, 0, 0.6);
-  padding: clamp(2rem, 4vw, 3rem); 
+  padding: clamp(2rem, 4vw, 3rem);
   border-radius: 20px;
   color: #fff;
   max-width: clamp(500px, 80vw, 900px);
+  margin: 110px 0 0 0;
 }
 
 .title {
@@ -217,18 +223,21 @@
   max-width: 700px;
   margin: 0 auto;
   color: #ddd;
-  word-break: break-word; 
+  word-break: break-word;
 }
 
 .mainContent {
-  padding: clamp(0.5rem, 1.5vw, 1rem) clamp(1rem, 3vw, 2rem); 
+  padding: clamp(0.5rem, 1.5vw, 1rem) clamp(1rem, 3vw, 2rem);
   display: flex;
   justify-content: center;
 }
 
 .cardsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(clamp(200px, 16vw, 280px), 1fr));
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(clamp(200px, 16vw, 280px), 1fr)
+  );
   gap: clamp(1rem, 2vw, 1.5rem);
   width: 100%;
   max-width: 1055px;
@@ -236,10 +245,10 @@
 }
 
 .card {
-  font-family: 'Poppins2';
+  font-family: "Poppins2";
   background: white;
   border-radius: 20px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   padding: clamp(1rem, 2vw, 1.5rem);
   text-align: center;
   transition: transform 0.4s ease, box-shadow 0.4s ease;
@@ -249,7 +258,7 @@
 
 .card:hover {
   transform: translateY(-8px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
 }
 
 .cardIcon {
@@ -263,21 +272,22 @@
 }
 
 .cardDesc {
-  font-size: clamp(0.8rem, 0.5vw, 1rem); 
+  font-size: clamp(0.8rem, 0.5vw, 1rem);
   color: #666;
-  word-break: break-word; 
+  word-break: break-word;
   text-wrap: balance;
   font-weight: 400;
 }
 
 .searchContainer {
-  display:flex;
+  width: 220px;
+  display: flex;
   align-items: center;
   background-color: white;
   padding: clamp(6px, 0.8vw, 8px) clamp(8px, 1vw, 10px);
-  border-radius: 15px;
+  border-radius: 18px;
   position: relative;
-  right: clamp(100px, 10vw, 160px); 
+  right: clamp(100px, 10vw, 160px);
   border: 1px solid #f4c063;
   transition: box-shadow ease-in-out 0.3s;
 }
@@ -290,11 +300,11 @@
 .searchIcon {
   margin-right: clamp(4px, 0.6vw, 8px);
   color: #f4c063;
-  font-size: clamp(0.9rem, 1.1vw, 1rem); 
+  font-size: clamp(0.9rem, 1.1vw, 1rem);
 }
 
 .searchInput {
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
   border: none;
   font-size: clamp(0.85rem, 1vw, 0.9rem);
   display: block;
@@ -308,22 +318,23 @@
 }
 
 .searchInput:focus {
-  outline: none; 
+  outline: none;
 }
 
 .searchInput::placeholder {
   color: #aaa;
-  opacity: 1; 
+  opacity: 1;
+  font-size: 0.85rem;
 }
 
 .toastCard {
   max-width: 90%;
-  background:  #2b2b2b;
+  background: #2b2b2b;
   width: clamp(260px, 19vw, 360px);
   padding: clamp(8px, 0.5vw, 10px) clamp(8px, 2vw, 12px);
   border-radius: 18px;
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-  font-family: 'Georgia', serif;
+  font-family: "Georgia", serif;
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -388,9 +399,176 @@
   animation-fill-mode: forwards;
 }
 
+.sidebarWrapper :global(.edgeWrapper) {
+  top: 97px; /* عدّل حسب النّافبار */
+}
+
+.sidebarWrapper :global(.sidebar) {
+  top: 97px; /* عدّل حسب النّافبار */
+}
+
+.sidebarWrapper :global(.arrowIcon) {
+  color: white;
+}
+
+.outletContainer :global(.profilePage) {
+  padding: 0 5rem;
+  width: 90%;
+  margin: 92px auto;
+}
+
+.outletContainer :global(.profileTitle) {
+  padding: 0;
+}
+
+.outletContainer :global(.center) {
+  height: 80vh;
+}
+
+.outletContainer :global(.cardContainer) {
+  width: 90%;
+  gap: 5rem;
+}
+
+.outletContainer :global(.profileCard) {
+  height: 71%;
+}
+
+.outletContainer :global(.editSection) {
+  height: 74%;
+}
+
+.outletContainer :global(.userContainer) {
+  padding: 15px;
+  width: 90%;
+  margin: 100px auto;
+  max-height: 84vh;
+}
+
+.outletContainer :global(.createButton) {
+  margin-top: 0vh;
+  margin-bottom: 1.5vh;
+}
+
+.outletContainer :global(.menuContainer) {
+  margin: 95px auto;
+  max-height: 84vh;
+  padding: 15px;
+  padding-left: 0px;
+}
+
+.outletContainer :global(.addButton) {
+  top: 106px;
+  left: 1290px;
+}
+
+.outletContainer :global(.sectionTitle) {
+  margin: 0.5rem auto 0 auto;
+  width: 90%;
+  top: 1vh;
+}
+
+.outletContainer :global(.sectionDivider) {
+  width: 90%;
+  margin: 0.5rem auto 1rem auto;
+}
+
+.outletContainer :global(.menuGrid) {
+  width: 90%;
+  margin: auto;
+}
+
+.outletContainer :global(.inventortSection) {
+  width: 90%;
+  min-height: 72.5vh;
+  max-height: 73vh;
+  margin: 95px auto;
+}
+
+.outletContainer :global(.pageWrapper) {
+  background-color: white;
+  padding: 20px;
+}
+
+.outletContainer :global(.backgroundFull) {
+  opacity: 1;
+}
+
+.outletContainer :global(.supplySection) {
+  top: 55%;
+  transform: translate(-50%, -50%);
+}
+
+.outletContainer :global(.supplyOfferSection) {
+  padding: 15px 0;
+  width: 92%;
+  margin: 77px auto;
+  max-height: 85vh;
+}
+
+.outletContainer :global(.supplyOfferHeader) {
+  padding: 0;
+  margin-bottom: 15px;
+}
+
+.outletContainer :global(.purchaseBillsSection) {
+  max-height: 82vh;
+  width: 94%;
+  margin: 85px auto;
+}
+
+.outletContainer :global(.supplyHistorySection) {
+  padding: 0.8rem 0;
+  width: 92%;
+  margin: 90px auto;
+  max-height: 82vh;
+}
+
+.outletContainer :global(.mngNotPageWrapper) {
+  padding-top: 30px;
+  min-width: 0;
+  margin: 95px auto;
+}
+
+.outletContainer :global(.pageTitle) {
+  width: 90%;
+  margin: auto;
+}
+
+.outletContainer :global(.list) {
+  width: 90%;
+}
+
+.outletContainer :global(.promoWrapper) {
+  padding: 10px 30px;
+  max-height: 85vh;
+  min-height: 85vh;
+  margin: 96px auto;
+}
+
+.outletContainer :global(.pageHeader) {
+  padding: 0;
+  width: 90%;
+  margin: auto auto auto 40px;
+}
+
+.outletContainer :global(.cardGrid) {
+  width: 90%;
+  margin: 20px 0 auto 40px;
+}
+
+.outletContainer :global(.dashboard) {
+  max-width: none;
+  background-color: white;
+  margin: 97px auto;
+  min-height: 82vh;
+  padding: 2rem 5rem;
+  width: 90%;
+}
+
 @media (min-width: 1600px) {
   .navbar {
-    padding: 1.5rem 3rem; 
+    padding: 1.5rem 3rem;
   }
   .logo {
     width: 60px;
@@ -418,12 +596,12 @@
     font-size: 1.1rem;
   }
   .searchContainer {
-    padding: 10px 15px; 
-    margin-left: 3rem; 
+    padding: 10px 15px;
+    margin-left: 3rem;
   }
   .searchInput {
     font-size: 1rem;
-    min-width: 150px; 
+    min-width: 150px;
   }
   .bellIcon {
     font-size: 1.6rem;
@@ -442,9 +620,12 @@
     font-size: 1.3rem;
   }
   .cardsGrid {
-    grid-template-columns: repeat(auto-fit, minmax(clamp(200px, 22vw, 280px), 1fr));
+    grid-template-columns: repeat(
+      auto-fit,
+      minmax(clamp(200px, 22vw, 280px), 1fr)
+    );
     gap: 2rem;
-    max-width: 1300px; 
+    max-width: 1300px;
   }
   .card {
     padding: 2rem;
@@ -506,7 +687,10 @@
     font-size: clamp(0.8rem, 1vw, 1rem);
   }
   .cardsGrid {
-    grid-template-columns: repeat(auto-fit, minmax(clamp(200px, 16vw, 240px), 1fr));
+    grid-template-columns: repeat(
+      auto-fit,
+      minmax(clamp(200px, 16vw, 240px), 1fr)
+    );
     gap: clamp(0.8rem, 1.5vw, 1.2rem);
     max-width: 950px;
   }
@@ -561,7 +745,7 @@
   .searchContainer {
     padding: 4px;
   }
-  .searchInput::placeholder  {
+  .searchInput::placeholder {
     font-size: 0.7rem;
   }
   .searchContainer {
@@ -596,15 +780,15 @@
   .username {
     font-size: 0.6rem;
   }
-  .searchContainer { 
-    flex-grow: 1; 
+  .searchContainer {
+    flex-grow: 1;
   }
   .searchIcon {
     font-size: 0.9rem;
     margin-left: 10px;
   }
   .searchInput {
-    font-size: 0.8rem; 
+    font-size: 0.8rem;
   }
   .subtitle {
     text-wrap: balance;
@@ -668,8 +852,8 @@
     font-size: 0.6rem;
   }
   .searchContainer {
-    padding: 0.1px; 
-    width: 90px; 
+    padding: 0.1px;
+    width: 90px;
     right: 12px;
     border-radius: 10px;
   }
@@ -707,7 +891,8 @@
     right: 0;
     gap: 2px;
   }
-  .logo, .brandName {
+  .logo,
+  .brandName {
     display: none;
   }
   .navLinks {
@@ -744,7 +929,7 @@
     margin-right: 4px;
   }
   .searchInput {
-    font-size: 0.75rem; 
+    font-size: 0.75rem;
   }
   .hero {
     height: clamp(40vh, 55vw, 60vh);
@@ -785,7 +970,7 @@
 @media (max-width: 480px) and (max-height: 500px) {
   .container {
     min-height: 100vh;
-    max-height:100vh;
+    max-height: 100vh;
     overflow-y: auto;
   }
   .overlay {

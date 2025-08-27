@@ -13,6 +13,7 @@
   max-height: 83vh;
   overflow-y: auto;
   scroll-behavior: smooth;
+  margin: 105px auto;
 }
 
 .ordersPage::-webkit-scrollbar {
@@ -50,7 +51,7 @@
 .ordersGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  grid-auto-rows: 230px;
+  grid-auto-rows: 260px;
   gap: 1.5rem;
   margin-top: 25px;
   animation: slideUp 1.2s ease;
@@ -63,11 +64,14 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   transition: transform 0.4s ease, box-shadow 0.3s ease;
   animation: slideUp 1.2s ease;
+  position: relative;
+  z-index: 1;
 }
 
 .orderCard:hover {
   transform: translateY(-5px);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+  z-index: 10;
 }
 
 .orderHeader {
@@ -75,9 +79,12 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1rem;
-  font-weight: bold;
+  font-weight: bolder;
   font-size: 1.2rem;
   color: #ffaf4e;
+  padding-bottom: 6px;
+  border-bottom: 2px solid #eee;
+  position: relative;
 }
 
 .status {
@@ -87,6 +94,7 @@
   font-size: 0.9rem;
   font-weight: 600;
   color: #fff;
+  margin-left: 50px;
 }
 
 .status.pending {
@@ -110,10 +118,269 @@
   background-color: red;
 }
 
+.status.onHold {
+  background-color: rgb(138, 137, 137);
+}
+
+.status.assigned {
+  background-color: #6b543b;
+}
+
+.status.inTransit {
+  background-color: rgb(220, 145, 46);
+}
+
+/* تأكد من أن العناصر الأخرى لا تخفي التلميح */
+.orderBody {
+  position: relative;
+  z-index: 1;
+}
+
 .orderBody p {
   margin: 0.3rem 0;
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   color: #333;
+}
+
+.itemsInfo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+
+.itemsTooltipContainer {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltipIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+  font-size: 18px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-left: 6px;
+}
+
+.tooltipIcon:hover {
+  background: linear-gradient(135deg, #5809b5 0%, #1c64e0 100%);
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(106, 17, 203, 0.4);
+}
+
+.itemsTooltip {
+  visibility: hidden;
+  opacity: 0;
+  width: 250px;
+  background-color: white;
+  color: #333;
+  text-align: left;
+  border-radius: 16px;
+  padding: 16px;
+  position: absolute;
+  z-index: 1000;
+  top: 35px;
+  left: -55px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e1e5e9;
+  transition: all 0.3s ease;
+  transform: translateY(10px);
+}
+
+.itemsTooltip::before {
+  content: "";
+  position: absolute;
+  top: -8px;
+  left: 62px;
+  width: 16px;
+  height: 16px;
+  background: white;
+  transform: rotate(45deg);
+  border-top: 1px solid #e1e5e9;
+  border-left: 1px solid #e1e5e9;
+  z-index: -1;
+}
+
+.itemsTooltipContainer:hover .itemsTooltip {
+  visibility: visible;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.itemsTooltip h4 {
+  margin: auto;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #f0f0f5;
+  color: #6a11cb;
+  font-size: 16px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.itemsList {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 12px 0;
+  max-height: 240px;
+}
+
+.itemDetail {
+  width: 80%;
+  margin: auto;
+  display: flex;
+  font-size: 0.8rem;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background-color 0.2s ease;
+}
+
+.itemDetail:hover {
+  background-color: #fafaff;
+  border-radius: 16px;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+.itemDetail:last-child {
+  border-bottom: none;
+}
+
+.itemName {
+  flex: 1;
+  font-weight: 500;
+}
+
+.itemMeta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font-size: 14px;
+  color: #666;
+}
+
+.itemTotal {
+  font-weight: 700;
+  color: #6a11cb;
+  font-size: 0.8rem;
+  background: #f0f0ff;
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
+.itemsTotal {
+  padding-top: 8px;
+  border-top: 2px solid #6a11cb;
+  text-align: right;
+  color: #333;
+}
+
+.menuToggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px 8px;
+  border-radius: 4px;
+  font-size: 20px;
+  transition: all 0.2s ease;
+}
+
+.menuToggle:hover {
+  background-color: #f0f0f0;
+  color: #4b2c20;
+}
+
+.menuDropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  padding: 8px 0;
+  min-width: 180px;
+  min-height: 5vh;
+  z-index: 1000;
+  border: 1px solid #e0e0e0;
+  animation: fadeInScale 0.2s ease;
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.menuItem {
+  width: 100%;
+  box-sizing: border-box;
+  text-align: left;
+  padding: 10px 15px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: #333;
+  transition: all 0.2s ease;
+  position: relative;
+  z-index: 1001;
+}
+
+.menuItem:hover {
+  background-color: #f8f4eb;
+  color: #6b543b;
+}
+
+.menuItem svg {
+  width: 14px;
+}
+
+.pauseIcon {
+  color: rgb(100, 99, 99);
+}
+
+.resumeIcon {
+  color: rgb(0, 0, 88);
+}
+
+.trashIcon {
+  color: rgb(141, 1, 1);
+}
+
+.rePrepIcon {
+  color: rgb(90, 40, 7);
+}
+
+.reorderIcon {
+  color: #5809b5;
+}
+
+@media (max-width: 768px) {
+  .menuDropdown {
+    right: -50px;
+    min-width: 160px;
+  }
+
+  .menuItem {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
 }
 
 .actions {
@@ -121,9 +388,7 @@
   justify-content: center;
   flex-wrap: no-wrap;
   gap: 0.5rem;
-  margin-top: 1rem;
-  position: relative;
-  top: 10px;
+  margin-top: 0.6rem;
 }
 
 button {
@@ -132,7 +397,7 @@ button {
   padding: 0.4rem 1rem;
   border-radius: 10px;
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -166,6 +431,26 @@ button {
   background-color: #a7f3d0;
 }
 
+.trackBtn {
+   padding: 0.5rem 1rem;
+  background-color: #e0f7fa;
+  color: #006064;
+}
+
+.trackBtn:hover {
+  background-color: #b2ebf2;
+}
+
+.receiptBtn {
+   padding: 0.5rem 1rem;
+  background-color: #fff3e0;
+  color: #ef6c00;
+}
+
+.receiptBtn:hover {
+  background-color: #ffe0b2;
+}
+
 .invoiceBtn {
   background-color: #ede9fe;
   color: #6d28d9;
@@ -180,82 +465,233 @@ button {
   background-color: #ddd6fe;
 }
 
-.invoiceOverlay {
+.receiptInfo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+
+.receiptTooltipContainer {
+  position: relative;
+  display: inline-block;
+}
+
+.receiptTooltip {
+  visibility: hidden;
+  opacity: 0;
+  width: 260px;
+  background-color: #ffffff;
+  color: #2d3436;
+  text-align: left;
+  border-radius: 16px;
+  padding: 16px;
+  position: absolute;
+  z-index: 1000;
+  top: 35px;
+  left: -172px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+  border: 1px solid #dfe6e9;
+  transition: all 0.3s ease;
+  transform: translateY(12px);
+}
+
+.receiptTooltip::before {
+  content: "";
+  position: absolute;
+  top: -8px;
+  left: 178px;
+  width: 16px;
+  height: 16px;
+  background: white;
+  transform: rotate(45deg);
+  border-top: 1px solid #dfe6e9;
+  border-left: 1px solid #dfe6e9;
+  z-index: -1;
+}
+
+.receiptTooltipContainer:hover .receiptTooltip {
+  visibility: visible;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Heading */
+.receiptTooltip h4 {
+  margin: auto;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #00b894;
+  color: #00b894;
+  font-size: 16px;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* List */
+.receiptList {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 0 0;
+}
+
+.receiptList li {
+  font-size: 0.8rem;
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px dashed #ecf0f1;
+  transition: all 0.2s ease;
+}
+
+.receiptList li:last-child {
+  border-bottom: none;
+}
+
+.receiptList li:hover {
+  background-color: #f7fffa;
+  border-radius: 10px;
+  transform: translateX(1px);
+}
+
+/* Labels */
+.receiptList li strong {
+  font-weight: 600;
+  margin-right: 6px;
+}
+
+/* Badge styling */
+.deliveryBadge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  justify-content: center;
+  padding: 6px 10px;
+  border-radius: 16px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s ease;
+}
+
+.deliveryBadge:hover {
+  transform: scale(1.05);
+}
+
+/* Fee Badge */
+.feeBadge {
+  background: linear-gradient(135deg, #f59e0b, #fbbf24);
+}
+
+/* ETA Badge */
+.etaBadge {
+  background: linear-gradient(135deg, #3b82f6, #60a5fa);
+}
+
+/* Icon inside badge */
+.badgeIcon {
+  font-size: 0.9rem;
+}
+
+.reprepOverlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(20, 20, 20, 0.7);
+  background: rgba(0, 0, 0, 0.55);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 999;
-  backdrop-filter: blur(4px);
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-in-out;
 }
 
-.invoiceContent {
+.reprepModal {
   background: #fff;
-  padding: 40px;
-  width: 500px;
-  max-width: 90%;
   border-radius: 16px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-  font-family: "Georgia", serif;
-  color: #333;
+  width: clamp(320px, 90%, 480px);
+  padding: 1.8rem;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.25);
+  text-align: center;
   position: relative;
-  animation: fadeInUp 0.4s ease;
+  animation: slideUp 0.35s ease-out;
 }
 
-.closeOverlay {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  background: none;
-  border: none;
-  font-size: 24px;
+.reprepIcon {
+  font-size: 2.5rem;
+  color: #c94d3f; /* أحمر معتدل */
+}
+
+.reprepTitle {
+  font-size: clamp(1.2rem, 2vw, 1.5rem);
+  font-weight: 600;
+  color: #4b2c20; /* بني كالقهوة */
+  margin-bottom: 0.5rem;
+}
+
+.reprepText {
+  font-size: clamp(0.9rem, 1.1vw, 1rem);
+  color: #555;
+  margin-bottom: 1.2rem;
+  line-height: 1.5;
+}
+
+.reprepInput {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  margin-bottom: 1.2rem;
+  transition: border-color 0.2s;
+}
+
+.reprepInput:focus {
+  border-color: #4b2c20;
+  outline: none;
+}
+
+.reprepActions {
+  display: flex;
+  gap: 0.8rem;
+  justify-content: center;
+}
+
+.reprepBtn {
+  flex: 1;
+  padding: 0.7rem;
+  border-radius: 10px;
+  font-weight: 500;
+  font-size: 0.9rem;
   cursor: pointer;
-  color: #999;
-  transition: color 0.2s;
+  transition: all 0.25s ease-in-out;
 }
 
-.closeOverlay:hover {
-  color: #000;
-  transform: scale(1.2);
-  transition: ease 0.5s;
-}
-
-.invoiceContent h2 {
-  color: rgb(196, 128, 1);
-  margin-bottom: 20px;
-  font-size: clamp(18px, 2vw, 24px);
-  border-bottom: 2px solid #eee;
-  padding-bottom: 10px;
+.reprepCancel {
+  background: #eee;
+  color: #333;
+  border: none;
+  display: block;
   text-align: center;
 }
 
-.invoiceItems {
-  list-style: none;
-  padding: 0;
-  margin: 20px 0;
+.reprepCancel:hover {
+  background: #ddd;
 }
 
-.invoiceItems li {
-  display: flex;
-  justify-content: space-between;
-  padding: 8px 0;
-  border-bottom: 1px dashed #ccc;
-  font-size: clamp(14px, 1vw, 16px);
+.reprepConfirm {
+  background: #4b2c20;
+  color: #fff;
+  border: none;
+  display: block;
+  text-align: center;
 }
 
-.totalAmount {
-  color: #110e0c;
-  text-align: right;
-  font-weight: bold;
-  font-size: clamp(14px, 1vw, 16px);
-  margin-top: 20px;
-  border-top: 2px solid #110e0c;
-  padding-top: 10px;
+.reprepConfirm:hover {
+  background: #3a2015;
 }
 
 .emptyOrderList {
@@ -294,9 +730,9 @@ button {
   transform: translate(-50%, -50%);
 }
 
-.floatingIcon {
+/* .floatingIcon {
   animation: float 2s ease-in-out infinite;
-}
+} */
 
 @keyframes fadeInDelay {
   from {
@@ -461,7 +897,7 @@ button {
     font-size: 1.8rem;
   }
   .ordersGrid {
-    grid-template-columns: 1fr; 
+    grid-template-columns: 1fr;
     grid-auto-rows: auto;
     gap: 1rem;
     width: 250px;

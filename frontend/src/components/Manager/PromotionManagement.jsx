@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext, useMemo } from 'react';
 import styles from '../styles/PromotionManagement.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faTrash, faEdit, faPercentage, faCalendarAlt, faTags, faTimes, faGift } from '@fortawesome/free-solid-svg-icons';
@@ -6,6 +6,9 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import '../styles/toastStyles.css';
 import axios from 'axios'; 
+import { SearchContext } from "./ManagerDashboard";
+import { EmpSearchContext } from "../Employee/EmployeeHome";
+import { usePermissions } from "../../context/PermissionsContext";
 
 const PromotionManagement = () => {
 
@@ -20,6 +23,7 @@ const PromotionManagement = () => {
   const [description, setDescription] = useState('');
   const [products, setProducts] = useState('');
   const [loading, setLoading] = useState(true);
+  const { permissions, role } = usePermissions();
 
   const token = sessionStorage.getItem('authToken') || localStorage.getItem('authToken');
   const axiosInstance = axios.create({
@@ -38,16 +42,109 @@ const PromotionManagement = () => {
     fetchPromotions();
   }, []);
 
+  const mockPromotions = [
+    {
+      id: 1,
+      title: "Early Bird Special",
+      discount_percentage: 20,
+      start_date: "2023-11-01",
+      end_date: "2023-11-30",
+      description: "All coffee orders before 8AM",
+      products: "Espresso, Americano, Latte, Cappuccino"
+    },
+    {
+      id: 2,
+      title: "Happy Hour",
+      discount_percentage: 10,
+      start_date: "2023-11-01",
+      end_date: "2023-12-31",
+      description: "3PM-5PM daily on selected drinks",
+      products: "Iced Coffee, Cold Brew, Lemonade"
+    },
+    {
+      id: 3,
+      title: "Weekend Brunch",
+      discount_percentage: 20,
+      start_date: "2023-11-04",
+      end_date: "2023-11-05",
+      description: "With any large coffee purchase",
+      products: "Croissant, Muffin, Danish"
+    },
+    {
+      id: 4,
+      title: "Student Discount",
+      discount_percentage: 15,
+      start_date: "2023-09-01",
+      end_date: "2024-06-30",
+      description: "Valid with student ID",
+      products: "All drinks, All food items"
+    },
+    {
+      id: 5,
+      title: "Loyalty Reward",
+      discount_percentage: 40,
+      start_date: "2023-01-01",
+      end_date: "2023-12-31",
+      description: "After 10 stamps on loyalty card",
+      products: "Any regular sized drink"
+    },
+    {
+      id: 6,
+      title: "Pumpkin Spice Season",
+      discount_percentage: 10,
+      start_date: "2023-10-01",
+      end_date: "2023-11-15",
+      description: "Special autumn flavors",
+      products: "Pumpkin Spice Latte, Pumpkin Muffin"
+    },
+    {
+      id: 7,
+      title: "Takeaway Tuesday",
+      discount_percentage: 95,
+      start_date: "2023-11-07",
+      end_date: "2023-11-07",
+      description: "All takeaway orders",
+      products: "Coffee, Sandwiches, Salads"
+    },
+    {
+      id: 8,
+      title: "New Product Launch",
+      discount_percentage: 80,
+      start_date: "2023-11-15",
+      end_date: "2023-11-17",
+      description: "Try our new winter special",
+      products: "Peppermint Mocha, Gingerbread Cookie"
+    },
+    {
+      id: 9,
+      title: "Black Friday",
+      discount_percentage: 50,
+      start_date: "2023-11-24",
+      end_date: "2023-11-24",
+      description: "From opening until 10AM only",
+      products: "All drinks, All bakery items"
+    },
+    {
+      id: 10,
+      title: "Christmas Countdown",
+      discount_percentage: 30,
+      start_date: "2023-12-01",
+      end_date: "2023-12-24",
+      description: "Different offer each day until Christmas",
+      products: "Seasonal drinks, Holiday treats"
+    }
+  ];
 
   const fetchPromotions = async () => {
     try {
-      const response = await axiosInstance.get('/manager/promotion');
+      // const response = await axiosInstance.get('/manager/promotion');
       
-      const formattedPromotions = response.data.map(promo => ({
-        ...promo,
-        products: Array.isArray(promo.products) ? promo.products.join(', ') : '', 
-      }));
-      setPromotions(formattedPromotions);
+      // const formattedPromotions = response.data.map(promo => ({
+      //   ...promo,
+      //   products: Array.isArray(promo.products) ? promo.products.join(', ') : '', 
+      // }));
+      // setPromotions(formattedPromotions);
+      setPromotions(mockPromotions);
     } catch (error) {
         toast.error('Failed to load promotions.');
     } finally {
@@ -156,10 +253,27 @@ const PromotionManagement = () => {
     setShowModal(false);
   };
 
+  const managerContext = useContext(SearchContext);
+  const empContext = useContext(EmpSearchContext);
+  const context = role === "manager" ? managerContext : empContext;
+  const { searchQuery, setSearchPlaceholder } = context;
+  
+  const filteredPromotions = useMemo(() => {
+    return promotions.filter(promo => 
+      searchQuery === "" ||
+      promo.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      promo.products.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [promotions, searchQuery]);
+
+  useEffect(() => {
+    setSearchPlaceholder("Search by title or product...");
+  }, [setSearchPlaceholder]);
+
   return (
-    <div className={styles.pageWrapper}>
+    <div className="promoWrapper">
       <ToastContainer />
-      <div className={styles.pageHeader}>
+      <div className="pageHeader">
         <h2 className={styles.pageTitle}><FontAwesomeIcon icon={faGift}/> Promotion List</h2>
         <button className={styles.addBtn} onClick={() => setShowModal(true)}>
           <FontAwesomeIcon icon={faPlus} /> Add Promotion
@@ -170,16 +284,23 @@ const PromotionManagement = () => {
           <p className={styles.emptyText}>Loading...</p>
         </div>
       ) : (
-      <div className={styles.cardGrid}>
-        {promotions.map((promo) => (
+      <div className="cardGrid">
+      {filteredPromotions.length === 0 ? (
+        <p className={styles.noResults}>
+          {searchQuery 
+            ? `No promotions found matching "${searchQuery}"`
+            : "No promotions available"}
+        </p>
+      ) : (
+        filteredPromotions.map((promo) => (
           <div key={promo.id} className={styles.card}>
             <h4 className={styles.cardTitle}>
               <FontAwesomeIcon icon={faTags} /> {promo.title}
             </h4>
-            <p><FontAwesomeIcon icon={faPercentage} /> {promo.discount_percentage}%</p> {/* استخدام discount_percentage */}
-            <p><FontAwesomeIcon icon={faCalendarAlt} /> {promo.start_date} ➜ {promo.end_date}</p> {/* استخدام start_date و end_date */}
+            <p><FontAwesomeIcon icon={faPercentage} /> {promo.discount_percentage}%</p> 
+            <p><FontAwesomeIcon icon={faCalendarAlt} /> {promo.start_date} ➜ {promo.end_date}</p> 
 
-            <p><strong>Products:</strong> {promo.products}</p> {/* المنتجات جاهزة كسلسلة نصية */}
+            <p><strong>Products:</strong> {promo.products}</p> 
             <p className={styles.desc}>{promo.description}</p>
             <div className={styles.cardActions}>
               <button className={styles.editBtn} onClick={() => startEdit(promo)}>
@@ -190,7 +311,7 @@ const PromotionManagement = () => {
               </button>
             </div>
           </div>
-        ))}
+        )))}
       </div>
       )}
       {showModal && (

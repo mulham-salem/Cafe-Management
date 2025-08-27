@@ -1,0 +1,325 @@
+.invoiceOverlay {
+  --bg-overlay: rgba(18, 18, 18, 0.72);
+  --card-bg: linear-gradient(180deg, #fffdf8 0%, #fff8f0 100%);
+  --accent: #c47f05; /* coffee/gold */
+  --accent-dark: #8b5a02;
+  --muted: #7a7268;
+  --border: rgba(15, 12, 10, 0.06);
+  --shadow: 0 18px 40px rgba(12, 10, 9, 0.35);
+  --success: #2a9d8f;
+  --danger: #d62828;
+  --glass: rgba(255, 255, 255, 0.6);
+  --radius-lg: 16px;
+  --radius-md: 10px;
+  --text: #110e0c;
+}
+
+@font-face {
+  font-family: "Poppins-Regular";
+  src: url("Fonts/Poppins/Poppins-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* overlay full-screen */
+.invoiceOverlay {
+  position: fixed;
+  inset: 0;
+  background-color: var(--bg-overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(6px) saturate(1.05);
+  -webkit-backdrop-filter: blur(6px);
+  padding: 24px;
+}
+
+/* card */
+.invoiceContent {
+  font-family: "Poppins-Regular";
+  width: 540px;
+  margin: 5px 0 0 0;
+  max-width: 96%;
+  background: var(--card-bg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: clamp(20px, 3.6vw, 36px);
+  color: var(--text);
+  font-family: var(--ui);
+  position: relative;
+  animation: rise 0.8s cubic-bezier(0.2, 0.9, 0.24, 1);
+  border: 1px solid var(--border);
+  overflow: visible;
+}
+
+/* entrance */
+@keyframes rise {
+  from {
+    transform: translateY(18px) scale(0.995);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* close button */
+.closeOverlay {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  color: var(--muted);
+  cursor: pointer;
+  transition: transform 0.2s ease, color 0.15s ease;
+}
+.closeOverlay:hover {
+  color: var(--text);
+  transform: scale(1.15);
+}
+
+@font-face {
+  font-family: "Poppins-Medium";
+  src: url("Fonts/Poppins/Poppins-Medium.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* heading */
+.invoiceContent h2 {
+  font-family: "Poppins-Medium";
+  color: var(--accent-dark);
+  text-align: center;
+  margin: 0 0 25px 0;
+  font-size: clamp(18px, 2.3vw, 22px);
+  border-bottom: 1px dashed rgba(0, 0, 0, 0.06);
+  padding-bottom: 12px;
+}
+
+/* summary text */
+.invoiceContent p {
+  margin: 10px 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/* item list */
+.invoiceItems {
+  list-style: none;
+  padding: 0;
+  margin: 16px 0;
+  max-height: 260px;
+  overflow: auto;
+}
+
+/* each line */
+.invoiceItems li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px dashed rgba(0, 0, 0, 0.06);
+  font-size: clamp(13px, 1vw, 15px);
+  color: var(--text);
+}
+
+/* delivery fee row */
+.deliveryFee {
+  font-size: 14px;
+  color: var(--muted);
+  margin-top: 6px;
+}
+
+/* loyalty box (nice accent) */
+.loyaltyBox {
+  margin-top: 14px;
+  padding: 12px;
+  border-radius: 10px;
+  background: linear-gradient(
+    180deg,
+    rgba(196, 127, 5, 0.04),
+    rgba(255, 255, 255, 0)
+  );
+  border-left: 4px solid var(--accent);
+  display: grid;
+  gap: 8px;
+  font-size: 13.5px;
+}
+
+/* header inside loyalty */
+.loyaltyHeader {
+  font-family: "Poppins-Medium";
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--accent-dark);
+}
+
+/* rows */
+.loyaltyRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--muted);
+  font-size: 13.5px;
+}
+
+/* input row */
+.loyaltyInputRow {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+
+/* points input */
+.pointsInput {
+  width: 110px;
+  min-width: 90px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(16, 12, 10, 0.08);
+  background: #fff;
+  font-size: 14px;
+  outline: none;
+  transition: box-shadow 0.15s ease, transform 0.08s ease;
+}
+.pointsInput:focus {
+  box-shadow: 0 6px 18px rgba(12, 10, 9, 0.06);
+  transform: translateY(-1px);
+}
+
+/* use max and apply buttons */
+.useMaxBtn,
+.applyBtn {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.useMaxBtn {
+  background: transparent;
+  color: var(--accent-dark);
+  border: 1px dashed rgba(139, 90, 2, 0.12);
+}
+.useMaxBtn:hover {
+  transform: translateY(-2px);
+}
+
+.applyBtn {
+  background: var(--accent);
+  color: white;
+  box-shadow: 0 8px 18px rgba(196, 127, 5, 0.12);
+}
+.applyBtn[disabled] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* small helper */
+.loyaltyNote {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  color: var(--muted);
+  font-size: 12.5px;
+  margin-top: 6px;
+}
+
+/* totals layout */
+.totalsBox {
+  margin-top: 14px;
+  border-top: 1px solid rgba(0, 0, 0, 0.04);
+  padding-top: 12px;
+  display: grid;
+  gap: 10px;
+  font-size: 14px;
+}
+.totalsBox > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--muted);
+}
+
+.discountRow span:last-child {
+  color: var(--danger);
+  font-weight: 700;
+}
+.totalAmount {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 700;
+  color: var(--text);
+  font-size: clamp(15px, 1.6vw, 16px);
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  padding-top: 10px;
+}
+
+/* action buttons */
+.payActions {
+  position: relative;
+  top: 15px;
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  align-items: center;
+}
+.cashBtn,
+.electronicBtn {
+  flex: 1;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 14px;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+}
+.cashBtn {
+  background: transparent;
+  border: 1px solid rgba(17, 14, 12, 0.08);
+  color: var(--text);
+}
+.electronicBtn {
+  background: linear-gradient(90deg, var(--accent) 0%, var(--accent-dark) 100%);
+  color: #fff;
+  box-shadow: 0 12px 30px rgba(139, 90, 2, 0.12);
+}
+.cashBtn:hover,
+.electronicBtn:hover {
+  transform: translateY(-3px);
+}
+
+/* responsive tweaks */
+@media (max-width: 520px) {
+  .invoiceContent {
+    padding: 18px;
+    border-radius: 12px;
+  }
+  .pointsInput {
+    width: 86px;
+  }
+  .payActions {
+    flex-direction: column;
+  }
+  .cashBtn,
+  .electronicBtn {
+    width: 100%;
+  }
+}

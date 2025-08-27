@@ -1,0 +1,243 @@
+.modalOverlay {
+  --accent: #c47f05;
+  --accent-2: #8b5a02;
+  --muted: #6e655d;
+  --card: #fffefb;
+  --shadow-lg: 0 20px 50px rgba(10, 9, 8, 0.34);
+  --radius: 14px;
+  --danger: #d62828;
+}
+
+@font-face {
+  font-family: "Poppins-Regular";
+  src: url("Fonts/Poppins/Poppins-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* overlay */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(12, 10, 9, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  backdrop-filter: blur(4px);
+}
+
+/* card */
+.modalCard {
+  width: 480px;
+  max-width: 96%;
+  background: linear-gradient(180deg, #fffefb 0%, #fff8f2 100%);
+  border-radius: var(--radius);
+  padding: clamp(18px, 3.4vw, 28px);
+  box-shadow: var(--shadow-lg);
+  font-family: "Poppins-Regular";
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  position: relative;
+  color: #1a1917;
+  animation: pop 0.28s cubic-bezier(0.2, 0.9, 0.24, 1);
+}
+
+@keyframes pop {
+  from {
+    transform: translateY(10px) scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* shared close */
+.closeOverlay {
+  position: absolute;
+  top: 14px;
+  right: 0px;
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  font-size: 18px;
+  cursor: pointer;
+}
+.closeOverlay:hover {
+  color: #000;
+  transform: scale(1.15);
+}
+
+@font-face {
+  font-family: "Poppins-Medium";
+  src: url("Fonts/Poppins/Poppins-Medium.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* heading & amount */
+.modalCard h3 {
+  margin: 10px 0;
+  color: var(--accent-2);
+  font-family: "Poppins-Medium";
+  font-size: 20px;
+  border-bottom: 1px dashed rgba(0, 0, 0, 0.06);
+  padding-bottom: 12px;
+}
+.amountRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a1917;
+}
+
+/* method buttons */
+.methods {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.methodBtn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  background: transparent;
+  cursor: pointer;
+  font-weight: 700;
+  transition: all 0.5s ease;
+}
+
+.methodBtn:hover {
+  transform: translateY(-3px);
+}
+.methodBtn svg {
+  opacity: 1;
+  font-size: 18px;
+}
+
+/* active style */
+.methodBtn.active {
+  background: linear-gradient(90deg, var(--accent) 0%, var(--accent-2) 100%);
+  color: #fff;
+  box-shadow: 0 12px 24px rgba(139, 90, 2, 0.12);
+  border: none;
+}
+
+/* card form fields */
+.cardForm {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.field label {
+  display: block;
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.field input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(16, 12, 10, 0.06);
+  outline: none;
+  font-size: 14px;
+  transition: box-shadow 0.12s ease, transform 0.08s ease;
+}
+.field input:focus {
+  box-shadow: 0 10px 22px rgba(12, 10, 9, 0.06);
+  transform: translateY(-1px);
+}
+
+.row2 {
+  display: flex;
+  gap: 50px;
+}
+.row2 .field {
+  flex: 1;
+}
+
+/* notice */
+.notice {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 6px;
+}
+
+/* apple pay mock */
+.applePayMock {
+  margin-top: 8px;
+  padding: 12px;
+  border-radius: 10px;
+  background: linear-gradient(
+    180deg,
+    rgba(42, 157, 143, 0.06),
+    rgba(255, 255, 255, 0)
+  );
+  color: var(--muted);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* footer */
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 14px;
+}
+
+/* pay button */
+.payBtn {
+  padding: 10px 16px;
+  background: linear-gradient(90deg, var(--accent) 0%, var(--accent-2) 100%);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 14px 36px rgba(139, 90, 2, 0.12);
+  transition: transform 0.12s ease, opacity 0.12s ease;
+}
+.payBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.payBtn:hover:not(:disabled) {
+  transform: translateY(-3px);
+}
+
+/* tiny responsive */
+@media (max-width: 520px) {
+  .modalCard {
+    padding: 14px;
+    width: 100%;
+    border-radius: 12px;
+  }
+  .methods {
+    flex-direction: column;
+  }
+  .methodBtn {
+    width: 100%;
+  }
+  .footer {
+    justify-content: center;
+  }
+}

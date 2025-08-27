@@ -1,3 +1,10 @@
+@font-face {
+  font-family: "Ubuntu";
+  src: url("Fonts/Ubuntu/Ubuntu-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
 .container {
   padding: clamp(1rem, 4vw, 2rem);
   background-color: #f8f5f0;
@@ -7,6 +14,7 @@
   max-height: 80vh;
   overflow-y: auto;
   scroll-behavior: smooth;
+  margin: 105px auto;
 }
 
 .container::-webkit-scrollbar {
@@ -32,6 +40,7 @@
 }
 
 .tabButton {
+  font-family: "Ubuntu";
   background-color: transparent;
   border: 2px solid #a58c6f;
   padding: clamp(0.5rem, 2.5vw, 0.75rem) clamp(1rem, 4vw, 1.5rem);
@@ -75,15 +84,22 @@
   }
 }
 
+@font-face {
+  font-family: "Ubuntu-bold";
+  src: url("Fonts/Ubuntu/Ubuntu-Bold.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
 h3 {
-  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+  font-family: "Ubuntu-bold";
   color: #3b1e0a;
   margin-bottom: clamp(0.5rem, 2vw, 1rem);
   position: relative;
   bottom: clamp(0px, 2vw, 10px);
   display: block;
   text-align: center;
-  font-size: clamp(1.1rem, 3vw, 1.4rem);
+  font-size: clamp(1.1rem, 3vw, 1.5rem);
 }
 
 .newReservation {
@@ -97,7 +113,7 @@ h3 {
   background-color: #fff;
   padding: clamp(1rem, 3vw, 1.5rem);
   border-radius: 16px;
-  margin-top: clamp(0px, 8vh, 60px);
+  margin-top: clamp(0px, 9vh, 69px);
   margin-left: clamp(0px, 4vw, 16px);
   width: 85%;
   border: 2px solid #a58c6f;
@@ -105,15 +121,15 @@ h3 {
 }
 
 .formColumn h2 {
-  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+  font-family: "Ubuntu-bold";
   color: #3b1e0a;
   display: block;
   text-align: center;
-  font-size: clamp(1.3rem, 3.5vw, 1.8rem);
+  font-size: clamp(1.3rem, 3vw, 1.7rem);
 }
 
 .formGroup {
-  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+  font-family: "Ubuntu";
   margin-bottom: clamp(0.8rem, 2vw, 1rem);
 }
 
@@ -152,13 +168,14 @@ select:hover {
 }
 
 .confirmBtn {
+  font-family: "Ubuntu";
   background-color: #3b1e0a;
   color: white;
-  padding: clamp(0.6rem, 2vw, 0.8rem) clamp(1rem, 3.5vw, 1.5rem);
+  padding: clamp(0.6rem, 2vw, 0.8rem) clamp(1rem, 3vw, 1.2rem);
   border: none;
   border-radius: 15px;
   font-weight: bold;
-  font-size: clamp(0.9rem, 2.5vw, 1rem);
+  font-size: clamp(0.9rem, 1vw, 1rem);
   cursor: pointer;
   transition: background-color 0.4s ease;
   display: flex;
@@ -340,15 +357,22 @@ select:hover {
   animation-delay: 0.4s;
 }
 
-.emptyText {
-  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
-    "Lucida Sans", Arial, sans-serif;
-  font-size: clamp(14px, 2.5vw, 18px);
-  color: #888;
-  position: fixed;
-  top: 50%;
-  left: 71%;
-  transform: translate(-29%, -50%);
+.loadingSpinner {
+  width: 40px;
+  height: 40px;
+  border: 5px solid rgba(107, 55, 31, 0.2);
+  border-radius: 50%;
+  border-top-color: rgb(67, 29, 3);
+  animation: spin 1s ease-in-out infinite;
+  position: absolute;
+  top: 55%;
+  left: 69%;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes fadeInDelay {
@@ -360,7 +384,7 @@ select:hover {
   }
 }
 
-.emptyText2 {
+.emptyText {
   font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
     "Lucida Sans", Arial, sans-serif;
   font-size: clamp(14px, 2.5vw, 18px);
@@ -369,6 +393,10 @@ select:hover {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+}
+
+.visualMap {
+  margin-right: 8px;
 }
 
 @media screen and (min-width: 7680px) {

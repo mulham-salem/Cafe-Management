@@ -58,8 +58,8 @@ const ManagerNotification = () => {
   };
 
   return (
-    <div className={styles.pageWrapper}>
-      <h2 className={styles.pageTitle}>
+    <div className="mngNotPageWrapper">
+      <h2 className="pageTitle">
         <FontAwesomeIcon icon={faBell} className={styles.bellIcon} /> Notifications
       </h2>
 
@@ -72,7 +72,7 @@ const ManagerNotification = () => {
       ) : notifications.length === 0 ? (
         <p className={styles.emptyText}>No notifications available.</p>
       ) : (
-        <div className={styles.list}>
+        <div className="list">
           {notifications.map((notif) => (
             <div
               key={notif.id}

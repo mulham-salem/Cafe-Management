@@ -36,7 +36,6 @@ class ManagerAuthController extends Controller
         return response()->json([
             'token' => $token,
             'message' => 'Welcome back '.$manager->name,
-
         ]);
     }
 

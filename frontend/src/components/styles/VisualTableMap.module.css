@@ -1,0 +1,406 @@
+.map {
+  --map-bg-1: #efe6d8;
+  --map-bg-2: #f6f1e6;
+  --accent-dark: #8b5e34;
+  --glass-alpha: 0.12;
+  --tile-size: 160px;
+  --grid-size: 20px;
+  --shadow-strong: 0 18px 40px rgba(0, 0, 0, 0.28);
+  --shadow-soft: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.map {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1512 / 652;
+  height: 83vh;
+  min-height: 640px;
+  background: radial-gradient(
+      1200px 400px at 10% 10%,
+      rgba(255, 255, 255, 0.55),
+      transparent
+    ),
+    linear-gradient(180deg, var(--map-bg-1) 0%, var(--map-bg-2) 100%);
+  border: 4px solid var(--accent-dark);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.04),
+    0 12px 30px rgba(0, 0, 0, 0.08);
+
+  transform: translateZ(0);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  animation: mapEntrance 1s ease-out forwards;
+  opacity: 0;
+  transform: scale(0.95) translateY(20px);
+}
+
+@keyframes mapEntrance {
+  0% {
+    opacity: 0;
+    transform: scale(0.95) translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* حركة ضوء رقيقة تمشي فوق الخريطة لتعطيها حيوية */
+.map::before {
+  content: "";
+  position: absolute;
+  inset: -30%;
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.06) 0%,
+    rgba(255, 255, 255, 0) 30%,
+    rgba(255, 255, 255, 0) 70%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  pointer-events: none;
+  z-index: 5;
+}
+
+
+/* طبقة بلاط الأرضية — تعطي إحساس بالمساحة وليس مجرد مربعات */
+.floorOverlay {
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(
+      rgba(120, 90, 50, 0.04) 5px,
+      transparent 1px
+    ),
+    linear-gradient(90deg, rgba(120, 90, 50, 0.03) 5px, transparent 1px);
+  background-size: var(--tile-size) var(--tile-size);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.door {
+  position: absolute;
+  padding: 5px;
+  background-color: #8B4513;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+}
+
+.doorIcon {
+  color: white;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.window {
+  position: absolute;
+  background-color: #0ea3ae;
+  border: 2px solid #145f9c;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+}
+
+/* البار */
+.bar {
+  position: absolute;
+  background-color: #ffe39c;
+  border: 2px solid #6f5207;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.barIcon {
+  color: rgb(112, 67, 11);
+  font-size: 24px;
+  margin-bottom: 5px;
+}
+
+.barLabel {
+  color: rgb(112, 67, 11);
+  font-size: 12px;
+  font-weight: bold;
+}
+
+/* status badge (icon inside each table) */
+.statusBadge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 34px;
+  height: 34px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+  z-index: 30;
+  pointer-events: none; /* لا تمنع النقر أو السحب */
+  box-shadow: 0 6px 16px rgba(0,0,0,0.22);
+  backdrop-filter: blur(4px);
+}
+
+/* الطاولة الدائرية — مظهر متقدم */
+.table {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  cursor: grab;
+  border-radius: 50%;
+  transition: transform 160ms cubic-bezier(0.2, 0.9, 0.3, 1), box-shadow 160ms;
+  z-index: 12;
+  will-change: transform;
+  overflow: visible;
+  /* inner ring and glossy top */
+  box-shadow: inset 0 -6px 18px rgba(255, 255, 255, 0.06),
+    0 10px 28px rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: radial-gradient(
+      circle at 35% 30%,
+      rgba(255, 255, 255, 0.12),
+      transparent 28%
+    ),
+    radial-gradient(circle at 70% 70%, rgba(0, 0, 0, 0.05), transparent 30%);
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.table:hover {
+  transform: scale(1.08);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+  filter: brightness(1.1);
+}
+
+.table:active {
+  cursor: grabbing;
+  transform: scale(1.02);
+}
+
+/* Status-based colors */
+.available {
+  background: linear-gradient(145deg, #4caf50, #3d8b40);
+}
+
+.reserved {
+  background: linear-gradient(145deg, #f44336, #d32f2f);
+}
+
+.cleaning {
+  background: linear-gradient(145deg, #2196f3, #1976d2);
+}
+
+/* طابع رقمي صغير للنص داخل الطاولة */
+.tableTop {
+  position: absolute;
+  top: 10px;
+  text-align: center;
+  z-index: 20;
+  pointer-events: none;
+  color: #fff;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
+}
+
+.label {
+  display: inline-block;
+  font-weight: 800;
+  font-size: 14px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.16);
+  backdrop-filter: blur(4px);
+  margin-bottom: 8px;
+  letter-spacing: 0.4px;
+}
+
+.seatCount {
+  display: block;
+  font-size: 10px;
+  font-weight: 600;
+  margin: 5px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* الكراسي — دوائر صغيرة حول الطاولة */
+.seat {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  z-index: 11;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.22);
+  border: 2px solid rgba(255, 255, 255, 0.18);
+  transform-origin: center;
+  transition: transform 160ms ease, box-shadow 160ms ease, opacity 140ms;
+  opacity: 0.98;
+}
+
+/* تأثير hover للكراسي */
+.table:hover .seat {
+  transform: scale(1.08);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.28);
+}
+
+/* ألوان الكراسي حسب الحالة */
+.available .seat {
+  background: linear-gradient(180deg, #bff0bc, #7bd07c);
+}
+.reserved .seat {
+  background: linear-gradient(180deg, #ffc6c2, #ff8582);
+}
+.cleaning .seat {
+  background: linear-gradient(180deg, #cfe9ff, #8fcfff);
+}
+
+/* حالة Available */
+.table.available {
+  border-color: #2ecc71;
+}
+
+/* حالة Reserved (بدون تحريك transform) */
+.table.reserved {
+  border-color: #e74c3c;
+  animation: reserved-glow 1.5s infinite alternate;
+}
+@keyframes reserved-glow {
+  from {
+    box-shadow: 0 0 5px #e74c3c, 0 0 15px rgba(231, 76, 60, 0.5);
+  }
+  to {
+    box-shadow: 0 0 15px #e74c3c, 0 0 30px rgba(231, 76, 60, 0.8);
+  }
+}
+
+/* حالة Cleaning */
+.table.cleaning {
+  border-color: #0e4f88;
+  animation: cleaning-pulse 1.5s infinite;
+}
+@keyframes cleaning-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgb(0, 242, 255);
+  }
+  70% {
+    box-shadow: 0 0 0 15px rgba(243, 156, 18, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(243, 156, 18, 0);
+  }
+}
+
+/* Dropdown for status */
+.statusSelect {
+  position: absolute;
+  top: 65px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 11px;
+  text-align: center;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+  z-index: 25;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.statusSelect:hover {
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.statusSelect:focus {
+  outline: 2px solid rgba(255, 255, 255, 0.8);
+  outline-offset: 2px;
+}
+
+.available .statusSelect {
+  color: #2e7d32;
+}
+
+.occupied .statusSelect {
+  color: #c62828;
+}
+
+.reserved .statusSelect {
+  color: #ef6c00;
+}
+
+.cleaning .statusSelect {
+  color: #1565c0;
+}
+
+.table::after {
+  content: attr(aria-label);
+  position: absolute;
+  bottom: calc(100% + 5px);
+  left: 50%;
+  transform: translateX(-50%) translateY(6px);
+  white-space: nowrap;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.72);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms ease, transform 180ms ease;
+  z-index: 40;
+  backdrop-filter: blur(4px);
+}
+
+.table:hover::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Loading text */
+.loading {
+  font-size: 18px;
+  font-weight: 500;
+  color: #5c4033;
+  text-align: center;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: pulse 1.5s infinite;
+}
+
+.empty {
+  font-size: 18px;
+  font-weight: 500;
+  color: #5c4033;
+  text-align: center;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.4;
+  }
+}

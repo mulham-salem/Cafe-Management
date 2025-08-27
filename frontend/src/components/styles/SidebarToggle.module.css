@@ -1,0 +1,253 @@
+/* fixed narrow left edge container */
+@font-face {
+    font-family: "Ubuntu";
+    src: url("Fonts/Ubuntu/Ubuntu-Regular.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+  }
+
+:global(.edgeWrapper ){
+    position: fixed;
+    left: 0;
+    top: 68px; /* عدّل حسب ارتفاع النّافبار عندك */
+    z-index: 1200;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    pointer-events: auto;
+    transform: translateZ(0);
+  }
+  
+  /* tiny edge clickable area */
+  .edgeButton {
+    width: 30px;
+    height: 60px;
+    background: transparent;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 0 10px 10px 0;
+    transition: background 160ms ease, transform 160ms ease;
+    -webkit-tap-highlight-color: transparent;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    box-shadow: 0 2px 8px rgba(2,6,23,0.04);
+    transform-origin: left center;
+    will-change: transform;
+  }
+  .edgeButton:active { transform: translateX(4px); }
+  .edgeButton:hover { background: rgba(15,23,42,0.04); }
+  
+  /* arrow icon */
+  :global(.arrowIcon) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: #0f172a;
+    line-height: 1;
+    transition: all 0.2s ease;
+  }
+  
+  :global(.edgeButton:hover .arrowIcon) {
+    color: #5d2d06;
+    transform: scale(1.05);
+  }
+
+  .tipContainer {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .starIcon {
+    color: gold;
+    font-size: 1.2rem;
+    margin-right: 0px;
+  }
+
+  .starIcon {
+    animation: shine 2s infinite;
+  }
+  
+  @keyframes shine {
+    0% { opacity: 0.8; }
+    50% { opacity: 1; transform: scale(1.1); }
+    100% { opacity: 0.8; }
+  }
+
+  /* small intro tip bubble that shows briefly on page load */
+  .tipBubble {
+    font-family: "Ubuntu";
+    font-weight: 500;
+    margin-left: 5px;
+    background: white;
+    padding: 8px 12px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1);
+    font-size: 13px;
+    color: #1e293b;
+    transform-origin: left center;
+    white-space: nowrap;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    position: relative;
+    overflow: hidden;
+    border: 1px solid #fbf4ed;
+  }
+  
+  /* translucent backdrop when sidebar is open */
+  .backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1100;
+    background: rgba(2,6,23,0.18);
+  }
+  
+  /* the sliding sidebar panel */
+  :global(.sidebar) {
+    position: fixed;
+    left: 0;
+    top: 68px; /* عدّل حسب النّافبار */
+    height: 88vh;
+    z-index: 1300;
+    background: linear-gradient(180deg,#ffffff,#fbfbff);
+    box-shadow: 6px 0 34px rgba(2,6,23,0.06);
+    border-right: 1px solid rgba(15,23,42,0.04);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    padding: 14px;
+    width: 240px; /* يجب أن يطابق variant open width */
+    min-width: 0;
+    transform-origin: left center;
+    overflow: hidden !important;
+    will-change: transform, width, opacity;
+    backface-visibility: hidden;
+  }
+
+  :global(.sidebar > *) {
+    transition: opacity 1s ease;
+  }
+  
+  /* header area inside sidebar */
+  .sidebarHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px dashed rgba(15,23,42,0.04);
+  }
+  .headerTitle {
+    font-family: "Ubuntu";
+    margin: 0;
+    font-size: 15px;
+    letter-spacing: 0.2px;
+    color: #96753a;
+    font-weight: 800;
+  }
+  
+  .linkItem, .sidebarHeader, .footerNote {
+    transform-origin: left center;
+    white-space: nowrap;
+  }
+  
+  /* small close button in header */
+  .closeSmall {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #475569;
+  }
+  .closeSmall:hover { color: #0f172a; transform: translateX(-2px); }
+  
+  /* list of links */
+  .linkList {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-right: 6px;
+    overflow: auto;
+  }
+  
+  /* single link item */
+  .linkItem {
+    font-family: "Ubuntu";
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    text-decoration: none;
+    color: #0f172a;
+    font-weight: 600;
+    font-size: 13.5px;
+    transition: transform 140ms ease, background 140ms ease, box-shadow 140ms ease;
+    will-change: transform;
+  }
+  .linkItem:hover {
+    transform: translateX(6px);
+    background: rgba(66, 45, 12, 0.06); /* subtle indigo hover */
+    box-shadow: 0 6px 20px rgba(15,23,42,0.04);
+  }
+  
+  /* icon circle for each link */
+  .iconWrap {
+    min-width: 36px;
+    min-height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background: linear-gradient(180deg, rgba(99,102,241,0.08), rgba(99,102,241,0.02));
+    font-size: 16px;
+    color: #3f3d56;
+  }
+  
+  /* label text */
+  .linkLabel {
+    flex: 1;
+    display: inline-block;
+  }
+  
+  /* footer small note */
+  .footerNote {
+    font-family: "Ubuntu";
+    margin-top: auto;
+    text-align: center;
+    padding-top: 13px;
+    border-top: 1px dashed #475569;
+    font-size: 12px;
+    color: #475569;
+  }
+  
+  /* scrollbar styling for the sidebar list (modern browsers) */
+  .linkList::-webkit-scrollbar { width: 8px; }
+  .linkList::-webkit-scrollbar-thumb {
+    background: rgba(15,23,42,0.06);
+    border-radius: 6px;
+  }
+  
+  /* responsiveness */
+  @media (max-width: 768px) {
+    :global(.edgeWrapper) { top: 68px; }
+    :global(.sidebar) { top: 56px; height: calc(100vh - 56px); width: 220px; padding: 12px; }
+    .tipBubble { font-size: 12px; padding: 6px 8px; }
+    .edgeButton { width: 34px; height: 44px; }
+  }
+  
+  @media (max-width: 420px) {
+    :global(.sidebar) { width: 200px; }
+    .linkItem { padding: 8px 10px; font-size: 13px; }
+    .iconWrap { min-width: 32px; min-height: 32px; font-size: 14px; }
+  }

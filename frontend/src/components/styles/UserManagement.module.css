@@ -6,7 +6,7 @@ html {
   padding: 0;
 }
 
-.container {
+:global(.userContainer) {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   padding: 20px;
   height: 100%;
@@ -14,21 +14,22 @@ html {
   overflow-x: hidden;
   width: 100%;
   max-width: 100%;
+  max-height: 90vh;
   scroll-behavior: smooth;
 }
 
-.container::-webkit-scrollbar {
+:global(.userContainer::-webkit-scrollbar) {
   display: none;
 }
 
-.createButton {
+:global(.createButton) {
   background-color: #4a2b04;
   color: white;
   border: none;
   padding: clamp(6px, 0.7vw, 12px) clamp(8px, 0.7vw, 16px);
   font-size: clamp(12px, 1vw, 18px);
   border-radius: 10px;
-  margin-top: 5vh;
+  margin-top: 4vh;
   margin-bottom: 1.5vh;
   cursor: pointer;
   display: flex;
@@ -39,11 +40,11 @@ html {
   animation: fadeIn 0.8s ease;
 }
 
-.container.open {
-  padding-top: 15vh;
+:global(.userContainer.open) {
+  padding-top: 20vh;
 }
 
-.createButton:hover {
+:global(.createButton:hover) {
   background-color: #6b3a01;
   transition: All ease-in-out 0.4s;
 }
@@ -55,6 +56,7 @@ html {
   font-size: clamp(12px, 1vw, 18px);
   box-shadow: 0px 0px 10px tan;
   border-radius: 12px;
+  overflow: hidden;
   z-index: 1000;
   table-layout: fixed;
   animation: fadeIn 0.8s ease;
@@ -312,6 +314,20 @@ html {
   transform: translate(-50%, -50%);
 }
 
+.noResults {
+  text-align: center;
+  width: 100%;
+  padding: 40px 0;
+  color: #888;
+  font-size: clamp(1rem, 1.1vw, 1.2rem);
+  font-style: italic;
+  font-weight: 450;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
 @keyframes fadeInDelay {
   from {
     opacity: 0;
@@ -333,7 +349,7 @@ html {
 }
 
 @media screen and (min-width: 1600px) {
-  .container {
+  :global(.userContainer) {
     padding: 30px 40px;
     max-width: 1400px;
     margin: 0 auto;
@@ -362,12 +378,12 @@ html {
 }
 
 @media screen and (max-width: 1200px) {
-  .container {
+  :global(.userContainer) {
     padding: 0;
     max-height: none;
   }
 
-  .createButton {
+  :global(.createButton) {
     padding: 8px 10px;
     gap: 6px;
   }
@@ -403,7 +419,7 @@ html {
 }
 
 @media screen and (width: 768px) {
-  .container {
+  :global(.userContainer) {
     padding: clamp(12px, 3vw, 20px);
     max-height: none;
     overflow-y: auto;
@@ -412,7 +428,7 @@ html {
     gap: 12px;
   }
 
-  .createButton {
+  :global(.createButton) {
     font-weight: 450;
     align-self: flex-start;
     position: static;
@@ -476,7 +492,7 @@ html {
 }
 
 @media screen and (max-width: 480px) {
-  .container {
+  :global(.userContainer) {
     height: 100%;
     overflow-y: auto;
     padding: clamp(10px, 5vw, 16px);
@@ -485,7 +501,7 @@ html {
     gap: 10px;
   }
 
-  .createButton {
+  :global(.createButton) {
     margin-top: 5vh;
     align-self: flex-start;
     margin-bottom: 0;
