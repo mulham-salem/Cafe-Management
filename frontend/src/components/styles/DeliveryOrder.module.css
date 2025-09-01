@@ -1,0 +1,337 @@
+.page {
+  --bg: #faf6f1;
+  --card-bg: #fff;
+  --primary: #7b4f2e; /* بني قهوة */
+  --primary-hover: #5a3820;
+  --secondary: #f0d9c2;
+  --accent: #3c8c5a; /* أخضر */
+  --text: #2b1d12;
+  --muted: #8b7b6b;
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 6px 16px rgba(0, 0, 0, 0.08);
+  --radius: 16px;
+
+  background: var(--bg);
+  min-height: 100vh;
+  width: 100%;
+  padding: 30px;
+  color: var(--text);
+  font-family: Inter, system-ui, sans-serif;
+  line-height: 1.6;
+}
+
+/* ===== Header ===== */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.headerLeft {
+  flex: 0 0 auto;
+}
+
+.headerCenter {
+  flex: 1 1 auto;
+  text-align: center;
+}
+
+.backBtn {
+  background: #fff;
+  border: 1px solid rgb(43 29 18 / 8%);
+  color: var(--text);
+  padding: 8px 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.backBtn:hover {
+  background: rgb(43 29 18 / 6%);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.pageTitle {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.subTitle {
+  color: var(--muted);
+  font-size: 1rem;
+  margin-top: 4px;
+}
+
+/* ===== List/Grid ===== */
+.list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 10px;
+}
+
+/* ===== Card ===== */
+.card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #333;
+}
+
+.cardHeader h3 {
+  font-size: 1.4rem;
+}
+
+.card p {
+  font-size: 0.9rem;
+  color: #555;
+  line-height: 1;
+}
+
+/* .total {
+  margin-bottom: 20px;
+} */
+
+/* ===== Status Pills ===== */
+.status {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  text-transform: capitalize;
+  letter-spacing: 0.5px;
+  box-shadow: var(--shadow-sm);
+}
+
+.Pending {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.Assigned {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.InTransit {
+  background: #99ccfc;
+  color: #114860;
+}
+
+.Delivered {
+  background: #c6f6d5;
+  color: #22543d;
+}
+
+/* ===== Actions ===== */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 10px;
+  width: 100%;
+}
+
+.actions button {
+  padding: 8px 14px;
+  border-radius: 12px;
+  font-weight: 500;
+  font-size: 0.8rem;
+  min-width: 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
+  display: block;
+  text-align: center;
+}
+
+.btnPrimary svg, .btnSecondary svg, .btnDetails svg {
+  width: 100%;
+  margin: auto;
+  font-size: 0.9rem;
+}
+
+.btnPrimary {
+  background: var(--primary);
+  color: #fff;
+  flex: 1;
+}
+
+.btnPrimary:hover {
+  background: var(--primary-hover);
+  transform: translateY(-1px);
+}
+
+.btnSecondary,
+.btnLocation {
+  flex: 1;
+}
+
+.btnSecondary {
+  background: var(--secondary);
+  color: var(--text);
+}
+
+.btnSecondary:hover {
+  opacity: 0.9;
+}
+
+.btnLocation {
+  background: #e5e7eb;
+  color: var(--text);
+}
+
+.btnSecondary svg {
+  margin: 0;
+}
+
+.btnLocation:hover {
+  background: #d1d5db;
+}
+
+.btnDetails {
+  background: transparent;
+  border: 1px solid #7b4f2e;
+  color: #7b4f2e;
+  flex: 1;
+}
+
+.btnDetails:hover {
+  background: rgba(123, 79, 46, 0.08);
+}
+
+/* ===== Modal ===== */
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal {
+  background: #fff;
+  border-radius: var(--radius);
+  padding: 30px;
+  width: min(450px, 90%);
+  box-shadow: var(--shadow-md);
+  position: relative;
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modalHeader h3 {
+  border-bottom: 1px dashed #5a3820;
+  width: 100%;
+  padding-bottom: 5px;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  position: absolute;
+  top: 2%;
+  right: 2%;
+  transition: rotate 0.5s ease;
+}
+
+.closeBtn:hover {
+  color: #92400e;
+  rotate: 90deg;
+}
+
+.modalBody {
+  margin-top: 5px;
+}
+
+.modalBody p {
+  margin: 0 0 25px;
+  line-height: 1;
+}
+
+.modalBody p ul {
+  line-height: 2;
+  margin: 12px 0;
+}
+
+/* ===== Loading & Empty ===== */
+.loadingOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  animation: fadeInDelay 0.3s ease-in both;
+  animation-delay: 0.4s;
+}
+
+.emptyText {
+  font-size: clamp(14px, 3vw, 18px);
+  color: #888;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ===== Animations ===== */
+@keyframes fadeInDelay {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 640px) {
+  .page {
+    padding: 20px;
+  }
+
+  .header {
+    gap: 8px;
+  }
+
+  .pageTitle {
+    font-size: 1.5rem;
+  }
+
+  .actions button {
+    font-size: 0.85rem;
+    padding: 8px 10px;
+  }
+}

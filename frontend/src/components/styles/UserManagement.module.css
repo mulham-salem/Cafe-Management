@@ -12,8 +12,8 @@ html {
   height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
-  width: 100%;
-  max-width: 100%;
+  width: 92%;
+  max-width: 92%;
   max-height: 90vh;
   scroll-behavior: smooth;
 }
@@ -29,8 +29,7 @@ html {
   padding: clamp(6px, 0.7vw, 12px) clamp(8px, 0.7vw, 16px);
   font-size: clamp(12px, 1vw, 18px);
   border-radius: 10px;
-  margin-top: 4vh;
-  margin-bottom: 1.5vh;
+  margin: 50px 0 10px 0;
   cursor: pointer;
   display: flex;
   align-items: center;

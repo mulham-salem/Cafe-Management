@@ -1,5 +1,3 @@
-import React from "react";
-
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -37,6 +35,10 @@ import KitchenOrders from "./components/Employee/KitchenOrders";
 import TableManagement from "./components/Employee/TableManagement";
 import EmployeeNotification from "./components/Employee/EmployeeNotification";
 
+import DeliveryHome from "./components/DeliveryWorker/deliveryHome";
+import DeliveryOrder from "./components/DeliveryWorker/deliveryOrder";
+import DeliveryNotification from "./components/DeliveryWorker/DeliveryNotification";
+
 import ProtectedRoute from "./components/ProtectedRoute";
 import PermissionGuard from "./components/PermissionGuard";
 
@@ -47,10 +49,11 @@ import { PermissionsProvider } from "./context/PermissionsContext";
 function App() {
   return (
     <>
-      <ToastContainer theme="dark"/>
+      <ToastContainer theme="dark" />
       <Router>
         <Routes>
           <Route path="/login" element={<Login />} />
+
           <Route
             path="/change-password"
             element={
@@ -64,6 +67,7 @@ function App() {
             element={<ResetPasswordWizard />}
           />
 
+          {/* Manager Routes */}
           <Route
             path="/login/manager-dashboard"
             element={
@@ -99,6 +103,7 @@ function App() {
             />
           </Route>
 
+          {/* Supplier Routes */}
           <Route
             path="/login/supplier-home"
             element={
@@ -134,6 +139,7 @@ function App() {
             </Route>
           </Route>
 
+          {/* Customer Routes */}
           <Route
             path="/login/customer-home"
             element={
@@ -154,6 +160,7 @@ function App() {
             />
           </Route>
 
+          {/* Employee Routes */}
           <Route
             path="/login/employee-home"
             element={
@@ -240,6 +247,24 @@ function App() {
                 element={<ManagerNotification />}
               />
             </Route>
+          </Route>
+
+          {/* Delivery Routes */}
+          <Route
+            path="/login/delivery-home"
+            element={
+              // <ProtectedRoute>
+              <DeliveryHome />
+              // </ProtectedRoute>
+            }
+          >
+            <Route path="delivery-order" element={<DeliveryOrder />} />
+            <Route
+              path="delivery-notification"
+              element={<DeliveryNotification />}
+            />
+            <Route path="my-account" element={<MyAccount />} />
+            <Route path="message" element={<InternalMessage />} />
           </Route>
         </Routes>
       </Router>

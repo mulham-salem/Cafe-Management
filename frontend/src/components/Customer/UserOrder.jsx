@@ -31,6 +31,7 @@ import "simplebar-react/dist/simplebar.min.css";
 import InvoiceOverlay from "./InvoiceOverlay";
 import PaymentModal from "./PaymentModal";
 import RatingModal from "./RatingModal";
+import DeliveryLocation from "../DeliveryWorker/DeliveryLocation";
 
 const mockOrders = [
   {
@@ -269,9 +270,9 @@ const UserOrder = () => {
   const [open, setOpen] = useState(false);
   const [reason, setReason] = useState("");
   const [selectedOrderId, setSelectedOrderId] = useState(null);
-  const [trackingOrder, setTrackingOrder] = useState(null);
   const [showRatingModal, setShowRatingModal] = useState(false);
   const [currentOrderForRating, setCurrentOrderForRating] = useState(null);
+  const [showLocationModal, setShowLocationModal] = useState(false);
 
   const fetchOrders = async () => {
     try {
@@ -924,7 +925,7 @@ const UserOrder = () => {
                   <>
                     <button
                       className={styles.trackBtn}
-                      onClick={() => setTrackingOrder(order)}
+                      onClick={() => setShowLocationModal(true)}
                     >
                       <FontAwesomeIcon icon={faMapMarkedAlt} /> Track Delivery
                     </button>
@@ -1019,13 +1020,12 @@ const UserOrder = () => {
         order={currentOrderForRating}
       />
 
-      {trackingOrder &&
-        {
-          // <TrackingMap
-          //   order={trackingOrder}
-          //   onClose={() => setTrackingOrder(null)}
-          // />
-        }}
+      {showLocationModal && 
+      <DeliveryLocation
+        isOpen={showLocationModal}
+        onClose={() => setShowLocationModal(false)}
+        isEditable={false}
+      />}
     </div>
   );
 };

@@ -91,11 +91,12 @@
   color: var(--muted);
   outline: none;
   transition: box-shadow var(--transition-fast),
-    transform var(--transition-fast);
+    transform 0.4s ease;
 }
+
 .searchInput:focus {
   box-shadow: 0 6px 18px rgba(167, 100, 66, 0.12);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
   border: 2px solid rgba(107, 55, 31, 0.06);
 }
 
@@ -428,6 +429,7 @@
   gap: 8px;
   margin-bottom: 8px;
 }
+
 .subjectInput {
   width: 84%;
   padding: 9px 12px;
@@ -435,6 +437,7 @@
   border: 2px solid rgba(107, 55, 31, 0.06);
   outline: none;
   font-size: 14px;
+  transition: transform 0.4s ease;
 }
 
 .subjectInput:focus {
@@ -456,8 +459,8 @@
 }
 
 .textarea {
-  width: 95%;
-  min-height: 56px;
+  width: 99%;
+  min-height: 75px;
   resize: none;
   padding: 12px;
   border-radius: 12px;
@@ -465,8 +468,9 @@
   font-size: 15px;
   outline: none;
   transition: box-shadow var(--transition-fast),
-    transform var(--transition-fast);
+    transform 0.4s ease;
 }
+
 .textarea:focus {
   box-shadow: 0 12px 30px rgba(167, 100, 66, 0.08);
   transform: translateY(-2px);
@@ -481,14 +485,15 @@
   display: flex;
   gap: 8px;
 }
+
 .emojiToggle {
   position: absolute;
-  top: 24px;
+  top: 20px;
   right: 12px;
   transform: none;
   background: rgba(0, 0, 0, 0.04);
   border: none;
-  width: 36px;
+  width: 25px;
   height: 36px;
   border-radius: 10px;
   cursor: pointer;
@@ -497,6 +502,7 @@
   place-items: center;
   transition: background var(--transition-fast);
 }
+
 .emojiToggle:hover {
   background: rgba(255, 255, 255, 0.25);
 }
@@ -519,6 +525,7 @@
   align-items: center;
   gap: 8px;
 }
+
 .sendBtn {
   background: linear-gradient(90deg, var(--accent-dark), var(--accent-mid));
   color: #fff;
@@ -532,6 +539,7 @@
   transition: transform var(--transition-fast),
     box-shadow var(--transition-fast);
 }
+
 .sendBtn:hover {
   transform: translateY(-3px);
   box-shadow: 0 18px 48px rgba(107, 55, 31, 0.2);

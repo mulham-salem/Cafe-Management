@@ -3,7 +3,7 @@
   padding: clamp(10px, 2vw, 30px);
   min-height: 100vh;
   position: relative;
-  width: 100%;
+  width: 95%;
   box-sizing: border-box;
   margin: auto;
 }
@@ -203,7 +203,7 @@
   align-items: center;
   opacity: 0;
   animation: fadeInDelay 0.3s ease-in both;
-  animation-delay: 0.4s; 
+  animation-delay: 0.4s;
 }
 
 .emptyText {
@@ -216,7 +216,6 @@
   left: 50%;
   transform: translate(-50%, -50%);
 }
-
 
 .noResults {
   text-align: center;
@@ -232,13 +231,12 @@
   transform: translate(-50%, -50%);
 }
 
-
 @keyframes fadeInDelay {
   from {
     opacity: 0;
   }
   to {
-    opacity: 1; 
+    opacity: 1;
   }
 }
 
@@ -474,7 +472,7 @@
   font-weight: bold;
   cursor: pointer;
   position: relative;
-  left: clamp(225px ,81vw ,1245px);
+  left: clamp(230px, 76.7vw, 1260px);
   bottom: clamp(33px, 12vh, 95px);
   z-index: 10;
 }
@@ -491,15 +489,13 @@
   max-height: 81vh;
   overflow-y: auto;
 
-  position: absolute;
-  top: 40%;
-  left: 50%;
-  transform: translate(-50%, -40%);
-  width: 96%;
-  height: 60%;
+  display: flex;
+  flex-direction: column;
+  margin: 14vh auto;
+  width: 100%;
   box-sizing: border-box;
   animation: fadeInDelay 0.5s ease-in both;
-  animation-delay: 0.4s; 
+  animation-delay: 0.4s;
 }
 
 :global(.supplySection::-webkit-scrollbar) {
@@ -527,9 +523,10 @@
   border-radius: 20px;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   box-shadow: 0 10px 10px rgba(0, 0, 0, 0.3);
-  width: 80%;
-  height: 80%;
-  margin: auto;
+
+min-width: 0;
+min-height: 200px;
+
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -543,8 +540,7 @@
 
 @font-face {
   font-family: "Open-Sans";
-  src: url("Fonts/Open_Sans/static/OpenSans-Bold.ttf")
-    format("truetype");
+  src: url("Fonts/Open_Sans/static/OpenSans-Bold.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
 }
@@ -558,12 +554,12 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
+    flex: 1;
 }
 
 @font-face {
   font-family: "Jost";
-  src: url("Fonts/Jost/static/Jost-Light.ttf")
-    format("truetype");
+  src: url("Fonts/Jost/static/Jost-Light.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
 }
@@ -571,7 +567,6 @@
 .card p {
   font-family: "Jost";
   font-size: clamp(14px, 1.1vw, 18px);
-  flex-grow: 1;
   margin-top: auto;
   text-align: center;
   word-break: break-word;
@@ -584,7 +579,8 @@
   color: white;
   padding: clamp(8px, 0.6vw, 14px);
   border: none;
-  border-radius: 20px;
+  border-radius: 10px;
+  margin-top: 10px;
   cursor: pointer;
   font-size: clamp(12px, 0.9vw, 18px);
   font-weight: bold;
@@ -922,7 +918,7 @@
 }
 
 .requestTextArea {
-  width: 95%;
+  width: 100%;
   padding: clamp(10px, 1.5vw, 14px);
   font-size: clamp(14px, 2vw, 16px);
   border: 2px solid #d1d5db;
@@ -1180,7 +1176,6 @@
   border: 1px solid #f5c6cb;
 }
 
-
 :global(.purchaseBillsSection) {
   padding: 20px;
   animation: fadeIn 0.3s ease-in-out;
@@ -1243,13 +1238,14 @@
 }
 
 .billsTable {
-  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif;
   width: 100%;
   border-collapse: collapse;
   background-color: white;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
 }
 
 .billsTable th {
@@ -1268,7 +1264,6 @@
   text-align: center;
 }
 
-
 .billsTable tr:hover {
   background-color: #fdfcf6;
   transition: background-color 0.3s ease;
@@ -1279,7 +1274,7 @@
 }
 
 .billItemRowData {
-  font-family: 'Courier New', Courier, monospace;
+  font-family: "Courier New", Courier, monospace;
   font-size: 0.85rem;
   color: #555;
   padding: 2px 0;
@@ -1294,7 +1289,7 @@
 }
 
 .billTotalPrice {
-  font-family: 'Courier New', Courier, monospace;
+  font-family: "Courier New", Courier, monospace;
   font-weight: 600;
   color: #3a1c04;
 }
@@ -1312,7 +1307,7 @@
 }
 
 .billModalTitle {
-  font-size: clamp(18px, 4vw, 22px); 
+  font-size: clamp(18px, 4vw, 22px);
   font-weight: 700;
   color: #333;
   border-bottom: 2px solid #4e2214;
@@ -1361,7 +1356,7 @@
 }
 
 .sectionSubTitle {
-  font-size: clamp(15px, 3.5vw, 16px); 
+  font-size: clamp(15px, 3.5vw, 16px);
   font-weight: 700;
   margin-bottom: clamp(8px, 2vw, 12px);
   color: #444;
@@ -1370,7 +1365,7 @@
 }
 
 .billItemRow {
-  font-size: clamp(13px, 2.5vw, 14px); 
+  font-size: clamp(13px, 2.5vw, 14px);
   padding: clamp(4px, 1vw, 6px) 0;
   display: flex;
   justify-content: space-between;
@@ -1383,7 +1378,7 @@
 
 .totalPrice {
   margin-top: clamp(10px, 2.5vw, 15px); /* Responsive margin */
-  font-size: clamp(16px, 4vw, 18px); 
+  font-size: clamp(16px, 4vw, 18px);
   font-weight: 700;
   color: #212529;
   text-align: right;
@@ -1396,13 +1391,13 @@
   justify-content: center;
   align-items: center;
   gap: clamp(40px, 8vw, 125px); /* Responsive gap */
-  margin-top: clamp(15px, 3vw, 20px); 
+  margin-top: clamp(15px, 3vw, 20px);
 }
 
 .billSaveBtn {
   background-color: #4e2214;
   color: white;
-  padding: clamp(8px, 0.5vw, 12px) clamp(20px, 5vw, 30px); 
+  padding: clamp(8px, 0.5vw, 12px) clamp(20px, 5vw, 30px);
   border: none;
   border-radius: 10px;
   cursor: pointer;
@@ -1417,7 +1412,7 @@
 .billCancelBtn {
   background-color: #6c757d;
   color: white;
-  padding: clamp(8px, 0.5vw, 12px) clamp(20px, 5.5vw, 35px); 
+  padding: clamp(8px, 0.5vw, 12px) clamp(20px, 5.5vw, 35px);
   border: none;
   border-radius: 10px;
   cursor: pointer;
@@ -1542,8 +1537,12 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* ===== Empty State ===== */
@@ -1689,8 +1688,12 @@
 }
 
 @keyframes fadeInR {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .itemsSection h4,
@@ -1744,12 +1747,12 @@
 /* 🌐 MEDIA QUERIES */
 
 @media screen and (min-width: 7680px) {
-
   :global(.inventortSection) {
     max-height: 100vh;
     margin-top: 20px;
   }
-  .addBtn, .backBtn {
+  .addBtn,
+  .backBtn {
     margin-right: 480px;
   }
   .modalActions {
@@ -1778,12 +1781,12 @@
 }
 
 @media screen and (min-width: 5120px) and (max-width: 7679px) {
-
   :global(.inventortSection) {
     max-height: 95vh;
     margin-top: 20px;
   }
-  .addBtn, .backBtn {
+  .addBtn,
+  .backBtn {
     margin-right: 280px;
   }
   .modalActions {
@@ -1812,12 +1815,12 @@
 }
 
 @media screen and (min-width: 3840px) and (max-width: 5119px) {
-
   :global(.inventortSection) {
     max-height: 90vh;
     margin-top: 20px;
   }
-  .addBtn, .backBtn {
+  .addBtn,
+  .backBtn {
     margin-right: 170px;
   }
   .modalActions {
@@ -1835,7 +1838,7 @@
     width: 100%;
   }
 
-  :global(.supplyOfferSection){
+  :global(.supplyOfferSection) {
     max-height: 95vh;
   }
   :global(.supplyOfferHeader) {
@@ -1846,12 +1849,12 @@
 }
 
 @media screen and (min-width: 2560px) and (max-width: 3839px) {
-
   :global(.inventortSection) {
     max-height: 85vh;
     margin-top: 20px;
   }
-  .addBtn, .backBtn {
+  .addBtn,
+  .backBtn {
     margin-right: 70px;
   }
   .modalActions {
@@ -1874,7 +1877,7 @@
     width: 100%;
   }
 
-  :global(.supplyOfferSection){
+  :global(.supplyOfferSection) {
     max-height: 92.5vh;
   }
   :global(.supplyOfferHeader) {
@@ -1885,7 +1888,6 @@
 }
 
 @media screen and (min-width: 1600px) and (max-width: 2559px) {
-
   .backgroundContent h2 {
     font-size: clamp(1.6rem, 4vw, 3rem);
   }
@@ -1894,7 +1896,8 @@
     margin-top: 20px;
     max-height: 81.5vh;
   }
-  .addBtn, .backBtn {
+  .addBtn,
+  .backBtn {
     margin-right: 20px;
   }
   .modalActions {
@@ -1908,7 +1911,7 @@
     margin-top: 105px;
   }
 
-  :global(.supplyOfferSection){
+  :global(.supplyOfferSection) {
     max-height: 91.5vh;
   }
   :global(.supplyOfferHeader) {
@@ -1967,7 +1970,8 @@
     border-radius: 6px;
     margin: 0;
   }
-  .table th, .table td {
+  .table th,
+  .table td {
     font-size: 0.95rem;
     padding: 12px;
   }
@@ -1989,7 +1993,7 @@
   }
 
   .backBtn2 {
-    left: clamp(500px,  78vw, 1035px);
+    left: clamp(500px, 78vw, 1035px);
     bottom: clamp(45px, 11vh, 95px);
     padding: 6px;
   }
@@ -2007,7 +2011,7 @@
     padding: 8px 25px;
   }
 
-  :global(.supplyOfferSection){
+  :global(.supplyOfferSection) {
     max-height: 91vh;
   }
   :global(.supplyOfferHeader) {
@@ -2039,7 +2043,6 @@
 }
 
 @media screen and (min-height: 1000px) and (max-width: 1280px) {
-
   :global(.inventortSection) {
     max-height: 83vh;
     margin-top: 40px;
@@ -2065,12 +2068,12 @@
   }
 
   .backBtn2 {
-    left: clamp(500px ,75vw ,800px);
+    left: clamp(500px, 75vw, 800px);
     bottom: 40px;
     padding: 6px;
   }
 
-  :global(.supplyOfferSection){
+  :global(.supplyOfferSection) {
     max-height: 93vh;
   }
 }
@@ -2119,7 +2122,7 @@
     margin-top: 30px;
   }
   :global(.headerButtons) {
-    flex-direction: row; 
+    flex-direction: row;
     width: 30%;
     bottom: 30px;
     right: 0;
@@ -2150,7 +2153,8 @@
   .table::-webkit-scrollbar {
     display: none;
   }
-  .table th, .table td {
+  .table th,
+  .table td {
     padding: 10px;
     font-size: 14px;
     min-width: 140px;
@@ -2169,7 +2173,8 @@
     gap: 50px;
     margin-top: 24px;
   }
-  .saveBtn, .cancelBtn {
+  .saveBtn,
+  .cancelBtn {
     padding: 6px 6px;
     font-size: 13px;
     width: 30%;
@@ -2189,7 +2194,7 @@
     border-radius: 6px;
     width: 24%;
   }
-  .card h4{
+  .card h4 {
     margin-bottom: 0px;
   }
 
@@ -2224,7 +2229,7 @@
     gap: 120px;
   }
 
-  :global(.supplyOfferSection){
+  :global(.supplyOfferSection) {
     max-height: 93vh;
   }
   :global(.supplyOfferHeader) {
@@ -2253,7 +2258,8 @@
     display: block;
     text-align: center;
   }
-  .acceptBtn, .rejectBtn {
+  .acceptBtn,
+  .rejectBtn {
     font-size: 10px;
   }
   .statusBadge {
@@ -2276,11 +2282,11 @@
     width: 97%;
   }
   .billModalActions {
-    flex-direction: row; 
+    flex-direction: row;
   }
 }
 
-@media screen and (max-width: 540px){
+@media screen and (max-width: 540px) {
   .backgroundContent h2::after {
     width: 80%;
     bottom: 1%;
@@ -2324,7 +2330,7 @@
     padding: 2px 8px;
     border-radius: 6px;
   }
-  .card h4{
+  .card h4 {
     margin-bottom: 0px;
   }
 
@@ -2393,7 +2399,7 @@
     margin-top: 30px;
   }
   :global(.headerButtons) {
-    flex-direction: row; 
+    flex-direction: row;
     width: 25%;
     bottom: 30px;
     right: 0;
@@ -2427,7 +2433,8 @@
   .table::-webkit-scrollbar {
     display: none;
   }
-  .table th, .table td {
+  .table th,
+  .table td {
     padding: 8px;
     font-size: 13px;
     min-width: 120px;
@@ -2453,7 +2460,8 @@
     margin-bottom: 28px;
     font-size: 18px;
   }
-  .saveBtn, .cancelBtn {
+  .saveBtn,
+  .cancelBtn {
     padding: 6px 6px;
     font-size: 13px;
     width: 30%;
@@ -2518,7 +2526,7 @@
     justify-content: center;
   }
 
-  :global(.supplyOfferSection){
+  :global(.supplyOfferSection) {
     max-height: 93vh;
   }
   :global(.supplyOfferHeader) {
@@ -2565,7 +2573,8 @@
     display: block;
     text-align: center;
   }
-  .acceptBtn, .rejectBtn {
+  .acceptBtn,
+  .rejectBtn {
     font-size: 10px;
   }
   .statusBadge {
@@ -2627,7 +2636,6 @@
 }
 
 @media screen and (max-width: 480px) and (max-height: 500px) {
-
   .bcgOverlay {
     margin-top: 60px;
   }
@@ -2667,7 +2675,8 @@
     padding: 4px;
     border-radius: 8px;
   }
-  .saveBtn, .cancelBtn {
+  .saveBtn,
+  .cancelBtn {
     padding: 4px 4px;
     font-size: 12px;
     width: 28%;
@@ -2676,7 +2685,7 @@
 
   .modalContainer {
     margin-top: clamp(50px, 20vh, 80px);
-    min-height:clamp(200px, 82vh, 394px);
+    min-height: clamp(200px, 82vh, 394px);
   }
   .formActions {
     width: 100%;
@@ -2685,7 +2694,7 @@
     padding: 4px 14px;
   }
 
-  :global(.supplyOfferSection){
+  :global(.supplyOfferSection) {
     max-height: 90vh;
   }
   :global(.supplyOfferHeader) {

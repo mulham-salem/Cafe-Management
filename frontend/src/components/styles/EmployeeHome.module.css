@@ -369,6 +369,7 @@
     opacity: 0;
     transform: translate(40px, -40px) scale(1);
   }
+  
   to {
     opacity: 1;
     transform: translate(0, 0) scale(1);
@@ -380,6 +381,7 @@
     opacity: 1;
     transform: translate(0, 0) scale(1);
   }
+
   to {
     opacity: 0;
     transform: translate(40px, -40px) scale(0);
@@ -400,7 +402,7 @@
 }
 
 .sidebarWrapper :global(.edgeWrapper) {
-  top: 97px; /* عدّل حسب النّافبار */
+  top: 87px; /* عدّل حسب النّافبار */
 }
 
 .sidebarWrapper :global(.sidebar) {
@@ -409,6 +411,10 @@
 
 .sidebarWrapper :global(.arrowIcon) {
   color: white;
+}
+
+.sidebarWrapper :global(.footerNote) {
+  margin: auto 0 25px 0;
 }
 
 .outletContainer :global(.profilePage) {
@@ -422,7 +428,7 @@
 }
 
 .outletContainer :global(.center) {
-  height: 80vh;
+  height: 90vh;
 }
 
 .outletContainer :global(.cardContainer) {
@@ -431,11 +437,11 @@
 }
 
 .outletContainer :global(.profileCard) {
-  height: 71%;
+  height: 72%;
 }
 
 .outletContainer :global(.editSection) {
-  height: 74%;
+  height: 75%;
 }
 
 .outletContainer :global(.userContainer) {
@@ -488,6 +494,7 @@
 .outletContainer :global(.pageWrapper) {
   background-color: white;
   padding: 20px;
+  width: 100%;
 }
 
 .outletContainer :global(.backgroundFull) {

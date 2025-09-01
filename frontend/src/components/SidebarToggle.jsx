@@ -286,7 +286,7 @@ export default function SidebarToggle({
                 ))}
               </nav>
 
-              <div className={styles.footerNote}>
+              <div className="footerNote">
                 <small>Tip: hover the left edge to reveal the toggle.</small>
               </div>
             </motion.aside>

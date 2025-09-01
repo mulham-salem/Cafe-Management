@@ -10,7 +10,7 @@ html, body {
   height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
-  width: 100%;
+  width: 92%;
   background-color: white;
   max-height: 92vh;
 }
@@ -33,7 +33,7 @@ html, body {
   transition: background-color 0.4s;
   position: fixed;
   font-weight: bold;
-  left: 1325px;
+  left: 1305px;
   top: 90px;
   z-index: 999;
 }
@@ -172,7 +172,7 @@ html, body {
   width: 100%;
   max-width: 260px;
   min-height: 320px;
-  margin: 0 auto;
+  margin: 10px auto;
   animation: fadeInDown 0.8s ease-in;
   z-index: 999;
 }

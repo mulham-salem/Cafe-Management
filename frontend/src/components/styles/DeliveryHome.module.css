@@ -1,0 +1,350 @@
+/* container (no JS mount needed now) */
+.container {
+  --muted: #6b7280;
+  --card-radius: 20px;
+
+  min-height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, #f7fafc 0%, #eef4fb 100%);
+  color: #0f172a;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+}
+
+/* NAVBAR */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 28px;
+  background: #fff;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.06);
+}
+
+.logoSection {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.logo {
+  width: 45px;
+  height: 45px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+@font-face {
+  font-family: Playfair-Display;
+  src: url("Fonts/Playfair_Display/PlayfairDisplay-VariableFont_wght.ttf")
+    format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+.cafeName {
+  font-family: Playfair-Display, sans-serif;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #0f172a;
+}
+
+.rightSection {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.username {
+  font-weight: 500;
+  font-size: clamp(0.9rem, 1vw, 1rem);
+  position: relative;
+  cursor: pointer;
+  padding: clamp(6px, 0.8vw, 8px);
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+}
+
+.dropdown {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  min-width: fit-content;
+  width: auto;
+  margin-top: 2px;
+  border-radius: 8px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(-50%) translateY(0);
+  transition: all 0.3s ease;
+  z-index: 1000;
+  display: flex;
+  gap: 1px;
+  flex-direction: column;
+}
+
+.dropdownButton {
+  border: 1px solid #110e0c;
+  padding: clamp(6px, 0.5vw, 12px) clamp(2px, 0.25vw, 8px);
+  background-color: white;
+  color: #110e0c;
+  font-size: clamp(0.7rem, 0.4vw, 0.9rem);
+  cursor: pointer;
+  border-radius: 10px;
+  width: 100%;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 540;
+  line-height: 1.1;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.dropdownButton:hover {
+  transform: none;
+  transform: scale(1.08);
+  transition: transform 0.2s;
+  font-weight: bold;
+}
+
+.username:hover .dropdown {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+.bellIcon {
+  font-size: clamp(1.2rem, 1.5vw, 1.6rem);
+  margin-top: 6px;
+}
+
+.bellIcon:hover {
+  color: #d4b083;
+  transform: scale(1.2);
+  transition: transform 0.3s ease;
+}
+
+/* MAIN */
+.main {
+  max-height: 100vh;
+  overflow-y: auto;
+  box-sizing: border-box;
+  flex: 1;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-image: url("/public/delivery_worker.png");
+  background-size: cover;
+  background-position: center;
+}
+
+.main::-webkit-scrollbar {
+  display: none;
+}
+
+.main :global(.profilePage) {
+  padding: 9rem 0 0;
+  background: linear-gradient(180deg, #fdfcfa 0%, #fbfaf7 100%);
+}
+
+.main :global(.profileTitle) {
+  padding: 2rem 0 0;
+}
+
+.main :global(.cardContainer) {
+  padding-top: 0.5rem;
+}
+
+.main :global(.profileCard) {
+  height: 64%;
+}
+
+.main :global(.editSection) {
+  height: 82%;
+}
+
+.main :global(.avatarWrap) {
+  margin: 20px auto 0;
+  width: 170px;
+  height: 165px;
+}
+
+.main :global(.actionsRow) {
+  margin-top: 50px;
+}
+
+.main :global(.center) {
+  height: 50vh;
+}
+
+@font-face {
+  font-family: Poppins;
+  src: url("Fonts/Poppins/Poppins-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* CARDS */
+.cardsWrap {
+  display: flex;
+  gap: 10rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.card {
+  font-family: Poppins, sans-serif;
+  border-radius: var(--card-radius);
+  padding: 40px;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 240px;
+  max-width: 800px;
+  flex: 1;
+  box-shadow: 0 8px 28px rgba(2, 6, 23, 0.1);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
+  background-size: 200% 200%;
+  background-position: center;
+  overflow: hidden;
+  position: relative; /* ضروري للـ pseudo-element */
+  z-index: 1;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.9; /* شفافية عالية */
+  transition: opacity 0.4s ease;
+  z-index: -1; /* ضعه خلف المحتوى */
+}
+
+.card:hover {
+  transform: translateY(-8px) scale(1.015);
+  box-shadow: 0 16px 40px rgba(2, 6, 23, 0.18);
+  filter: brightness(1.05);
+}
+
+/* icons animation */
+.iconInteractive {
+  transition: transform 0.35s ease;
+  transition: all 0.3s ease;
+}
+
+.card:hover .iconInteractive {
+  transform: translateY(-4px) rotate(-4deg) scale(1.06);
+}
+
+.cardGreen::before {
+  background: linear-gradient(135deg, #5bb869 0%, #3a723f 100%);
+}
+
+.cardGray::before {
+  background: linear-gradient(135deg, #64748b 0%, #475569 100%);
+}
+
+.cardGreen:hover::before,
+.cardGray:hover::before {
+  opacity: 1; /* إزالة الشفافية عند الهوفر */
+}
+
+/* Card Head */
+.cardHead {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.cardIcon {
+  width: 50px;
+  height: 50px;
+  color: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.15);
+  padding: 10px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 5px;
+  backdrop-filter: blur(6px);
+}
+
+.cardTitle {
+  font-family: Poppins, sans-serif;
+  font-size: 1.5rem;
+  letter-spacing: -0.3px;
+  color: rgba(255, 255, 255, 1);
+}
+
+.cardText {
+  font-size: 1rem;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+/* Card Footer */
+.cardFoot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.cardMeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.metaIcon {
+  width: 16px;
+  height: 16px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.cardAction {
+  padding: 8px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: background 0.25s ease;
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.cardAction,
+.cardActionNeutral {
+  transition: all 0.2s ease;
+}
+
+.cardAction:hover {
+  background: rgba(255, 255, 255, 0.35);
+  color: white;
+}
+
+.cardActionNeutral {
+  background: rgba(0, 0, 0, 0.06);
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.cardActionNeutral:hover {
+  background: rgba(255, 255, 255, 0.28);
+  color: white;
+}

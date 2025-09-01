@@ -730,9 +730,9 @@ button {
   transform: translate(-50%, -50%);
 }
 
-/* .floatingIcon {
+.floatingIcon {
   animation: float 2s ease-in-out infinite;
-} */
+}
 
 @keyframes fadeInDelay {
   from {

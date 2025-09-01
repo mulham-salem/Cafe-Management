@@ -108,7 +108,6 @@
   gap: clamp(10px, 1vw, 20px);
 }
 
-
 .searchContainer {
   width: 220px;
   display: flex;

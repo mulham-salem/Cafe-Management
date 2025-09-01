@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, createContext } from "react";
+import { useState, useEffect, useMemo, createContext } from "react";
 import styles from "../styles/SupplierHome.module.css";
 import logo from "/logo_1.png";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";

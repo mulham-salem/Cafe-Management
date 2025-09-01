@@ -27,6 +27,10 @@ const mockProfile = {
   address: "Damascus",
   points_balance: 125.75,
   tier: "Gold",
+  transport: "Motorbike",
+  license: "SY-12345",
+  status: "Available",
+  rating: 4.8,
 };
 
 export default function MyAccount() {
@@ -40,6 +44,9 @@ export default function MyAccount() {
     phone_number: "",
     company_name: "",
     address: "",
+    transport: "",
+    license: "",
+    status: "",
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
@@ -79,6 +86,11 @@ export default function MyAccount() {
         address: data.address || "",
         points_balance: data.points_balance ?? 0,
         tier: data.tier ?? "Bronze",
+
+        transport: data.transport || "Motorbike",
+        license: data.license || "",
+        status: data.status || "Available",
+        rating: data.rating || 1.0,
       });
     } catch (err) {
       console.warn("Could not fetch profile, using mock:", err?.message || err);
@@ -94,6 +106,11 @@ export default function MyAccount() {
         phone_number: data.phone_number,
         company_name: data.company_name,
         address: data.address,
+
+        transport: data.transport,
+        license: data.license,
+        status: data.status,
+        rating: data.rating,
       });
     } finally {
       setLoading(false);
@@ -109,6 +126,9 @@ export default function MyAccount() {
     if (!form.phone_number.trim()) e.phone_number = "Phone number is required";
     if (!form.company_name.trim()) e.company_name = "Company name is required";
     if (!form.address.trim()) e.address = "Address is required";
+
+    if (!form.license.trim()) e.license = "license is required";
+
     if (form.username && form.username.length < 3)
       e.username = "Username must be at least 3 characters";
     if (!form.email.trim()) e.email = "Email is required";
@@ -209,6 +229,10 @@ export default function MyAccount() {
         phone_number: form.phone_number.trim() ?? "",
         company_name: form.company_name.trim() ?? "",
         address: form.address.trim() ?? "",
+
+        transport: form.transport.trim() ?? "",
+        status: form.status.trim() ?? "Available",
+        license: form.license.trim() ?? "",
       };
 
       // 3) update profile
@@ -229,6 +253,10 @@ export default function MyAccount() {
         phone_number: updated.phone_number || "",
         company_name: updated.company_name || "",
         address: updated.address || "",
+        transport: updated.transport || "Motorbike",
+        license: updated.license || "",
+        status: updated.status || "Available",
+        rating: updated.rating || 1.0,
       });
 
       // cleanup local file & preview
@@ -263,6 +291,10 @@ export default function MyAccount() {
       phone_number: profile.phone_number || "",
       company_name: profile.company_name || "",
       address: profile.address || "",
+
+      transport: profile.transport || "",
+      status: profile.status || "",
+      license: profile.license || "",
     });
     setErrors({});
     if (previewUrl) {
@@ -286,6 +318,7 @@ export default function MyAccount() {
 
   const supplierPath = location.pathname === "/login/supplier-home/my-account";
   const customerPath = location.pathname === "/login/customer-home/my-account";
+  const deliveryPath = location.pathname === "/login/delivery-home/my-account";
 
   return (
     <div className="profilePage">
@@ -494,6 +527,73 @@ export default function MyAccount() {
               </div>
             )}
 
+            {deliveryPath && (
+              <>
+                <div className={styles.row}>
+                  <label className={styles.label}>
+                    Transport
+                    <select
+                      name="transport"
+                      value={form.transport}
+                      onChange={handleChange}
+                      className={styles.input}
+                      disabled={saving}
+                    >
+                      <option value="">Select Transport</option>
+                      <option value="Motorbike">Motorbike</option>
+                      <option value="Bicycle">Bicycle</option>
+                      <option value="Car">Car</option>
+                      <option value="Van">Van</option>
+                    </select>
+                  </label>
+
+                  <label className={styles.label}>
+                    License
+                    <input
+                      name="license"
+                      value={form.license}
+                      onChange={handleChange}
+                      className={styles.input}
+                      placeholder="License"
+                      disabled={saving}
+                    />
+                    {errors.license && (
+                      <small className={styles.error}>{errors.license}</small>
+                    )}
+                  </label>
+                </div>
+
+                <div className={styles.row}>
+                  <label className={styles.label}>
+                    Status
+                    <select
+                      name="status"
+                      value={form.status}
+                      onChange={handleChange}
+                      className={styles.input}
+                      disabled={saving}
+                    >
+                      <option value="">Select Status</option>
+                      <option value="Available">Available</option>
+                      <option value="OnDelivery">OnDelivery</option>
+                      <option value="Inactive">Inactive</option>
+                    </select>
+                  </label>
+
+                  <label className={styles.label}>
+                    Rating
+                    <input
+                      name="rating"
+                      value={form.rating}
+                      className={styles.input}
+                      placeholder="Rating"
+                      disabled
+                    />
+                  </label>
+                </div>
+              </>
+            )}
+            
             {/* File input + preview - Redesigned with fixed alignment */}
             <div className={styles.imageUploadContainer}>
               <div className={styles.uploadColumn}>

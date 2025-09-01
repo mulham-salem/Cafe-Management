@@ -82,12 +82,14 @@ const ChangePassword = () => {
     <div className={styles.container}>
       <ToastContainer />
       <div className={styles.card}>
-        <img
-          src={logo}
-          alt="Cafe Delights Logo"
-          className={`${styles.logo} ${isTextVisible ? styles.fadeInUp : ""}`}
-        />
-        <h1 className={styles.name}>Cafe Delights</h1>
+        <div className={styles.cardHeader}>
+          <img
+            src={logo}
+            alt="Cafe Delights Logo"
+            className={`${styles.logo} ${isTextVisible ? styles.fadeInUp : ""}`}
+          />
+          <h1 className={styles.name}>Cafe Delights</h1>
+        </div>
         <h2 className={styles.title}>Keep Your Account Secure</h2>
 
         <form className={styles.form} onSubmit={handleSubmit}>
@@ -138,7 +140,7 @@ const ChangePassword = () => {
           </button>
 
           <div className={styles.backLink}>
-            <Link to={from}> {`← Back to home`} </Link>
+            <Link to={from}> {`← Back to my account`} </Link>
           </div>
         </form>
       </div>

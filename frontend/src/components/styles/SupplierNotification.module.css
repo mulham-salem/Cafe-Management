@@ -11,7 +11,7 @@
 }
 
 .pageTitle {
-  width: 90%;
+  width: 95%;
   margin: 15px auto;
   position: relative;
   bottom: clamp(10px, 2.5vh, 20px);
@@ -71,7 +71,7 @@
 }
 
 .card {
-  width: 85%;
+  width: 92%;
   margin: auto;
   display: flex;
   gap: clamp(10px, 3vw, 18px);

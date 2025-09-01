@@ -132,7 +132,6 @@ const InventorySupply = () => {
 
   useEffect(() => {
     if (role === "manager") {
-      changeTab(null);
       return;
     }
     const hasInventory = permissions.includes("Inventory Management");
@@ -176,8 +175,8 @@ const InventorySupply = () => {
       ? supplierContext
       : role === "employee"
       ? empContext
-      : "";
-  const { searchQuery, setSearchPlaceholder } = context;
+      : null;
+  const { searchQuery, setSearchPlaceholder } = context || {};
 
   const fetchInventory = async () => {
     try {
@@ -1037,6 +1036,7 @@ const InventorySupply = () => {
   }, [supplyHistory, searchQuery]);
 
   useEffect(() => {
+    if (!setSearchPlaceholder) return;
     if (activeTab === "inventory") {
       setSearchPlaceholder("Search by item or quantity..."); //inventory
     } else if (activeTab === "offers") {
