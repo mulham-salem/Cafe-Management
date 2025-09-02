@@ -17,6 +17,18 @@ const mockTables = [
   { id: 8, number: "T8", status: "cleaning", x: 200, y: 150, capacity: 4 },
   { id: 9, number: "T9", status: "reserved", x: 100, y: 150, capacity: 4 },
   { id: 10, number: "T10", status: "reserved", x: 250, y: 100, capacity: 4 },
+  { id: 11, number: "T11", status: "available", x: 200, y: 150, capacity: 4 },
+  { id: 12, number: "T12", status: "reserved", x: 250, y: 200, capacity: 4 },
+  { id: 13, number: "T13", status: "reserved", x: 200, y: 200, capacity: 4 },
+  { id: 14, number: "T14", status: "cleaning", x: 450, y: 300, capacity: 4 },
+  { id: 15, number: "T15", status: "available", x: 300, y: 250, capacity: 4 },
+  { id: 16, number: "T16", status: "available", x: 300, y: 100, capacity: 4 },
+  { id: 17, number: "T17", status: "available", x: 200, y: 100, capacity: 4 },
+  { id: 18, number: "T18", status: "available", x: 200, y: 150, capacity: 4 },
+  { id: 19, number: "T19", status: "available", x: 100, y: 150, capacity: 4 },
+  { id: 20, number: "T20", status: "available", x: 250, y: 100, capacity: 4 },
+  { id: 21, number: "T21", status: "available", x: 100, y: 150, capacity: 4 },
+  { id: 22, number: "T22", status: "available", x: 250, y: 100, capacity: 4 },
 ];
 
 const doors = [

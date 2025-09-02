@@ -354,20 +354,26 @@
 
 .outletContainer :global(.cardContainer) {
   width: 99%;
+  padding-top: 0;
 }
 
 .outletContainer :global(.profileCard) {
-  height: 69.6%;
+  height: 73.2%;
 }
 
 .outletContainer :global(.editSection) {
-  height: 71.7%;
+  height: 75.5%;
+}
+
+.outletContainer :global(.actionsRow) {
+  top: 10px;
+  gap: 0.5rem;
 }
 
 .outletContainer :global(.avatarWrap) {
   margin: 20px auto 0;
-  width: 155px;
-  height: 300px;
+  width: 170px;
+  height: 285px;
 }
 
 
@@ -376,6 +382,7 @@
     opacity: 0;
     transform: translateY(15px);
   }
+  
   to {
     opacity: 1;
     transform: translateY(0);

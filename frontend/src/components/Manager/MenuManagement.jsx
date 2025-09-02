@@ -156,14 +156,14 @@ const MenuManagement = () => {
 
   const fetchMenuItems = async () => {
     try {
-      // const response = await axiosInstance.get('/manager/menuitem');
-      // const formattedItems = response.data.map(item => ({
-      //   ...item,
-      //   category: item.category_name ? item.category_name.toLowerCase() : '',
-      //   image_url: item.image_url || '', 
-      // }));
-      // setMenuItems(formattedItems);
-      setMenuItems(mockMenu);
+      const response = await axiosInstance.get('/manager/menuitem');
+      const formattedItems = response.data.map(item => ({
+        ...item,
+        category: item.category_name ? item.category_name.toLowerCase() : '',
+        image_url: item.image_url || '', 
+      }));
+      setMenuItems(formattedItems);
+      // setMenuItems(mockMenu);
     } catch (error) {
       toast.error('Failed to load menu items. Please ensure you are logged in.');
     } finally {

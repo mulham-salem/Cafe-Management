@@ -279,7 +279,9 @@ const MenuAndOrder = () => {
   const [orderItems, setOrderItems] = useState([]);
   const [note, setNote] = useState("");
   const [showOverlay, setShowOverlay] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loadingMenu, setLoadingMenu] = useState(true);
+  const [loadingPromo, setLoadingPromo] = useState(true);
+  const [loadingBest, setLoadingBest] = useState(true);
   const [isScrolled, setIsScrolled] = useState(false);
   const containerRef = useRef(null);
   const [loadingFav, setLoadingFav] = useState(false);
@@ -311,45 +313,49 @@ const MenuAndOrder = () => {
   useEffect(() => {
     const fetchMenu = async () => {
       try {
-        // const response = await axios.get('/user/customer/menuitem');
-        // if (response.data.data) {
-        //   setMenu(response.data.data.map(item => ({
-        //     ...item,
-        //     id: item.id,
-        //     imageUrl: item.image,
-        //     category: item.category,
-        //     available: item.available,
-        //     isFavorite: item.isFavorite
-        //   })));
-        //   setFilteredMenu(response.data.data.map(item => ({
-        //     ...item,
-        //     id: item.id,
-        //     imageUrl: item.image,
-        //     category: item.category,
-        //     available: item.available,
-        //     isFavorite: item.isFavorite
-        //   })));
-        if (mockMenu) {
+        const response = await axios.get("/user/customer/menuitem");
+        if (response.data.data) {
           setMenu(
-            mockMenu.map((item) => ({
+            response.data.data.map((item) => ({
               ...item,
               id: item.id,
-              imageUrl: item.imageUrl,
+              imageUrl: item.image,
               category: item.category,
               available: item.available,
               isFavorite: item.isFavorite,
             }))
           );
           setFilteredMenu(
-            mockMenu.map((item) => ({
+            response.data.data.map((item) => ({
               ...item,
               id: item.id,
-              imageUrl: item.imageUrl,
+              imageUrl: item.image,
               category: item.category,
               available: item.available,
               isFavorite: item.isFavorite,
             }))
           );
+          // if (mockMenu) {
+          //   setMenu(
+          //     mockMenu.map((item) => ({
+          //       ...item,
+          //       id: item.id,
+          //       imageUrl: item.imageUrl,
+          //       category: item.category,
+          //       available: item.available,
+          //       isFavorite: item.isFavorite,
+          //     }))
+          //   );
+          //   setFilteredMenu(
+          //     mockMenu.map((item) => ({
+          //       ...item,
+          //       id: item.id,
+          //       imageUrl: item.imageUrl,
+          //       category: item.category,
+          //       available: item.available,
+          //       isFavorite: item.isFavorite,
+          //     }))
+          //   );
         } else {
           toast.info(response.data.message);
           setMenu([]);
@@ -361,7 +367,7 @@ const MenuAndOrder = () => {
         setMenu([]);
         setFilteredMenu([]);
       } finally {
-        setLoading(false);
+        setLoadingMenu(false);
       }
     };
     fetchMenu();
@@ -660,7 +666,7 @@ const MenuAndOrder = () => {
       setOffers(mockPromo);
       //toast.error("Failed to fetch promotions. Showing demo data.");
     } finally {
-      setLoading(false);
+      setLoadingPromo(false);
     }
   }
 
@@ -747,7 +753,7 @@ const MenuAndOrder = () => {
         console.error("Error fetching best sellers:", error);
         //toast.error("Error fetching best sellers data");
       } finally {
-        setLoading(false);
+        setLoadingBest(false);
       }
     };
 
@@ -1327,7 +1333,7 @@ const MenuAndOrder = () => {
           </div>
         )}
         <div className={styles.menuContent}>
-          {loading ? (
+          {loadingMenu ? (
             <div className={styles.loadingSpinner}></div>
           ) : filteredMenuItem.length === 0 ? (
             <div className={styles.emptyState}>
@@ -1448,7 +1454,7 @@ const MenuAndOrder = () => {
           </span>
           Active Promotions
         </h2>
-        {loading ? (
+        {loadingPromo ? (
           <div className={styles.loadingSpinner}></div>
         ) : offers.length === 0 ? (
           <div className={styles.emptyState}>
@@ -1544,7 +1550,7 @@ const MenuAndOrder = () => {
           Best-Selling Items
         </h2>
 
-        {loading ? (
+        {loadingBest ? (
           <div className={styles.loadingSpinner}></div>
         ) : bestSellers.length === 0 ? (
           <div className={styles.emptyState}>
