@@ -38,6 +38,7 @@ class SupplyManagementController extends Controller
                 'items' => $offer->supplyOfferItems->map(function ($item) {
                     $itemName = $item->inventoryItem->name ?? $item->name;
                     $itemUnit = $item->inventoryItem->unit ?? $item->unit;
+
                     return [
                         'item_name' => $itemName,
                         'quantity' => $item->quantity,
@@ -53,8 +54,6 @@ class SupplyManagementController extends Controller
 
     /**
      * Get a list of suppliers associated with the authenticated manager.
-     *
-     * @return JsonResponse
      */
     public function getSuppliers(): JsonResponse
     {
@@ -72,7 +71,7 @@ class SupplyManagementController extends Controller
     /**
      * Accept a pending supply offer.
      *
-     * @param int $id
+     * @param  int  $id
      * @return JsonResponse
      */
     public function acceptOffer($id)
@@ -102,8 +101,7 @@ class SupplyManagementController extends Controller
     /**
      * Reject a pending supply offer.
      *
-     * @param Request $request
-     * @param int $id
+     * @param  int  $id
      * @return JsonResponse
      */
     public function rejectOffer(Request $request, $id)
@@ -137,9 +135,6 @@ class SupplyManagementController extends Controller
 
     /**
      * Store a new supply request.
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function store(Request $request): JsonResponse
     {
@@ -198,7 +193,6 @@ class SupplyManagementController extends Controller
     /**
      * Store a new purchase bill and update inventory based on an accepted supply offer.
      *
-     * @param Request $request
      * @return JsonResponse
      */
     public function storePurchaseBill(Request $request)
@@ -267,10 +261,9 @@ class SupplyManagementController extends Controller
         ], 201);
     }
 
-
     public function show(string $id) {}
+
     public function update(Request $request, string $id) {}
+
     public function destroy(string $id) {}
 }
-
-

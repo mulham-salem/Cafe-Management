@@ -15,9 +15,9 @@ class Table extends Model
 {
     use HasFactory;
 
-    public function manager(): BelongsTo
+    public function employee(): BelongsTo
     {
-        return $this->belongsTo(Manager::class, 'manager_id');
+        return $this->belongsTo(Employee::class, 'employee_id');
     }
 
     public function reservations(): HasMany
@@ -25,5 +25,5 @@ class Table extends Model
         return $this->hasMany(Reservation::class, 'table_id');
     }
 
-    protected $fillable = ['number', 'capacity', 'manager_id', 'status'];
+    protected $fillable = ['number', 'capacity', 'employee_id', 'status'];
 }

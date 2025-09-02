@@ -9,13 +9,18 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('tables', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('manager_id');
-            $table->integer('number')->unique();
+            $table->id(); // bigint unsigned auto increment
+
+            $table->integer('number');
             $table->integer('capacity');
-            $table->string('status');
-            $table->timestamps();
-            $table->foreign('manager_id')->references('id')->on('managers')->onDelete('cascade');
+            $table->enum('status', ['available', 'reserved', 'cleaning'])->default('available');
+
+            $table->timestamps(); // created_at, updated_at
+
+            $table->foreignId('employee_id')
+                ->nullable()
+                ->constrained('employees') // أو 'users' إذا اعتمدنا الوراثة
+                ->nullOnDelete();
         });
     }
 

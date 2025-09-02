@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\Manager;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -13,12 +12,12 @@ class UsersTableSeeder extends Seeder
      */
     public function run(): void
     {
-        $managers = Manager::all();
+        User::factory()->count(10)->create();
 
-        for ($i = 0; $i < 9; $i++) {
-            User::factory()->create([
-                'manager_id' => $managers->random()->id,
-            ]);
-        }
+        // مثال على إنشاء مستخدمين نوع محدد
+        User::factory()->customer()->count(5)->create();
+        User::factory()->employee()->count(5)->create();
+        User::factory()->supplier()->count(3)->create();
+        User::factory()->deliveryWorker()->count(3)->create();
     }
 }

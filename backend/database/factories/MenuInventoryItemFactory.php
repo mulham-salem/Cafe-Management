@@ -2,24 +2,22 @@
 
 namespace Database\Factories;
 
+use App\Models\InventoryItem;
 use App\Models\MenuInventoryItem;
+use App\Models\MenuItem;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/**
- * @extends Factory<MenuInventoryItem>
- */
 class MenuInventoryItemFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
-    public function definition(): array
+    protected $model = MenuInventoryItem::class;
+
+    public function definition()
     {
         return [
-            'quantity_used' => $this->faker->randomFloat(2, 0.1, 5),
-            'unit' => $this->faker->randomElement(['kg', 'ml', 'pcs']),
+            'menuItem_id' => MenuItem::inRandomOrder()->first()->id,
+            'inventoryItem_id' => InventoryItem::inRandomOrder()->first()->id,
+            'quantity_used' => $this->faker->numberBetween(1, 10),
+            'unit' => $this->faker->randomElement(['kg', 'g', 'liter', 'ml', 'dozen', 'box', 'piece']),
         ];
     }
 }

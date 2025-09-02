@@ -4,24 +4,22 @@ namespace Database\Factories;
 
 use App\Models\Manager;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
-/**
- * @extends Factory<Manager>
- */
 class ManagerFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
+    protected $model = Manager::class;
+
     public function definition(): array
     {
         return [
-            'username' => $this->faker->userName(),
-            'password' => bcrypt('password'),
-            'name' => $this->faker->name(),
-            'email' => $this->faker->unique()->safeEmail(),
+            'username' => $this->faker->unique()->userName,
+            'password' => Hash::make('password123'), // كلمة سر افتراضية
+            'name' => $this->faker->name,
+            'email' => $this->faker->unique()->safeEmail,
+            'role' => 'Manager', // ثابت حسب الـ migration
+            'remember_token' => Str::random(10),
         ];
     }
 }

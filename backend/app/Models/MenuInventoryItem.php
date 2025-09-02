@@ -19,4 +19,11 @@ class MenuInventoryItem extends Model
     {
         return $this->belongsTo(MenuItem::class, 'menuItem_id');
     }
+
+    protected $fillable = [
+        'menuItem_id',
+        'inventoryItem_id',
+        'quantity_used',
+        'unit',
+    ];
 }

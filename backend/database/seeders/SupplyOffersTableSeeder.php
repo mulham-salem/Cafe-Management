@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\Supplier;
 use App\Models\SupplyOffer;
 use Illuminate\Database\Seeder;
 
@@ -13,10 +12,7 @@ class SupplyOffersTableSeeder extends Seeder
      */
     public function run(): void
     {
-        $suppliers = Supplier::all();
+        SupplyOffer::factory()->count(10)->create();
 
-        foreach ($suppliers as $supplier) {
-            SupplyOffer::factory(2)->create(['supplier_id' => $supplier->id]);
-        }
     }
 }

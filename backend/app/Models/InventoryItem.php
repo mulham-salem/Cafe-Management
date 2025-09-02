@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @method static inRandomOrder()
+ *
  * @property int $quantity
  * @property $threshold_level
  */
@@ -41,5 +42,5 @@ class InventoryItem extends Model
         return $this->hasMany(MenuInventoryItem::class, 'inventory_item_id');
     }
 
-    protected $fillable = ['name', 'quantity', 'unit', 'note', 'expiry_date', 'threshold_level', 'promotion_id', 'purchaseBill_id', 'manager_id'];
+    protected $fillable = ['name', 'quantity', 'unit', 'note', 'expiry_date', 'threshold_level', 'purchaseBill_id', 'manager_id'];
 }

@@ -15,7 +15,6 @@ class SupplierController extends Controller
     /**
      * Stores a new supply offer submitted by an authenticated supplier.
      *
-     * @param StoreSupplyOfferRequest $request
      * @return JsonResponse
      */
     public function store(StoreSupplyOfferRequest $request)
@@ -74,7 +73,6 @@ class SupplierController extends Controller
         }
     }
 
-
     /**
      * Retrieves all supply offers submitted by the authenticated supplier.
      *
@@ -113,6 +111,3 @@ class SupplierController extends Controller
         ]);
     }
 }
-
-
-

@@ -12,8 +12,6 @@ class NotificationManagementController extends Controller
 
     /**
      * Retrieves all notifications for the authenticated manager, categorized by purpose and sender.
-     *
-     * @return JsonResponse
      */
     public function getAllManagerNotifications(): JsonResponse
     {
@@ -40,7 +38,6 @@ class NotificationManagementController extends Controller
             ->with('user')
             ->get();
 
-
         $formatted = collect()
             ->merge($offerNotifications)
             ->merge($responseNotifications)
@@ -63,6 +60,7 @@ class NotificationManagementController extends Controller
                 } else {
                     $data['sent_by'] = 'Unknown';
                 }
+
                 return $data;
             });
 
@@ -75,8 +73,6 @@ class NotificationManagementController extends Controller
 
     /**
      * Retrieves all notifications for the authenticated supplier, categorized.
-     *
-     * @return JsonResponse
      */
     public function getAllSupplierNotifications(): JsonResponse
     {
@@ -98,9 +94,10 @@ class NotificationManagementController extends Controller
                     'purpose' => $notification->purpose,
                     'sent_by' => $notification->manager->name,
                 ];
+
                 return $data;
             })
-        ->toArray();
+            ->toArray();
 
         $supplyRequests = Notification::where('user_id', $supplier->id)
             ->where('sent_by', 'manager')
@@ -126,12 +123,12 @@ class NotificationManagementController extends Controller
                         ];
                     }),
                 ];
+
                 return $data;
             })
             ->toArray();
 
-
-        $allNotifications =collect(array_merge($offerResponses, $supplyRequests))
+        $allNotifications = collect(array_merge($offerResponses, $supplyRequests))
             ->sortByDesc('createdAt')
             ->values();
 
@@ -145,9 +142,7 @@ class NotificationManagementController extends Controller
     /**
      * Allows a supplier to respond to a supply request notification.
      *
-     * @param Request $request
-     * @param int $notificationId
-     * @return JsonResponse
+     * @param  int  $notificationId
      */
     public function respondToSupplyRequestNotification(Request $request, $notificationId): JsonResponse
     {
@@ -202,22 +197,19 @@ class NotificationManagementController extends Controller
 
     /**
      * Retrieves all notifications for the authenticated customer or employee.
-     *
-     * @return JsonResponse
      */
     public function getAllCustomerNotifications(): JsonResponse
     {
 
         $user = auth('user')->user();
 
-        if (!$user) {
+        if (! $user) {
             return response()->json(['message' => 'Unauthorized.'], 401);
         }
 
         $notifications = Notification::where('user_id', $user->id)
             ->orderBy('createdAt', 'desc')
             ->get();
-
 
         $formattedNotifications = $notifications->map(function ($notification) {
             return [
@@ -241,8 +233,7 @@ class NotificationManagementController extends Controller
     /**
      * Marks a specific notification as seen.
      *
-     * @param int $id
-     * @return JsonResponse
+     * @param  int  $id
      */
     public function markAsSeen($id): JsonResponse
     {
@@ -254,7 +245,3 @@ class NotificationManagementController extends Controller
         return response()->json(['message' => 'Notification marked as seen']);
     }
 }
-
-
-
-

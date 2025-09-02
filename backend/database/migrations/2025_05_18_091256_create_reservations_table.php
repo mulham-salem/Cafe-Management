@@ -10,14 +10,20 @@ return new class extends Migration
     {
         Schema::create('reservations', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('customer_id');
-            $table->unsignedBigInteger('table_id');
+
+            $table->foreignId('customer_id')
+                ->constrained('customers')
+                ->cascadeOnDelete();
+
+            $table->foreignId('table_id')
+                ->constrained('tables')
+                ->cascadeOnDelete();
+
             $table->dateTime('reservation_time');
             $table->integer('numberOfGuests');
-            $table->string('status');
+            $table->enum('status', ['Active', 'Inactive'])->default('Inactive');
+
             $table->timestamps();
-            $table->foreign('customer_id')->references('id')->on('customers')->onDelete('cascade');
-            $table->foreign('table_id')->references('id')->on('tables')->onDelete('cascade');
         });
     }
 

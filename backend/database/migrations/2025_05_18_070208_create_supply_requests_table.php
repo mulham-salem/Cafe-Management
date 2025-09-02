@@ -10,14 +10,13 @@ return new class extends Migration
     {
         Schema::create('supply_requests', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('manager_id');
+            $table->foreignId('manager_id')->constrained('managers')->onDelete('cascade');
             $table->string('title')->nullable();
             $table->dateTime('request_date');
             $table->text('note')->nullable();
-            $table->string('status');
-            $table->text('rejection_reason')->nullable();
+            $table->enum('status', ['pending', 'accepted', 'rejected'])->default('pending');
+            $table->string('reject_reason', 100)->nullable();
             $table->timestamps();
-            $table->foreign('manager_id')->references('id')->on('managers')->onDelete('cascade');
 
         });
     }

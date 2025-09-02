@@ -2,27 +2,27 @@
 
 namespace Database\Factories;
 
+use App\Models\Manager;
 use App\Models\Notification;
+use App\Models\SupplyRequest;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/**
- * @extends Factory<Notification>
- */
 class NotificationFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
-    public function definition(): array
+    protected $model = Notification::class;
+
+    public function definition()
     {
         return [
-            'purpose' => $this->faker->randomElement(['supply_offer', 'reservation_request', 'inventory_alert']),
-            'sent_by' => $this->faker->randomElement(['supplier', 'employee']),
-            'message' => $this->faker->sentence(),
-            'createdAt' => $this->faker->dateTime(),
-            'seen' => $this->faker->boolean(),
+            'user_id' => User::inRandomOrder()->first()?->id,
+            'manager_id' => Manager::inRandomOrder()->first()?->id,
+            'supplyRequest_id' => SupplyRequest::inRandomOrder()->first()?->id,
+            'sent_by' => $this->faker->name(),
+            'purpose' => $this->faker->sentence(3),
+            'message' => $this->faker->paragraph(),
+            'createdAt' => $this->faker->dateTimeBetween('-1 month', 'now'),
+            'seen' => $this->faker->boolean(50),
         ];
     }
 }

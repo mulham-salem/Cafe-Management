@@ -3,28 +3,27 @@
 namespace Database\Factories;
 
 use App\Models\Permission;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/**
- * @extends Factory<Permission>
- */
 class PermissionFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
-    public function definition(): array
+    protected $model = Permission::class;
+
+    public function definition()
     {
+        $users = User::all();
+
         return [
+            'user_id' => $users->isNotEmpty() ? $users->random()->id : null,
             'permission' => $this->faker->randomElement([
                 'User Management',
                 'Menu Management',
                 'Table Management',
-                'Inventory & Supply',
+                'Inventory Management',
+                'Supply Management',
                 'Promotion Management',
-                "Manager's Notifications",
+                'Report Dashboard',
                 'Default',
             ]),
         ];

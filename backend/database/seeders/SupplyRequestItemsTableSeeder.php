@@ -2,8 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\InventoryItem;
-use App\Models\SupplyRequest;
 use App\Models\SupplyRequestItem;
 use Illuminate\Database\Seeder;
 
@@ -14,14 +12,7 @@ class SupplyRequestItemsTableSeeder extends Seeder
      */
     public function run(): void
     {
-        $requests = SupplyRequest::all();
-        $inventoryItems = InventoryItem::all();
+        SupplyRequestItem::factory()->count(50)->create();
 
-        foreach ($requests as $request) {
-            SupplyRequestItem::factory(4)->create([
-                'supplyRequest_id' => $request->id,
-                'inventory_item_id' => $inventoryItems->random()->id,
-            ]);
-        }
     }
 }

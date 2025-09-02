@@ -42,15 +42,13 @@ class MenuManagementController extends Controller
 
     /**
      * Display a listing of menu items managed by the authenticated manager.
-     *
-     * @return JsonResponse
      */
     public function index(): JsonResponse
     {
         $managerId = auth('manager')->id();
 
         $menuItems = MenuItem::with('category:id,name')
-        ->where('manager_id', $managerId)
+            ->where('manager_id', $managerId)
             ->get();
 
         $formattedMenuItems = $menuItems->map(function ($item) {
@@ -70,9 +68,6 @@ class MenuManagementController extends Controller
 
     /**
      * Store a newly created menu item in storage.
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function store(Request $request): JsonResponse
     {
@@ -104,15 +99,14 @@ class MenuManagementController extends Controller
      * Display the specified menu item.
      *
      * @param  int  $id
-     * @return JsonResponse
      */
     public function show($id): JsonResponse
     {
         $menuItem = MenuItem::with('category')->find($id);
 
-        if (!$menuItem) {
+        if (! $menuItem) {
             return response()->json([
-                'message' => 'Menu item not found'
+                'message' => 'Menu item not found',
             ], 404);
         }
 
@@ -131,10 +125,6 @@ class MenuManagementController extends Controller
 
     /**
      * Update the specified menu item in storage.
-     *
-     * @param Request $request
-     * @param  string  $id
-     * @return JsonResponse
      */
     public function update(Request $request, string $id): JsonResponse
     {
@@ -166,25 +156,22 @@ class MenuManagementController extends Controller
 
     /**
      * Remove the specified menu item from storage.
-     *
-     * @param  string  $id
-     * @return JsonResponse
      */
     public function destroy(string $id): JsonResponse
     {
         $menuItem = MenuItem::findOrFail($id);
 
-         $activeOrders = DB::table('order_items')
-             ->join('orders', 'order_items.order_id', '=', 'orders.id')
-             ->where('order_items.menuItem_id', $id)
-             ->where('orders.status', '!=', 'delivered')
-             ->exists();
+        $activeOrders = DB::table('order_items')
+            ->join('orders', 'order_items.order_id', '=', 'orders.id')
+            ->where('order_items.menuItem_id', $id)
+            ->where('orders.status', '!=', 'delivered')
+            ->exists();
 
-         if ($activeOrders) {
-             return response()->json([
-                 'message' => 'Failed to remove item. Because this item used in an active order',
-             ], 403);
-         }
+        if ($activeOrders) {
+            return response()->json([
+                'message' => 'Failed to remove item. Because this item used in an active order',
+            ], 403);
+        }
 
         $menuItem->delete();
 

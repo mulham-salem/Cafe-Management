@@ -39,5 +39,15 @@ class MenuItem extends Model
         return $this->belongsTo(Promotion::class, 'promotion_id');
     }
 
+    public function favoriteItem(): HasMany
+    {
+        return $this->hasMany(FavoriteItem::class, 'menu_item_id');
+    }
+
+    public function promotionMenuItems(): HasMany
+    {
+        return $this->hasMany(PromotionMenuItem::class, 'menu_item_id');
+    }
+
     protected $fillable = ['name', 'description', 'price', 'category_id', 'manager_id', 'image_url', 'available'];
 }

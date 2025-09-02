@@ -17,11 +17,8 @@ class OrderManagementController extends Controller
 {
     /**
      * Fetches menu items, optionally filtered by category.
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
-    public function fetchMenuItems(Request $request): JsonResponse //1
+    public function fetchMenuItems(Request $request): JsonResponse // 1
     {
         $category = $request->query('category', 'all');
 
@@ -58,11 +55,8 @@ class OrderManagementController extends Controller
 
     /**
      * Creates a new order.
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
-    public function createOrder(Request $request): JsonResponse //2
+    public function createOrder(Request $request): JsonResponse // 2
     {
         $request->validate([
             'items' => 'required|array|min:1',
@@ -119,10 +113,8 @@ class OrderManagementController extends Controller
 
     /**
      * Retrieves orders for the authenticated customer or employee.
-     *
-     * @return JsonResponse
      */
-    public function getCustomerOrders(): JsonResponse //3
+    public function getCustomerOrders(): JsonResponse // 3
     {
         $user = auth('user')->user();
         $query = Order::with(['orderItems.menuItem', 'bill']);
@@ -154,15 +146,14 @@ class OrderManagementController extends Controller
     /**
      * Views the bill for a specific order.
      *
-     * @param int $orderId
-     * @return JsonResponse
+     * @param  int  $orderId
      */
-    public function viewOrderBill($orderId): JsonResponse //4
+    public function viewOrderBill($orderId): JsonResponse // 4
     {
         $user = auth('user')->user();
 
         $orderQuery = Order::with(['orderItems.menuItem', 'bill', 'customer.user', 'employee.user'])
-                    ->where('id', $orderId);
+            ->where('id', $orderId);
 
         if ($user->role === 'customer') {
             $customerId = optional($user->customer)->id;
@@ -191,11 +182,11 @@ class OrderManagementController extends Controller
             'message' => "Bill for order #{$order->id}",
             'username' => $username,
             'items' => $order->orderItems->map(function ($item) {
-            return [
-                'menu_item' => $item->menuItem->name,
-                'quantity' => $item->quantity,
-                'price' => $item->price,
-            ];
+                return [
+                    'menu_item' => $item->menuItem->name,
+                    'quantity' => $item->quantity,
+                    'price' => $item->price,
+                ];
             }),
             'total_price' => $order->bill->total_amount,
         ]);
@@ -204,11 +195,9 @@ class OrderManagementController extends Controller
     /**
      * Edits an existing order. Supports GET (to show edit interface) and PUT (to update order).
      *
-     * @param Request $request
-     * @param int $orderId
-     * @return JsonResponse
+     * @param  int  $orderId
      */
-    public function editOrder(Request $request, $orderId): JsonResponse //5
+    public function editOrder(Request $request, $orderId): JsonResponse // 5
     {
         $user = auth('user')->user();
         $column = $user->role === 'employee' ? 'employee_id' : 'customer_id';
@@ -313,10 +302,9 @@ class OrderManagementController extends Controller
     /**
      * Allows a user (customer or employee) to cancel a pending order.
      *
-     * @param int $id
-     * @return JsonResponse
+     * @param  int  $id
      */
-    public function cancelOrder($id): JsonResponse //6
+    public function cancelOrder($id): JsonResponse // 6
     {
         $user = auth('user')->user();
         $order = Order::with(['employee.user', 'customer.user'])->findOrFail($id);
@@ -347,10 +335,9 @@ class OrderManagementController extends Controller
     /**
      * Allows a user (customer or employee) to confirm a pending order.
      *
-     * @param int $id
-     * @return JsonResponse
+     * @param  int  $id
      */
-    public function confirmOrder($id): JsonResponse //7
+    public function confirmOrder($id): JsonResponse // 7
     {
         $user = auth('user')->user();
         $order = Order::with('orderItems.menuItem')->findOrFail($id);
@@ -385,11 +372,11 @@ class OrderManagementController extends Controller
 
             foreach ($order->orderItems as $item) {
                 $totalAmount += $item->quantity * $item->menuItem->price;
-                $notificationMessage .= "- {$item->menuItem->name} (Qty: {$item->quantity}, Price: $" . number_format($item->price, 2) . ")\n";
+                $notificationMessage .= "- {$item->menuItem->name} (Qty: {$item->quantity}, Price: $".number_format($item->price, 2).")\n";
             }
 
-            $notificationMessage .= "Total Amount: $" . number_format($totalAmount, 2);
-            $notificationMessage .= "\nNote: " . ($order->note ?? 'N/A');
+            $notificationMessage .= 'Total Amount: $'.number_format($totalAmount, 2);
+            $notificationMessage .= "\nNote: ".($order->note ?? 'N/A');
 
             $user = auth('user')->user();
 
@@ -423,15 +410,12 @@ class OrderManagementController extends Controller
         }
     }
 
-
-    //----------------------------------------------------Employee Only---------------------------------------------------//
+    // ----------------------------------------------------Employee Only---------------------------------------------------//
 
     /**
      * Allows an employee to update the status of an order.
      *
-     * @param Request $request
-     * @param int $orderId
-     * @return JsonResponse
+     * @param  int  $orderId
      */
     public function updateOrderStatus(Request $request, $orderId): JsonResponse
     {
@@ -484,13 +468,10 @@ class OrderManagementController extends Controller
         return response()->json([
             'error' => 'Invalid status transition.',
         ], 403);
-    } //8
+    } // 8
 
     /**
      * Searches for an order by its ID and optionally by status.
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function searchOrder(Request $request): JsonResponse
     {
@@ -498,9 +479,9 @@ class OrderManagementController extends Controller
         $statuses = $request->query('statuses');
 
         $query = Order::with('orderItems', 'customer', 'employee')
-              ->where('id', $orderId);
+            ->where('id', $orderId);
 
-        if($statuses) {
+        if ($statuses) {
             $statusesArray = explode(',', $statuses);
             $query->whereIn('status', $statusesArray);
         }
@@ -522,12 +503,10 @@ class OrderManagementController extends Controller
                 'item_count' => $order->orderItems->count(),
             ],
         ]);
-    } //9
+    } // 9
 
     /**
      * Retrieves orders intended for the kitchen display (confirmed, preparing, ready, delivered).
-     *
-     * @return JsonResponse
      */
     public function getKitchenOrders(): JsonResponse
     {
@@ -550,12 +529,10 @@ class OrderManagementController extends Controller
                 ];
             }),
         ]);
-    } //10
+    } // 10
 
     /**
      * Retrieves a short list of orders for the authenticated customer (ID and status only).
-     *
-     * @return JsonResponse
      */
     public function getCustomerOrdersShort(): JsonResponse
     {
@@ -570,5 +547,5 @@ class OrderManagementController extends Controller
             ->get(['id', 'status']);
 
         return response()->json(['orders' => $orders], 200);
-    } //11
+    } // 11
 }

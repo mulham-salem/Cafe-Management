@@ -28,8 +28,23 @@ class Customer extends Model
     {
         return $this->hasMany(Reservation::class, 'customer_id');
     }
+
+    public function complaint(): HasMany
+    {
+        return $this->hasMany(Complaint::class, 'customer_id');
+    }
+
+    public function favoriteItem(): HasMany
+    {
+        return $this->hasMany(FavoriteItem::class, 'customer_id');
+    }
+
+    public function loyalityAccount(): HasMany
+    {
+        return $this->hasMany(LoyalityAccount::class, 'customer_id');
+    }
+
     protected $fillable = [
-        'id',
         'phone_number',
         'address',
     ];

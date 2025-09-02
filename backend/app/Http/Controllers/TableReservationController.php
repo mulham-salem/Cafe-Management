@@ -18,8 +18,6 @@ class TableReservationController extends Controller
      * Display a listing of available tables.
      * This method corresponds to the filtering and display of available tables in the React component.
      *
-     * @param Request $request
-     * @return JsonResponse
      **/
     public function indexAvailableTables(Request $request): JsonResponse
     {
@@ -36,13 +34,12 @@ class TableReservationController extends Controller
      * Display a listing of the user's reservations.
      * This corresponds to the 'My Reservations' tab in the React component.
      *
-     * @return JsonResponse
      **/
     public function index(): JsonResponse
     {
         $customerId = auth('api')->id();
 
-        if (!$customerId) {
+        if (! $customerId) {
             return response()->json(['message' => 'Customer not authenticated.'], Response::HTTP_UNAUTHORIZED);
         }
 
@@ -57,8 +54,6 @@ class TableReservationController extends Controller
      * Store a newly created reservation in storage.
      * This method handles the 'Confirm Reservation' functionality.
      *
-     * @param Request $request
-     * @return JsonResponse
      * @throws Exception
      **/
     public function store(Request $request): JsonResponse
@@ -76,7 +71,6 @@ class TableReservationController extends Controller
 
         $reservationTime = new DateTime($validatedData['reservation_time']);
 
-
         $conflict = Reservation::where('table_id', $validatedData['table_id'])
             ->where('reservation_time', $reservationTime)
             ->where('status', 'active')
@@ -86,10 +80,9 @@ class TableReservationController extends Controller
             return response()->json(['message' => 'Selected table is not available at this time.'], Response::HTTP_CONFLICT);
         }
 
-
         $table = Table::find($validatedData['table_id']);
 
-        if (!$table || $table->status !== 'available' || $table->capacity < $validatedData['numberOfGuests']) {
+        if (! $table || $table->status !== 'available' || $table->capacity < $validatedData['numberOfGuests']) {
             return response()->json(['message' => 'Selected table is not suitable or available.'], Response::HTTP_BAD_REQUEST);
         }
 
@@ -103,16 +96,14 @@ class TableReservationController extends Controller
             'status' => 'active',
         ]);
 
-
         $table->status = 'reserved';
         $table->save();
-
 
         $tableNumber = $table->number;
 
         $notificationMessage = "Your reservation #{$reservation->id} has been confirmed.\n";
         $notificationMessage .= "Table: No#{$tableNumber}\n";
-        $notificationMessage .= "Time: " . $reservation->reservation_time->format('Y-m-d H:i') . "\n";
+        $notificationMessage .= 'Time: '.$reservation->reservation_time->format('Y-m-d H:i')."\n";
         $notificationMessage .= "Guests: {$reservation->numberOfGuests}";
 
         Notification::create([
@@ -123,6 +114,7 @@ class TableReservationController extends Controller
             'createdAt' => now(),
             'seen' => false,
         ]);
+
         return response()->json($reservation, Response::HTTP_CREATED);
     }
 
@@ -138,9 +130,6 @@ class TableReservationController extends Controller
      * Update the specified reservation in storage.
      * This method handles the 'Save Changes' functionality after editing.
      *
-     * @param Request $request
-     * @param string $id
-     * @return JsonResponse
      * @throws Exception
      **/
     public function update(Request $request, string $id): JsonResponse
@@ -157,10 +146,9 @@ class TableReservationController extends Controller
 
         $reservation = Reservation::find($id);
 
-        if (!$reservation) {
+        if (! $reservation) {
             return response()->json(['message' => 'Reservation not found.'], Response::HTTP_NOT_FOUND);
         }
-
 
         if ($reservation->table_id != $validatedData['table_id'] || $reservation->reservation_time != $validatedData['reservation_time']) {
             $conflict = Reservation::where('table_id', $validatedData['table_id'])
@@ -173,7 +161,6 @@ class TableReservationController extends Controller
                 return response()->json(['message' => 'Selected table is not available at this time.'], Response::HTTP_CONFLICT);
             }
 
-
             if ($reservation->table_id != $validatedData['table_id']) {
                 $oldTable = Table::find($reservation->table_id);
                 if ($oldTable) {
@@ -181,9 +168,8 @@ class TableReservationController extends Controller
                     $oldTable->save();
                 }
 
-
                 $newTable = Table::find($validatedData['table_id']);
-                if (!$newTable || $newTable->status !== 'available' && $newTable->id !== $reservation->table_id || $newTable->capacity < $validatedData['numberOfGuests']) {
+                if (! $newTable || $newTable->status !== 'available' && $newTable->id !== $reservation->table_id || $newTable->capacity < $validatedData['numberOfGuests']) {
                     return response()->json(['message' => 'New selected table is not suitable or available.'], Response::HTTP_BAD_REQUEST);
                 }
 
@@ -205,14 +191,12 @@ class TableReservationController extends Controller
      * Remove the specified reservation from storage.
      * This method handles the 'Cancel Reservation' functionality.
      *
-     * @param string $id
-     * @return JsonResponse
      **/
     public function destroy(string $id): JsonResponse
     {
         $reservation = Reservation::find($id);
 
-        if (!$reservation) {
+        if (! $reservation) {
             return response()->json(['message' => 'Reservation not found.'], Response::HTTP_NOT_FOUND);
         }
 

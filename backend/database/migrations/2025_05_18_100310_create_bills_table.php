@@ -9,13 +9,18 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('bills', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('order_id');
-            $table->float('total_amount');
-            $table->string('payment_method');
+            $table->id(); // bigint unsigned auto increment
+
+            $table->foreignId('order_id')
+                ->constrained('orders')
+                ->cascadeOnDelete();
+
+            $table->decimal('total_amount', 8, 2);
+            $table->enum('payment_method', ['Cash', 'Card', 'Online']);
             $table->dateTime('date_issued');
-            $table->timestamps();
-            $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
+            $table->decimal('used_loyalty_points', 8, 2)->default(0.00);
+
+            $table->timestamps(); // created_at, updated_at
         });
     }
 

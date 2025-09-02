@@ -10,16 +10,13 @@ return new class extends Migration
     {
         Schema::create('purchase_bills', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('manager_id');
-            $table->unsignedBigInteger('supply_offer_id');
-            $table->unsignedBigInteger('supplier_id');
-            $table->text('unit_price')->nullable();
-            $table->float('total_amount');
+            $table->foreignId('manager_id')->constrained('managers')->onDelete('cascade');
+            $table->foreignId('supply_offer_id')->constrained('supply_offers')->onDelete('cascade');
+            $table->foreignId('supplier_id')->constrained('suppliers')->onDelete('cascade');
+            $table->decimal('unit_price', 5, 2)->nullable();
+            $table->decimal('total_amount', 10, 2);
             $table->dateTime('purchase_date');
             $table->timestamps();
-            $table->foreign('manager_id')->references('id')->on('managers')->onDelete('cascade');
-            $table->foreign('supply_offer_id')->references('id')->on('supply_offers')->onDelete('cascade');
-            $table->foreign('supplier_id')->references('id')->on('suppliers')->onDelete('cascade');
 
         });
     }

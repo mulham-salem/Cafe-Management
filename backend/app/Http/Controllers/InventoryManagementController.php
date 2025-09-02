@@ -3,11 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\InventoryItem;
+use App\Models\Notification;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use App\Models\Notification;
-use Carbon\Carbon;
 
 class InventoryManagementController extends Controller
 {
@@ -22,15 +22,12 @@ class InventoryManagementController extends Controller
 
         $items = InventoryItem::where('manager_id', $managerId)->get();
 
-        return response()->json(['inventory_items' => $items,]);
+        return response()->json(['inventory_items' => $items]);
     }
 
     /**
      * Checks for low stock and creates a notification if necessary.
      * Returns the low stock message if a new notification was created, otherwise null.
-     *
-     * @param InventoryItem $item
-     * @return string|null
      */
     protected function checkAndCreateLowStockNotification(InventoryItem $item): ?string
     {
@@ -44,7 +41,7 @@ class InventoryManagementController extends Controller
                 ->where('seen', false)
                 ->first();
 
-            if (!$existingNotification) {
+            if (! $existingNotification) {
 
                 Notification::create([
                     'manager_id' => $managerId,
@@ -54,16 +51,18 @@ class InventoryManagementController extends Controller
                     'createdAt' => Carbon::now(),
                     'seen' => false,
                 ]);
+
                 return $message;
             }
         }
+
         return null;
     }
 
     /**
      * Display the specified inventory item for the authenticated manager.
      *
-     * @param int $id
+     * @param  int  $id
      * @return JsonResponse
      */
     public function show($id)
@@ -89,7 +88,6 @@ class InventoryManagementController extends Controller
     /**
      * Store a newly created inventory item in storage.
      *
-     * @param Request $request
      * @return JsonResponse
      */
     public function store(Request $request)
@@ -124,8 +122,7 @@ class InventoryManagementController extends Controller
     /**
      * Update the specified inventory item in storage.
      *
-     * @param Request $request
-     * @param int $id
+     * @param  int  $id
      * @return JsonResponse
      */
     public function update(Request $request, $id)
@@ -160,19 +157,19 @@ class InventoryManagementController extends Controller
     /**
      * Remove the specified inventory item from storage.
      *
-     * @param int $id
+     * @param  int  $id
      * @return JsonResponse
      */
     public function destroy($id)
     {
         $item = InventoryItem::where('manager_id', auth('manager')->id())->findOrFail($id);
 
-//        if ($item->menuInventoryItems()->count() > 0) {
-//            return response()->json([
-//                'status' => false,
-//                'message' => 'Cannot delete this item because it is linked to active menu items.',
-//            ], 403);
-//        }
+        //        if ($item->menuInventoryItems()->count() > 0) {
+        //            return response()->json([
+        //                'status' => false,
+        //                'message' => 'Cannot delete this item because it is linked to active menu items.',
+        //            ], 403);
+        //        }
 
         $item->delete();
 
@@ -182,4 +179,3 @@ class InventoryManagementController extends Controller
         ]);
     }
 }
-

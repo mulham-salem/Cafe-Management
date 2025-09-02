@@ -3,27 +3,13 @@
 namespace Database\Seeders;
 
 use App\Models\InventoryItem;
-use App\Models\Manager;
-use App\Models\PurchaseBill;
 use Illuminate\Database\Seeder;
 
 class InventoryItemsTableSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        $managers = Manager::all();
-        $purchaseBills = PurchaseBill::all();
-
-        foreach ($managers as $manager) {
-            for ($i = 0; $i < 4; $i++) {
-                InventoryItem::factory()->create([
-                    'manager_id' => $manager->id,
-                    'purchaseBill_id' => $purchaseBills->isNotEmpty() ? $purchaseBills->random()->id : null,
-                ]);
-            }
-        }
+        // إنشاء 20 عنصر مخزون عشوائي
+        InventoryItem::factory()->count(20)->create();
     }
 }

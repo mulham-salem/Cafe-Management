@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Reservation extends Model
 {
@@ -19,6 +20,12 @@ class Reservation extends Model
     {
         return $this->belongsTo(Table::class, 'table_id');
     }
+
+    public function complaint(): HasOne
+    {
+        return $this->hasOne(Complaint::class, 'reservation_id');
+    }
+
     protected $fillable = [
         'customer_id',
         'table_id',
@@ -26,5 +33,4 @@ class Reservation extends Model
         'numberOfGuests',
         'status',
     ];
-
 }

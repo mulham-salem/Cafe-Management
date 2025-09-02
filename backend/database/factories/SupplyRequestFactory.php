@@ -2,26 +2,25 @@
 
 namespace Database\Factories;
 
+use App\Models\Manager;
 use App\Models\SupplyRequest;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/**
- * @extends Factory<SupplyRequest>
- */
 class SupplyRequestFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
-    public function definition(): array
+    protected $model = SupplyRequest::class;
+
+    public function definition()
     {
+        $managers = Manager::all();
+
         return [
-            'title' => $this->faker->sentence(3),
-            'request_date' => $this->faker->dateTimeBetween('-1 week', 'now'),
-            'note' => $this->faker->optional()->text(),
+            'manager_id' => $managers->isNotEmpty() ? $managers->random()->id : null,
+            'title' => $this->faker->optional()->sentence(3),
+            'request_date' => $this->faker->dateTimeBetween('-1 month', 'now'),
+            'note' => $this->faker->optional()->paragraph(),
             'status' => $this->faker->randomElement(['pending', 'accepted', 'rejected']),
+            'reject_reason' => $this->faker->optional()->sentence(),
         ];
     }
 }

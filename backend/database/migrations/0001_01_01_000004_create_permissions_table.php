@@ -9,19 +9,24 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('permissions', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('user_id');
+            $table->id(); // bigint unsigned auto increment
+
+            $table->foreignId('user_id')
+                ->constrained('users')
+                ->cascadeOnDelete();
+
             $table->enum('permission', [
                 'User Management',
                 'Menu Management',
                 'Table Management',
-                'Inventory & Supply',
+                'Inventory Management',
+                'Supply Management',
                 'Promotion Management',
-                "Manager\'s Notifications",
+                'Report Dashboard',
                 'Default',
             ])->default('Default');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->timestamps();
+
+            $table->timestamps(); // created_at, updated_at
         });
     }
 

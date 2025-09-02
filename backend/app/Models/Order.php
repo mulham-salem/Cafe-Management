@@ -35,12 +35,30 @@ class Order extends Model
         return $this->hasMany(OrderItem::class, 'order_id');
     }
 
+    public function complaint(): HasOne
+    {
+        return $this->hasOne(Complaint::class, 'order_id');
+    }
+
+    public function deliveryOrder(): HasOne
+    {
+        return $this->hasOne(DeliveryOrder::class, 'order_id');
+    }
+
     protected $fillable = [
         'customer_id',
         'employee_id',
         'createdAt',
         'confirmedAt',
-        'note',
         'status',
+        'note',
+        'onHold',
+        'pickup_method',
+        'pickup_time',
+        'rating_score',
+        'rating_comment',
+        'used_loyalty_points',
+        'repreparation_request',
+        'repreparation_reason',
     ];
 }
