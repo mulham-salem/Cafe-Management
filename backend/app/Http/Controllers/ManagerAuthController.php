@@ -71,6 +71,7 @@ class ManagerAuthController extends Controller
     public function profile(Request $request): JsonResponse
     {
         $manager = $request->user('manager');
+
         return response()->json([
             'name' => $manager->name,
         ]);

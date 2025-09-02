@@ -15,8 +15,8 @@ return new class extends Migration
             $table->string('name')->nullable();
             $table->integer('quantity');
             $table->string('unit');
-            $table->float('unit_price');
-            $table->float('total_price');
+            $table->decimal('unit_price', 5, 2);
+            $table->decimal('total_price', 10, 2);
             $table->timestamps();
             $table->foreign('supply_offer_id')->references('id')->on('supply_offers')->onDelete('cascade');
             $table->foreign('inventory_item_id')->references('id')->on('inventory_items')->onDelete('cascade');

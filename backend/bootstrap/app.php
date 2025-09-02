@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\CheckPermission;
 use App\Http\Middleware\CheckUserRole;
 use App\Http\Middleware\IsManager;
 use App\Http\Middleware\RoleMiddleware;
@@ -19,6 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'isManager' => isManager::class,
             'checkUserRole' => CheckUserRole::class,
             'role' => RoleMiddleware::class,
+            'CheckPermission' => CheckPermission::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

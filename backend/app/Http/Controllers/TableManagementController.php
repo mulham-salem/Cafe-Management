@@ -11,21 +11,16 @@ class TableManagementController extends Controller
 {
     /**
      * Display a listing of all tables with their associated manager.
-     *
-     * @return JsonResponse
      */
     public function index(): JsonResponse
     {
-        $tables = Table::with('manager')->get();
+        $tables = Table::with('employee')->get();
 
         return response()->json(['tables' => $tables]);
     }
 
     /**
      * Store a newly created table in storage.
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function store(Request $request): JsonResponse
     {
@@ -45,7 +40,7 @@ class TableManagementController extends Controller
         }
 
         $data = $validator->validated();
-        $data['manager_id'] = auth('manager')->id();
+        $data['employee_id'] = auth('user')->id();
 
         $table = Table::create($data);
 
@@ -54,13 +49,10 @@ class TableManagementController extends Controller
 
     /**
      * Display the specified table with its associated manager.
-     *
-     * @param  string  $id
-     * @return JsonResponse
      */
     public function show(string $id): JsonResponse
     {
-        $table = Table::with('manager')->find($id);
+        $table = Table::with('employee')->find($id);
 
         if (! $table) {
             return response()->json(['message' => 'Table not found'], 404);
@@ -71,10 +63,6 @@ class TableManagementController extends Controller
 
     /**
      * Update the specified table's status in storage.
-     *
-     * @param Request $request
-     * @param  string  $id
-     * @return JsonResponse
      */
     public function update(Request $request, string $id): JsonResponse
     {
@@ -98,7 +86,7 @@ class TableManagementController extends Controller
             'cleaning' => ['available'],
         ];
 
-        if ( ! in_array($newStatus, $allowedTransitions[$currentStatus] ?? []) ) {
+        if (! in_array($newStatus, $allowedTransitions[$currentStatus] ?? [])) {
             return response()->json([
                 'message' => 'Invalid status transition.',
             ], 422);
@@ -106,7 +94,7 @@ class TableManagementController extends Controller
 
         if ($currentStatus === 'reserved' && $newStatus === 'cleaning' && ! $request->boolean('confirm')) {
             return response()->json([
-                'message' => 'This table is currently reserved.' //'Are you sure you want to update status?',
+                'message' => 'This table is currently reserved.', // 'Are you sure you want to update status?',
             ], 409);
         }
 
@@ -119,9 +107,7 @@ class TableManagementController extends Controller
     /**
      * Remove the specified table from storage.
      *
-     * @param Request $request
      * @param  mixed  $id
-     * @return JsonResponse
      */
     public function destroy(Request $request, $id): JsonResponse
     {

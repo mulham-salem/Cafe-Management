@@ -10,13 +10,11 @@ return new class extends Migration
     {
         Schema::create('menu_inventory_items', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('menuItem_id');
-            $table->unsignedBigInteger('inventoryItem_id');
-            $table->float('quantity_used');
-            $table->string('unit');
+            $table->foreignId('menuItem_id')->constrained('menu_items')->onDelete('cascade');
+            $table->foreignId('inventoryItem_id')->constrained('inventory_items')->onDelete('cascade');
+            $table->integer('quantity_used');
+            $table->enum('unit', ['kg', 'g', 'liter', 'ml', 'dozen', 'box', 'piece'])->default('kg');
             $table->timestamps();
-            $table->foreign('menuItem_id')->references('id')->on('menu_items')->onDelete('cascade');
-            $table->foreign('inventoryItem_id')->references('id')->on('inventory_items')->onDelete('cascade');
         });
     }
 

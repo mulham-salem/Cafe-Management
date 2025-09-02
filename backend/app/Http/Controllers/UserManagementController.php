@@ -17,8 +17,6 @@ class UserManagementController extends Controller
 {
     /**
      * Display a listing of users managed by the authenticated manager.
-     *
-     * @return JsonResponse
      */
     public function index(): JsonResponse
     {
@@ -43,9 +41,6 @@ class UserManagementController extends Controller
 
     /**
      * Store a newly created user in storage.
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function store(Request $request): JsonResponse
     {
@@ -111,9 +106,6 @@ class UserManagementController extends Controller
 
     /**
      * Display the specified user with their permissions.
-     *
-     * @param  string  $id
-     * @return JsonResponse
      */
     public function show(string $id): JsonResponse
     {
@@ -126,10 +118,6 @@ class UserManagementController extends Controller
 
     /**
      * Update the specified user's data and permissions in storage.
-     *
-     * @param Request $request
-     * @param  string  $id
-     * @return JsonResponse
      */
     public function update(Request $request, string $id): JsonResponse
     {
@@ -177,9 +165,6 @@ class UserManagementController extends Controller
 
     /**
      * Remove the specified user from storage.
-     *
-     * @param  string  $id
-     * @return JsonResponse
      */
     public function destroy(string $id): JsonResponse
     {

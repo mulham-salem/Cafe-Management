@@ -2,28 +2,25 @@
 
 namespace Database\Factories;
 
+use App\Models\Category;
+use App\Models\Manager;
 use App\Models\MenuItem;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/**
- * @extends Factory<MenuItem>
- */
 class MenuItemFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
-    public function definition(): array
+    protected $model = MenuItem::class;
+
+    public function definition()
     {
         return [
-            'promotion_id' => null,
+            'category_id' => Category::inRandomOrder()->first()->id,
+            'manager_id' => Manager::inRandomOrder()->first()->id,
             'name' => $this->faker->word(),
             'description' => $this->faker->sentence(),
-            'price' => $this->faker->randomFloat(2, 5, 50),
-            'image_url' => $this->faker->imageUrl(),
-            'available' => $this->faker->boolean(90),
+            'price' => $this->faker->randomFloat(2, 1, 100),
+            'image_url' => $this->faker->imageUrl(640, 480, 'food'),
+            'available' => $this->faker->boolean(80), // غالباً متاح
         ];
     }
 }

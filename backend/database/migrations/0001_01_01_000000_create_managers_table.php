@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('managers', function (Blueprint $table) {
-            $table->id();
+            $table->id()->primary();
             $table->string('username')->unique();
             $table->string('password');
             $table->string('name')->nullable();
@@ -17,6 +17,7 @@ return new class extends Migration
             $table->enum('role', ['Manager'])->default('Manager');
             $table->rememberToken();
             $table->timestamps();
+
         });
     }
 

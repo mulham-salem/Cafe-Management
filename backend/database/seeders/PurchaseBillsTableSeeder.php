@@ -2,10 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Manager;
 use App\Models\PurchaseBill;
-use App\Models\Supplier;
-use App\Models\SupplyOffer;
 use Illuminate\Database\Seeder;
 
 class PurchaseBillsTableSeeder extends Seeder
@@ -15,16 +12,6 @@ class PurchaseBillsTableSeeder extends Seeder
      */
     public function run(): void
     {
-        $supplyOffers = SupplyOffer::all();
-        $managers = Manager::all();
-        $suppliers = Supplier::all();
-
-        foreach ($supplyOffers as $offer) {
-            PurchaseBill::factory()->create([
-                'supply_offer_id' => $offer->id,
-                'manager_id' => $managers->random()->id,
-                'supplier_id' => $suppliers->random()->id,
-            ]);
-        }
+        PurchaseBill::factory()->count(20)->create();
     }
 }

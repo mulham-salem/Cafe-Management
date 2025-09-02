@@ -1,9 +1,0 @@
-$user = new \App\Models\User;
-$user->manager_id = 3;
-$user->name = 'SupplierAdnan';
-$user->username = 'SupplierAdnan';
-$user->email = 'supplierA@example.com';
-$user->password = bcrypt('mcadnan2003');
-$user->role = 'supplier';
-$user->remember_token = \Illuminate\Support\Str::random(60);
-$user->save();

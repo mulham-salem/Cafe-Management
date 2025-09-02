@@ -9,14 +9,20 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('order_items', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('order_id');
-            $table->unsignedBigInteger('menuItem_id');
+            $table->id(); // bigint unsigned auto increment
+
+            $table->foreignId('order_id')
+                ->constrained('orders')
+                ->cascadeOnDelete();
+
+            $table->foreignId('menuItem_id')
+                ->constrained('menu_items')
+                ->cascadeOnDelete();
+            $table->string('item_name'); // varchar(255)
             $table->integer('quantity');
-            $table->float('price');
-            $table->timestamps();
-            $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
-            $table->foreign('menuItem_id')->references('id')->on('menu_items')->onDelete('cascade');
+            $table->decimal('price', 5, 2);
+
+            $table->timestamps(); // created_at, updated_at
         });
     }
 

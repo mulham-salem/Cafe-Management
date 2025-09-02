@@ -2,8 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\MenuItem;
-use App\Models\Order;
 use App\Models\OrderItem;
 use Illuminate\Database\Seeder;
 
@@ -14,14 +12,6 @@ class OrderItemsTableSeeder extends Seeder
      */
     public function run(): void
     {
-        $orders = Order::all();
-        $menuItems = MenuItem::all();
-
-        foreach ($orders as $order) {
-            OrderItem::factory(4)->create([
-                'order_id' => $order->id,
-                'menuItem_id' => $menuItems->random()->id,
-            ]);
-        }
+        OrderItem::factory()->count(30)->create();
     }
 }

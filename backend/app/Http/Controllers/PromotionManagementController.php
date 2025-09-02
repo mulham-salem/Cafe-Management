@@ -11,8 +11,6 @@ class PromotionManagementController extends Controller
 {
     /**
      * Display a listing of promotions managed by the authenticated manager.
-     *
-     * @return JsonResponse
      */
     public function index(): JsonResponse
     {
@@ -39,9 +37,6 @@ class PromotionManagementController extends Controller
 
     /**
      * Store a newly created promotion in storage.
-     *
-     * @param PromotionRequest $request
-     * @return JsonResponse
      */
     public function store(PromotionRequest $request): JsonResponse
     {
@@ -73,9 +68,6 @@ class PromotionManagementController extends Controller
 
     /**
      * Display the specified promotion.
-     *
-     * @param  string  $id
-     * @return JsonResponse
      */
     public function show(string $id): JsonResponse
     {
@@ -98,9 +90,7 @@ class PromotionManagementController extends Controller
     /**
      * Update the specified promotion in storage.
      *
-     * @param PromotionRequest $request
      * @param  mixed  $id
-     * @return JsonResponse
      */
     public function update(PromotionRequest $request, $id): JsonResponse
     {
@@ -135,9 +125,6 @@ class PromotionManagementController extends Controller
 
     /**
      * Remove the specified promotion from storage.
-     *
-     * @param  string  $id
-     * @return JsonResponse
      */
     public function destroy(string $id): JsonResponse
     {

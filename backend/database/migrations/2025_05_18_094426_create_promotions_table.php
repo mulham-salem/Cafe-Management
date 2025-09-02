@@ -10,14 +10,13 @@ return new class extends Migration
     {
         Schema::create('promotions', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('manager_id');
+            $table->foreignId('manager_id')->constrained('managers')->onDelete('cascade');
             $table->string('title');
-            $table->float('discount_percentage');
+            $table->decimal('discount_percentage', 5, 2);
             $table->dateTime('start_date');
             $table->dateTime('end_date');
             $table->text('description')->nullable();
             $table->timestamps();
-            $table->foreign('manager_id')->references('id')->on('managers')->onDelete('cascade');
         });
     }
 

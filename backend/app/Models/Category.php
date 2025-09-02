@@ -17,4 +17,6 @@ class Category extends Model
     {
         return $this->hasMany(MenuItem::class, 'category_id');
     }
+
+    protected $fillable = ['name'];
 }

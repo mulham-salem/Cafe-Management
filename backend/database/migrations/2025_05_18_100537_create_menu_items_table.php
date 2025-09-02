@@ -10,18 +10,14 @@ return new class extends Migration
     {
         Schema::create('menu_items', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('category_id');
-            $table->unsignedBigInteger('manager_id');
-            $table->unsignedBigInteger('promotion_id')->nullable();
+            $table->foreignId('category_id')->constrained('categories')->onDelete('cascade');
+            $table->foreignId('manager_id')->constrained('managers')->onDelete('cascade');
             $table->string('name');
             $table->text('description')->nullable();
-            $table->float('price');
-            $table->string('image_url')->nullable();
+            $table->double('price');
+            $table->string('image_url', 2083)->nullable();
             $table->boolean('available')->default(true);
             $table->timestamps();
-            $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
-            $table->foreign('manager_id')->references('id')->on('managers')->onDelete('cascade');
-            $table->foreign('promotion_id')->references('id')->on('promotions')->onDelete('cascade');
 
         });
     }

@@ -19,9 +19,14 @@ class Manager extends Authenticatable
         return $this->hasMany(User::class, 'manager_id');
     }
 
-    public function tables(): HasMany
+    public function finanicalReport(): HasMany
     {
-        return $this->hasMany(Table::class, 'manager_id');
+        return $this->hasMany(FinanicalReport::class, 'manager_id');
+    }
+
+    public function salesReport(): HasMany
+    {
+        return $this->hasMany(SalesReport::class, 'manager_id');
     }
 
     public function menuItems(): HasMany
@@ -60,6 +65,7 @@ class Manager extends Authenticatable
             $manager->role = 'Manager';
         });
     }
+
     protected $fillable = ['name', 'username', 'email', 'password', 'remember_token'];
 
     protected $hidden = ['password', 'remember_token'];

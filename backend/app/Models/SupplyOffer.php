@@ -30,6 +30,11 @@ class SupplyOffer extends Model
         return $this->hasMany(SupplyOfferItem::class, 'supply_offer_id');
     }
 
+    public function supplyHistory(): HasOne
+    {
+        return $this->hasOne(SupplyHistory::class, 'supply_offer_id');
+    }
+
     protected function casts(): array
     {
         return [

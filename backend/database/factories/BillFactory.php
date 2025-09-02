@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Bill;
+use App\Models\Order;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -18,9 +19,11 @@ class BillFactory extends Factory
     public function definition(): array
     {
         return [
-            'total_amount' => $this->faker->randomFloat(2, 50, 1000),
-            'payment_method' => $this->faker->randomElement(['cash', 'credit card', 'QR Code']),
-            'date_issued' => $this->faker->dateTimeBetween('now', '+1 day'),
+            'order_id' => Order::factory(),
+            'total_amount' => $this->faker->randomFloat(2, 10, 500),
+            'payment_method' => $this->faker->randomElement(['Cash', 'Card', 'Online']),
+            'date_issued' => $this->faker->dateTimeThisYear(),
+            'used_loyalty_points' => $this->faker->randomFloat(2, 0, 100),
         ];
     }
 }

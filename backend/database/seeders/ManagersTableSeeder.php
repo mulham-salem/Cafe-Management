@@ -12,6 +12,15 @@ class ManagersTableSeeder extends Seeder
      */
     public function run(): void
     {
-        Manager::factory(2)->create();
+        Manager::create([
+            'username' => 'admin',
+            'password' => bcrypt('admin123'), // كلمة سر مشفرة
+            'name' => 'System Admin',
+            'email' => 'admin@example.com',
+            'role' => 'Manager',
+        ]);
+
+        // إنشاء مدراء عشوائيين عبر الـ factory
+        Manager::factory(5)->create();
     }
 }

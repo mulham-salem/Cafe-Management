@@ -10,17 +10,15 @@ return new class extends Migration
     {
         Schema::create('inventory_items', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('manager_id');
-            $table->unsignedBigInteger('purchaseBill_id')->nullable();
-            $table->string('name');
+            $table->foreignId('manager_id')->constrained('managers')->onDelete('cascade');
+            $table->foreignId('purchaseBill_id')->nullable()->constrained('purchase_bills')->onDelete('cascade');
+            $table->string('name', 50);
             $table->integer('quantity');
-            $table->string('unit')->nullable();
-            $table->string('note')->nullable();
-            $table->integer('threshold_level')->nullable();
-            $table->date('expiry_date')->nullable();
+            $table->enum('unit', ['kg', 'g', 'liter', 'ml', 'dozen', 'box', 'piece'])->default('kg');
+            $table->string('note', 255)->nullable();
+            $table->integer('threshold_level');
+            $table->date('expiry_date');
             $table->timestamps();
-            $table->foreign('manager_id')->references('id')->on('managers')->onDelete('cascade');
-            $table->foreign('purchaseBill_id')->references('id')->on('purchase_bills')->onDelete('cascade');
         });
     }
 

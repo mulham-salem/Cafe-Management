@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\Manager;
 use App\Models\Table;
 use Illuminate\Database\Seeder;
 
@@ -13,12 +12,7 @@ class TablesTableSeeder extends Seeder
      */
     public function run(): void
     {
-        $managers = Manager::all();
+        Table::factory()->count(20)->create();
 
-        foreach ($managers as $manager) {
-            Table::factory(2)->create([
-                'manager_id' => $manager->id,
-            ]);
-        }
     }
 }

@@ -14,8 +14,10 @@ use Laravel\Sanctum\HasApiTokens;
  * @method static whereDoesntHave(string $string)
  * @method static where(string $string, mixed $username)
  * @method static whereIn(string $string, string[] $array)
+ *
  * @property $role
  * @property $id
+ * @property \Illuminate\Database\Eloquent\Collection|\App\Models\Permission[] $permissions
  */
 class User extends Authenticatable
 {
@@ -29,6 +31,11 @@ class User extends Authenticatable
     public function customer(): HasOne
     {
         return $this->hasOne(Customer::class, 'id', 'id');
+    }
+
+    public function deliveryWorker(): HasOne
+    {
+        return $this->hasOne(DeliveryWorker::class, 'id', 'id');
     }
 
     public function supplier(): HasOne
@@ -51,6 +58,16 @@ class User extends Authenticatable
         return $this->hasMany(Permission::class, 'user_id');
     }
 
+    public function userSender(): HasMany
+    {
+        return $this->hasMany(InternalMessage::class, 'sender_id');
+    }
+
+    public function userReceiver(): HasMany
+    {
+        return $this->hasMany(InternalMessage::class, 'receiver_id');
+    }
+
     protected static function booted(): void
     {
         static::created(function ($user) {
@@ -65,7 +82,17 @@ class User extends Authenticatable
         });
     }
 
-    protected $fillable = ['name', 'username', 'email', 'password', 'role', 'manager_id'];
+    protected $fillable = [
+        'manager_id',
+        'name',
+        'username',
+        'email',
+        'password',
+        'role',
+        'first_name',
+        'last_name',
+        'image_url',
+    ];
 
     protected $hidden = ['password', 'remember_token'];
 

@@ -1,8 +1,0 @@
-php artisan tinker
-$manager1 = new \App\Models\Manager;
-$manager1->name = 'Mulham';
-$manager1->username = 'ManagerMulham';
-$manager1->email = 'adminM@example.com';
-$manager1->password = bcrypt('00000000');
-$manager1->remember_token = \Illuminate\Support\Str::random(60);
-$manager1->save();

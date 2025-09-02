@@ -13,8 +13,7 @@ class IsManager
     /**
      * Handle an incoming request.
      *
-     * @param Request $request
-     * @param Closure(Request): (Response) $next
+     * @param  Closure(Request): (Response)  $next
      * @return JsonResponse|mixed|Response
      */
     public function handle(Request $request, Closure $next): mixed

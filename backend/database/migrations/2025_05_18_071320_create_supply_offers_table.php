@@ -10,15 +10,14 @@ return new class extends Migration
     {
         Schema::create('supply_offers', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('supplier_id');
+            $table->foreignId('supplier_id')->constrained('suppliers')->onDelete('cascade');
             $table->string('title');
-            $table->float('total_price');
+            $table->decimal('total_price', 10, 2);
             $table->dateTime('delivery_date');
             $table->text('note')->nullable();
-            $table->string('status');
-            $table->text('rejection_reason')->nullable();
+            $table->enum('status', ['pending', 'accepted', 'rejected'])->default('pending');
+            $table->string('reject_reason', 100)->nullable();
             $table->timestamps();
-            $table->foreign('supplier_id')->references('id')->on('suppliers')->onDelete('cascade');
         });
     }
 
