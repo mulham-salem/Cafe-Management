@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @method static inRandomOrder()
+ * @mixin IdeHelperCategory
  */
 class Category extends Model
 {

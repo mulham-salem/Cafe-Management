@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @method static inRandomOrder()
+ * @mixin IdeHelperPurchaseBill
  */
 class PurchaseBill extends Model
 {

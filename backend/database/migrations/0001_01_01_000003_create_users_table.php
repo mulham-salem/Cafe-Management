@@ -15,7 +15,7 @@ return new class extends Migration
                 ->constrained('managers')
                 ->cascadeOnDelete(); // FK -> managers.id
 
-            $table->string('name', 255);
+            $table->string('full_name', 255);
             $table->string('username', 50);
             $table->string('email', 255)->unique();
             $table->string('password', 255);

@@ -25,6 +25,8 @@ return new class extends Migration
             $table->string('receiver_name', 50);
             $table->dateTime('sent_at');
             $table->dateTime('read_at')->nullable();
+            $table->boolean('unread')->default(true);
+
             $table->timestamps();
         });
     }

@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 /**
  * @method static inRandomOrder()
  * @method static where(string $string, string $string1)
+ * @mixin IdeHelperTable
  */
 class Table extends Model
 {

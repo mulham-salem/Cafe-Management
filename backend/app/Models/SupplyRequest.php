@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * @method static inRandomOrder()
+ * @mixin IdeHelperSupplyRequest
  */
 class SupplyRequest extends Model
 {

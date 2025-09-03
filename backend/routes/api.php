@@ -4,6 +4,7 @@ use App\Http\Controllers\BillManagementController;
 use App\Http\Controllers\InventoryManagementController;
 use App\Http\Controllers\ManagerAuthController;
 use App\Http\Controllers\MenuManagementController;
+use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NotificationManagementController;
 use App\Http\Controllers\OrderManagementController;
 use App\Http\Controllers\PromotionManagementController;
@@ -28,6 +29,7 @@ Route::middleware('auth:sanctum')->prefix('user')->group(function () {
     Route::get('/profile', [UserAuthController::class, 'profile']);
     Route::post('/logout', [UserAuthController::class, 'logout']);
     Route::post('/change-password', [UserAuthController::class, 'changePassword']);
+    
     // .................................MyAccount...........................................................
     Route::get('/user/profile', [UserAuthController::class, 'profile']);
     Route::put('/user/profile', [UserAuthController::class, 'updateProfile']);
@@ -39,7 +41,14 @@ Route::middleware('auth:sanctum')->prefix('user')->group(function () {
 Route::post('/manager/login', [ManagerAuthController::class, 'login'])->middleware('throttle:3,1');
 
 Route::middleware(['auth:manager', 'isManager'])->prefix('manager')->group(function () {
+    // ......................................Messaging..............................................
 
+   Route::get('/messages/contacts', [MessageController::class, 'contacts']);
+    Route::get('/messages/thread/{contactName}', [MessageController::class, 'thread']);
+    Route::post('/messages', [MessageController::class, 'store']);
+    Route::post('/messages/mark-read', [MessageController::class, 'markRead']);
+
+    // .................................................................................................
     Route::get('/profile', [ManagerAuthController::class, 'profile']);
     Route::post('/logout', [ManagerAuthController::class, 'logout']);
     Route::post('/change-password', [ManagerAuthController::class, 'changePassword']);
@@ -77,6 +86,14 @@ Route::middleware(['auth:sanctum', 'checkUserRole:supplier'])->prefix('user/supp
 
     Route::post('/offers', [SupplierController::class, 'store']);
     Route::get('/view-offers', [SupplierController::class, 'viewMyOffers']);
+    // ......................................Messaging..............................................
+
+   Route::get('/messages/contacts', [MessageController::class, 'contacts']);
+    Route::get('/messages/thread/{contactName}', [MessageController::class, 'thread']);
+    Route::post('/messages', [MessageController::class, 'store']);
+    Route::post('/messages/mark-read', [MessageController::class, 'markRead']);
+    
+    // .................................................................................................
 
     // ** supplier notification **//
     Route::get('/notifications', [NotificationManagementController::class, 'getAllSupplierNotifications']);
@@ -129,4 +146,12 @@ Route::middleware(['auth:sanctum', 'checkUserRole:employee'])->prefix('user/empl
     // ** employee notification **//
     Route::get('/notifications', [NotificationManagementController::class, 'getAllCustomerNotifications']);
     Route::patch('/notifications/{id}/seen', [NotificationManagementController::class, 'markAsSeen']);
+    // ......................................Messaging..............................................
+
+   Route::get('/messages/contacts', [MessageController::class, 'contacts']);
+    Route::get('/messages/thread/{contactName}', [MessageController::class, 'thread']);
+    Route::post('/messages', [MessageController::class, 'store']);
+    Route::post('/messages/mark-read', [MessageController::class, 'markRead']);
+    
+    // .................................................................................................
 });
