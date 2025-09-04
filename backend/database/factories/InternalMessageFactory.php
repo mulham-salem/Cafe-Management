@@ -20,8 +20,8 @@ class InternalMessageFactory extends Factory
             'receiver_id' => $receiver->id,
             'subject' => $this->faker->sentence(3),
             'body' => $this->faker->paragraph(),
-            'sender_name' => $sender->name,
-            'receiver_name' => $receiver->name,
+            'sender_name' => $sender->full_name,
+            'receiver_name' => $receiver->full_name,
             'sent_at' => $this->faker->dateTimeBetween('-1 month', 'now'),
             'read_at' => $this->faker->optional()->dateTimeBetween('sent_at', 'now'),
         ];

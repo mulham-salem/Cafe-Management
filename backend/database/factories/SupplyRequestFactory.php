@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Manager;
+use App\Models\Supplier;
 use App\Models\SupplyRequest;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -13,9 +14,13 @@ class SupplyRequestFactory extends Factory
     public function definition()
     {
         $managers = Manager::all();
+        $suppliers = Supplier::all();
+
 
         return [
             'manager_id' => $managers->isNotEmpty() ? $managers->random()->id : null,
+             'supplier_id' => $suppliers->isNotEmpty() ? $suppliers->random()->id : null,
+
             'title' => $this->faker->optional()->sentence(3),
             'request_date' => $this->faker->dateTimeBetween('-1 month', 'now'),
             'note' => $this->faker->optional()->paragraph(),

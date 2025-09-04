@@ -15,11 +15,13 @@ class UserFactory extends Factory
     {
         $managers = Manager::all();
 
+         $first= $this->faker->firstName();
+         $last= $this->faker->lastName();
         return [
+            'first_name'=> $first,
+            'last_name'=> $last,
+            'full_name' => $first.''. $last,
             'manager_id' => $managers->isNotEmpty() ? $managers->random()->id : null,
-            'name' => $this->faker->name(),
-            'first_name' => $this->faker->firstName(),
-            'last_name' => $this->faker->lastName(),
             'username' => $this->faker->unique()->userName(),
             'email' => $this->faker->unique()->safeEmail(),
             'password' => bcrypt('password'), // كلمة مرور افتراضية

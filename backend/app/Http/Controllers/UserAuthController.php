@@ -144,59 +144,145 @@ class UserAuthController extends Controller
 
         return response()->json(['message' => 'Password has been reset successfully.']);
     }
+// ..................................AccountArragement..................................................
+     public function myAccount(Request $request)
+{
+    if (auth('manager')->check()) {
+        // === حالة المدير ===
+        $manager = auth('manager')->user();
 
-    // GET /api/user/profile
-    public function myAccount(Request $request)
-    {
-        $user = $request->user();
+        $parts = explode(' ', $manager->name, 2);
+        $firstName = $parts[0];
+        $lastName = $parts[1] ?? '';
 
         return response()->json([
-            'first_name' => $user->first_name,
-            'last_name' => $user->last_name,
-            'username' => $user->username,
-            'email' => $user->email,
-            'image_url' => $user->image_url,
+            'role'       => 'manager',
+            'first_name' => $firstName,
+            'last_name'  => $lastName,
+            'username'   => $manager->username,
+            'email'      => $manager->email,
         ]);
     }
 
-    // PUT /api/user/profile
-    public function updateMyAccount(Request $request)
-    {
-        $user = $request->user();
+    // === حالة المورد / المستخدم العادي ===
+    $user = $request->user();
+
+    $baseData = [
+        'role'       => $user->role,
+        'first_name' => $user->first_name,
+        'last_name'  => $user->last_name,
+        'username'   => $user->username,
+        'email'      => $user->email,
+        'image_url'  => $user->image_url,
+    ];
+
+    // إذا المورد، نضيف حقول إضافية
+    if ($user->role === 'supplier') {
+        $baseData['phone_number'] = $user->phone_number;
+        $baseData['company_name'] = $user->company_name;
+    }
+
+    return response()->json($baseData);
+}
+
+// PUT /api/user/profile
+public function updateMyAccount(Request $request)
+{
+    if (auth('manager')->check()) {
+        // === تحديث بيانات المدير ===
+        $manager = auth('manager')->user();
 
         $validated = $request->validate([
             'first_name' => 'string|max:255',
-            'last_name' => 'string|max:255',
-            'username' => 'string|max:255|unique:users,username,'.$user->id,
-            'email' => 'email|unique:users,email,'.$user->id,
+            'last_name'  => 'string|max:255|nullable',
+            'username'   => 'string|max:255|unique:managers,username,' . $manager->id,
+            'email'      => 'email|unique:managers,email,' . $manager->id,
         ]);
 
-        $user->update($validated);
+        $manager->name     = $validated['first_name'] . ' ' . ($validated['last_name'] ?? '');
+        $manager->username = $validated['username'];
+        $manager->email    = $validated['email'];
+        $manager->save();
 
         return response()->json([
             'message' => 'Profile updated successfully',
-            'user' => $user->only(['first_name', 'last_name', 'username', 'email', 'image_url']),
+            'user' => [
+                'role'       => 'manager',
+                'first_name' => $validated['first_name'],
+                'last_name'  => $validated['last_name'],
+                'username'   => $manager->username,
+                'email'      => $manager->email,
+            ],
         ]);
     }
 
-    // POST /api/user/upload-avatar
-    public function uploadAvatar(Request $request)
-    {
-        $request->validate([
-            'avatar' => 'required|image|mimes:jpeg,png,jpg,gif|max:3072',
-        ], [
-            'avatar.max' => 'image must be smaller than 3MB',
-        ]);
+    // === تحديث بيانات المورد أو المستخدم ===
+    $user = $request->user();
 
-        $path = $request->file('avatar')->store('avatars', 'public');
+    $rules = [
+        'first_name' => 'string|max:255',
+        'last_name'  => 'string|max:255|nullable',
+        'username'   => 'string|max:255|unique:users,username,' . $user->id,
+        'email'      => 'email|unique:users,email,' . $user->id,
+    ];
 
-        $user = $request->user();
-        $user->image_url = asset('storage/'.$path);
-        $user->save();
+    // إذا المورد، نضيف قواعد تحقق إضافية
+    if ($user->role === 'supplier') {
+        $rules['phone_number'] = 'string|max:20|unique:users,phone_number,' . $user->id;
+        $rules['company_name'] = 'string|max:255';
+    }
+
+    $validated = $request->validate($rules);
+
+    $user->update($validated);
+
+    return response()->json([
+        'message' => 'Profile updated successfully',
+        'user'    => $user->only([
+            'role',
+            'first_name',
+            'last_name',
+            'username',
+            'email',
+            'image_url',
+            'phone_number',
+            'company_name',
+        ]),
+    ]);
+}
+
+// POST /api/user/upload-avatar
+public function uploadAvatar(Request $request)
+{
+    $request->validate([
+        'avatar' => 'required|image|mimes:jpeg,png,jpg,gif|max:3072',
+    ], [
+        'avatar.max' => 'image must be smaller than 3MB',
+    ]);
+
+    $path = $request->file('avatar')->store('avatars', 'public');
+
+    if (auth('manager')->check()) {
+        $manager = auth('manager')->user();
+        $manager->image_url = asset('storage/' . $path);
+        $manager->save();
 
         return response()->json([
-            'message' => 'image uploaded successfully',
-            'image_url' => $user->image_url,
+            'message'   => 'image uploaded successfully',
+            'image_url' => $manager->image_url,
         ]);
     }
+
+    $user = $request->user();
+    $user->image_url = asset('storage/' . $path);
+    $user->save();
+
+    return response()->json([
+        'message'   => 'image uploaded successfully',
+        'image_url' => $user->image_url,
+    ]);
+}
+
+
+   
 }
