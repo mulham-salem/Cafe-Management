@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @method static inRandomOrder()
+ *
  * @mixin IdeHelperMenuItem
  */
 class MenuItem extends Model

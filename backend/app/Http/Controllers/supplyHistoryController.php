@@ -55,13 +55,10 @@ class supplyHistoryController extends Controller
         return response()->json($history);
     }
 
-
-    
-    
     // .................................................supplierSupplyHistory................................................
     public function supplierIndex()
     {
-        $supplierId = auth('user')->id(); 
+        $supplierId = auth('user')->id();
 
         $offers = SupplyOffer::with('supplyOfferItems')
             ->where('supplier_id', $supplierId)

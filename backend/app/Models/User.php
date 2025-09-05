@@ -14,9 +14,11 @@ use Laravel\Sanctum\HasApiTokens;
  * @method static whereDoesntHave(string $string)
  * @method static where(string $string, mixed $username)
  * @method static whereIn(string $string, string[] $array)
+ *
  * @property $role
  * @property $id
  * @property \Illuminate\Database\Eloquent\Collection|\App\Models\Permission[] $permissions
+ *
  * @mixin IdeHelperUser
  */
 class User extends Authenticatable

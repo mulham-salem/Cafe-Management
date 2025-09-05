@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * @method static inRandomOrder()
+ *
  * @mixin IdeHelperOrder
  */
 class Order extends Model

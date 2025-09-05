@@ -16,10 +16,9 @@ class SupplyRequestFactory extends Factory
         $managers = Manager::all();
         $suppliers = Supplier::all();
 
-
         return [
             'manager_id' => $managers->isNotEmpty() ? $managers->random()->id : null,
-             'supplier_id' => $suppliers->isNotEmpty() ? $suppliers->random()->id : null,
+            'supplier_id' => $suppliers->isNotEmpty() ? $suppliers->random()->id : null,
 
             'title' => $this->faker->optional()->sentence(3),
             'request_date' => $this->faker->dateTimeBetween('-1 month', 'now'),
