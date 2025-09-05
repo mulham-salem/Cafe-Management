@@ -9,8 +9,10 @@ use App\Models\SupplyOffer;
 use App\Models\SupplyRequest;
 use App\Models\SupplyRequestItem;
 use App\Models\User;
+use App\UserRole;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class SupplyManagementController extends Controller
 {
@@ -30,7 +32,7 @@ class SupplyManagementController extends Controller
             return [
                 'id' => $offer->id,
                 'title' => $offer->title,
-                'supplier_name' => $offer->supplier->user->name ?? 'Unknown',
+                'supplier_name' => $offer->supplier->user->full_name ?? 'Unknown',
                 'total_price' => $offer->total_price,
                 'delivery_date' => $offer->delivery_date->toDateTimeString(),
                 'note' => $offer->note,
@@ -57,12 +59,28 @@ class SupplyManagementController extends Controller
      */
     public function getSuppliers(): JsonResponse
     {
-        $managerId = auth('manager')->id();
+        // احصل على الفاعل: إمّا manager عبر غارد manager، أو user عبر الغارد الافتراضي
+        if (Auth::guard('manager')->check()) {
+            $actor = Auth::guard('manager')->user();
+            $isManager = true;
+            $managerId = $actor->id;
+        } elseif (auth('user')->check()) {
+            $actor = auth('user')->user();
+            $isManager = false;
+            // السماح فقط اذا الـ user هو employee
+            if ($actor->role !== UserRole::Employee->value) {
+                abort(403, 'Unauthorized');
+            }
+            // الموظف من المفترض أن له manager_id
+            $managerId = $actor->manager_id;
+        } else {
+            abort(403, 'Unauthorized');
+        }
 
         // جلب الموردين الذين أنشأهم هذا المدير والمرتبطين بجدول users
         $suppliers = User::where('role', 'supplier')
             ->where('manager_id', $managerId)
-            ->select('id', 'name')
+            ->select('id', 'full_name')
             ->get();
 
         return response()->json($suppliers);
@@ -76,6 +94,24 @@ class SupplyManagementController extends Controller
      */
     public function acceptOffer($id)
     {
+        // احصل على الفاعل: إمّا manager عبر غارد manager، أو user عبر الغارد الافتراضي
+        if (Auth::guard('manager')->check()) {
+            $actor = Auth::guard('manager')->user();
+            $isManager = true;
+            $managerId = $actor->id;
+        } elseif (auth('user')->check()) {
+            $actor = auth('user')->user();
+            $isManager = false;
+            // السماح فقط اذا الـ user هو employee
+            if ($actor->role !== UserRole::Employee->value) {
+                abort(403, 'Unauthorized');
+            }
+            // الموظف من المفترض أن له manager_id
+            $managerId = $actor->manager_id;
+        } else {
+            abort(403, 'Unauthorized');
+        }
+
         $supplyOffer = SupplyOffer::with('supplier.user', 'supplyOfferItems.inventoryItem')->findOrFail($id);
 
         if ($supplyOffer->status !== 'pending') {
@@ -86,7 +122,7 @@ class SupplyManagementController extends Controller
         $supplyOffer->save();
 
         Notification::create([
-            'manager_id' => auth('manager')->user()->id,
+            'manager_id' => $managerId,
             'user_id' => $supplyOffer->supplier_id,
             'sent_by' => 'manager',
             'purpose' => 'Supply Offer Response',
@@ -106,6 +142,24 @@ class SupplyManagementController extends Controller
      */
     public function rejectOffer(Request $request, $id)
     {
+        // احصل على الفاعل: إمّا manager عبر غارد manager، أو user عبر الغارد الافتراضي
+        if (Auth::guard('manager')->check()) {
+            $actor = Auth::guard('manager')->user();
+            $isManager = true;
+            $managerId = $actor->id;
+        } elseif (auth('user')->check()) {
+            $actor = auth('user')->user();
+            $isManager = false;
+            // السماح فقط اذا الـ user هو employee
+            if ($actor->role !== UserRole::Employee->value) {
+                abort(403, 'Unauthorized');
+            }
+            // الموظف من المفترض أن له manager_id
+            $managerId = $actor->manager_id;
+        } else {
+            abort(403, 'Unauthorized');
+        }
+
         $supplyOffer = SupplyOffer::with('supplier.user', 'supplyOfferItems.inventoryItem')->findOrFail($id);
 
         $request->validate([
@@ -121,7 +175,7 @@ class SupplyManagementController extends Controller
         $supplyOffer->save();
 
         Notification::create([
-            'manager_id' => auth('manager')->user()->id,
+            'manager_id' => $managerId,
             'user_id' => $supplyOffer->supplier_id,
             'sent_by' => 'manager',
             'purpose' => 'Supply Offer Response',
@@ -138,6 +192,23 @@ class SupplyManagementController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
+        // احصل على الفاعل: إمّا manager عبر غارد manager، أو user عبر الغارد الافتراضي
+        if (Auth::guard('manager')->check()) {
+            $actor = Auth::guard('manager')->user();
+            $isManager = true;
+            $managerId = $actor->id;
+        } elseif (auth('user')->check()) {
+            $actor = auth('user')->user();
+            $isManager = false;
+            // السماح فقط اذا الـ user هو employee
+            if ($actor->role !== UserRole::Employee->value) {
+                abort(403, 'Unauthorized');
+            }
+            // الموظف من المفترض أن له manager_id
+            $managerId = $actor->manager_id;
+        } else {
+            abort(403, 'Unauthorized');
+        }
         $validated = $request->validate([
             'supplier_id' => 'required|exists:users,id',
             'title' => 'required|string',
@@ -158,7 +229,7 @@ class SupplyManagementController extends Controller
         }
 
         $supplyRequest = SupplyRequest::create([
-            'manager_id' => auth('manager')->id(),
+            'manager_id' => $managerId,
             'title' => $validated['title'],
             'note' => $validated['note'],
             'request_date' => now(),
@@ -174,7 +245,7 @@ class SupplyManagementController extends Controller
         }
 
         Notification::create([
-            'manager_id' => auth('manager')->id(),
+            'manager_id' => $managerId,
             'user_id' => $validated['supplier_id'],
             'supplyRequest_id' => $supplyRequest->id,
             'sent_by' => 'manager',
@@ -197,6 +268,23 @@ class SupplyManagementController extends Controller
      */
     public function storePurchaseBill(Request $request)
     {
+        // احصل على الفاعل: إمّا manager عبر غارد manager، أو user عبر الغارد الافتراضي
+        if (Auth::guard('manager')->check()) {
+            $actor = Auth::guard('manager')->user();
+            $isManager = true;
+            $managerId = $actor->id;
+        } elseif (auth('user')->check()) {
+            $actor = auth('user')->user();
+            $isManager = false;
+            // السماح فقط اذا الـ user هو employee
+            if ($actor->role !== UserRole::Employee->value) {
+                abort(403, 'Unauthorized');
+            }
+            // الموظف من المفترض أن له manager_id
+            $managerId = $actor->manager_id;
+        } else {
+            abort(403, 'Unauthorized');
+        }
         $request->validate([
             'supply_offer_id' => 'required|exists:supply_offers,id',
             'supplier_id' => 'required|exists:suppliers,id',
@@ -214,7 +302,7 @@ class SupplyManagementController extends Controller
         $totalAmount = $supplyOffer->supplyOfferItems->sum('total_price');
 
         $purchaseBill = PurchaseBill::create([
-            'manager_id' => auth('manager')->user()->id,
+            'manager_id' => $managerId,
             'supply_offer_id' => $request->supply_offer_id,
             'supplier_id' => $request->supplier_id,
             'total_amount' => $totalAmount,
@@ -240,7 +328,7 @@ class SupplyManagementController extends Controller
                 $inventoryItem->save();
             } else {
                 $inventoryItem = InventoryItem::create([
-                    'manager_id' => auth('manager')->user()->id,
+                    'manager_id' => $managerId,
                     'name' => $offerItem->name,
                     'quantity' => $offerItem->quantity,
                     'unit' => $offerItem->unit,

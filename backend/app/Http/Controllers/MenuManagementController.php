@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\MenuItem;
+use App\UserRole;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
@@ -45,7 +47,23 @@ class MenuManagementController extends Controller
      */
     public function index(): JsonResponse
     {
-        $managerId = auth('manager')->id();
+        // احصل على الفاعل: إمّا manager عبر غارد manager، أو user عبر الغارد الافتراضي
+        if (Auth::guard('manager')->check()) {
+            $actor = Auth::guard('manager')->user();
+            $isManager = true;
+            $managerId = $actor->id;
+        } elseif (auth('user')->check()) {
+            $actor = auth('user')->user();
+            $isManager = false;
+            // السماح فقط اذا الـ user هو employee
+            if ($actor->role !== UserRole::Employee->value) {
+                abort(403, 'Unauthorized');
+            }
+            // الموظف من المفترض أن له manager_id
+            $managerId = $actor->manager_id;
+        } else {
+            abort(403, 'Unauthorized');
+        }
 
         $menuItems = MenuItem::with('category:id,name')
             ->where('manager_id', $managerId)
@@ -71,8 +89,24 @@ class MenuManagementController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
+        // تحديد الفاعل/نوعه وmanagerId المرجعي
+        if (Auth::guard('manager')->check()) {
+            $actor = Auth::guard('manager')->user();
+            $isManager = true;
+            $managerId = $actor->id;
+        } elseif (auth('user')->check()) {
+            $actor = auth('user')->user();
+            $isManager = false;
+            if ($actor->role !== UserRole::Employee->value) {
+                abort(403, 'Unauthorized');
+            }
+            $managerId = $actor->manager_id;
+        } else {
+            abort(403, 'Unauthorized');
+        }
+
         $validated = $request->validate([
-            'name' => ['required', Rule::in($this->allowedNames)],
+            'name' => 'required|string',
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'category' => ['required', Rule::in(['drinks', 'snacks'])],
@@ -87,7 +121,7 @@ class MenuManagementController extends Controller
             'description' => $validated['description'] ?? '',
             'price' => $validated['price'],
             'category_id' => $categoryId,
-            'manager_id' => auth('manager')->id(),
+            'manager_id' => $managerId,
             'image_url' => $validated['image_url'] ?? null,
             'available' => $validated['available'] ?? true,
         ]);
@@ -128,8 +162,23 @@ class MenuManagementController extends Controller
      */
     public function update(Request $request, string $id): JsonResponse
     {
+        // تحديد الفاعل
+        if (Auth::guard('manager')->check()) {
+            $actor = Auth::guard('manager')->user();
+            $isManager = true;
+            $managerId = $actor->id;
+        } elseif (auth('user')->check()) {
+            $actor = auth('user')->user();
+            $isManager = false;
+            if ($actor->role !== UserRole::Employee->value) {
+                abort(403, 'Unauthorized');
+            }
+            $managerId = $actor->manager_id;
+        } else {
+            abort(403, 'Unauthorized');
+        }
         $validated = $request->validate([
-            'name' => ['required', Rule::in($this->allowedNames)],
+            'name' => 'required|string',
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'category' => ['required', Rule::in(['drinks', 'snacks'])],
@@ -146,7 +195,7 @@ class MenuManagementController extends Controller
             'description' => $validated['description'] ?? '',
             'price' => $validated['price'],
             'category_id' => $categoryId,
-            'manager_id' => auth('manager')->id(),
+            'manager_id' => $managerId,
             'image_url' => $validated['image_url'] ?? null,
             'available' => $validated['available'] ?? true,
         ]);

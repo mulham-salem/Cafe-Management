@@ -16,19 +16,35 @@ use Illuminate\Validation\Rule;
 class UserManagementController extends Controller
 {
     /**
-     * Display a listing of users managed by the authenticated manager.
+     * Display a listing of users managed by the authenticated manager/authorized employee.
      */
     public function index(): JsonResponse
     {
-        $manager = Auth::guard('manager')->user();
+        // احصل على الفاعل: إمّا manager عبر غارد manager، أو user عبر الغارد الافتراضي
+        if (Auth::guard('manager')->check()) {
+            $actor = Auth::guard('manager')->user();
+            $isManager = true;
+            $managerId = $actor->id;
+        } elseif (auth('user')->check()) {
+            $actor = auth('user')->user();
+            $isManager = false;
+            // السماح فقط اذا الـ user هو employee
+            if ($actor->role !== UserRole::Employee->value) {
+                abort(403, 'Unauthorized');
+            }
+            // الموظف من المفترض أن له manager_id
+            $managerId = $actor->manager_id;
+        } else {
+            abort(403, 'Unauthorized');
+        }
 
         $users = User::with('permissions')
-            ->where('manager_id', $manager->id)
+            ->where('manager_id', $managerId)
             ->get()
             ->map(function ($user) {
                 return [
                     'id' => $user->id,
-                    'name' => $user->name,
+                    'fullName' => $user->full_name,
                     'email' => $user->email,
                     'username' => $user->username,
                     'role' => $user->role,
@@ -44,34 +60,69 @@ class UserManagementController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        $manager = Auth::guard('manager')->user();
+        // تحديد الفاعل/نوعه وmanagerId المرجعي
+        if (Auth::guard('manager')->check()) {
+            $actor = Auth::guard('manager')->user();
+            $isManager = true;
+            $managerId = $actor->id;
+        } elseif (auth('user')->check()) {
+            $actor = auth('user')->user();
+            $isManager = false;
+            if ($actor->role !== UserRole::Employee->value) {
+                abort(403, 'Unauthorized');
+            }
+            $managerId = $actor->manager_id;
+        } else {
+            abort(403, 'Unauthorized');
+        }
+
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'fullName' => 'required|string|max:255',
             'email' => 'required|string|email|unique:users,email',
             'username' => 'required|string|unique:users,username',
             'password' => 'required|string|min:8',
             'role' => ['required', Rule::in(UserRole::values())],
-            'permissions' => 'array',
-            'permissions.*' => [Rule::in(UserPermission::values())],
+            // permissions مقبول فقط لو الفاعل manager
+            'permissions' => $isManager ? 'array' : 'exclude',
+            'permissions.*' => $isManager ? [Rule::in(UserPermission::values())] : [],
         ]);
 
+        $fullName = trim($validated['fullName']);
+        $nameParts = preg_split('/\s+/', $fullName, 2);
+
+        $firstName = $nameParts[0];
+        $lastName = $nameParts[1] ?? null;
+
         $user = User::create([
-            'name' => $validated['name'],
+            'full_name' => $fullName,
+            'first_name' => $firstName,
+            'last_name' => $lastName,
             'email' => $validated['email'],
             'username' => $validated['username'],
             'password' => Hash::make($validated['password']),
             'role' => $validated['role'],
-            'manager_id' => $manager->id,
+            'manager_id' => $managerId, // استخدم managerId من الفاعل (manager نفسه أو manager المرتبط بالموظف)
         ]);
 
-        if (isset($validated['permissions'])) {
+        // فقط ال manager يقدر يضيف صلاحيات
+        if ($isManager && isset($validated['permissions'])) {
             foreach ($validated['permissions'] as $permission) {
                 Permission::create([
                     'user_id' => $user->id,
                     'permission' => $permission,
                 ]);
             }
+        } else {
+            $defaultPermissions = ['Default'];
+            foreach ($defaultPermissions as $permission) {
+                Permission::create([
+                    'user_id' => $user->id,
+                    'permission' => $permission,
+                ]);
+            }
         }
+
+        // إنشاء الصف الخاص بالدور في الجداول الوريثة
         switch ($user->role) {
             case UserRole::Customer->value:
                 DB::table('customers')->insert([
@@ -94,26 +145,23 @@ class UserManagementController extends Controller
                     'phone_number' => null,
                 ]);
                 break;
+
+            case UserRole::DeliveryWorker->value:
+                DB::table('delivery_worker')->insert([
+                    'id' => $user->id,
+                    'transport' => 'Motorbike',
+                    'license' => 'SY-12345',
+                    'status' => 'Available',
+                    'rating' => null,
+                ]);
+                break;
         }
 
         return response()->json([
             'message' => 'User created successfully.',
-            'user' => $user->only(['id', 'name', 'email', 'username', 'role']),
+            'user' => $user->only(['id', 'full_name', 'email', 'username', 'role']),
             'permissions' => $user->permissions()->pluck('permission'),
         ], 201);
-
-    }
-
-    /**
-     * Display the specified user with their permissions.
-     */
-    public function show(string $id): JsonResponse
-    {
-        $user = User::with('permissions')->findOrFail($id);
-
-        return response()->json([
-            'user' => $user->only(['id', 'name', 'email', 'username', 'role']),
-        ]);
     }
 
     /**
@@ -121,21 +169,45 @@ class UserManagementController extends Controller
      */
     public function update(Request $request, string $id): JsonResponse
     {
-        $manager = Auth::guard('manager')->user();
+        // تحديد الفاعل
+        if (Auth::guard('manager')->check()) {
+            $actor = Auth::guard('manager')->user();
+            $isManager = true;
+            $managerId = $actor->id;
+        } elseif (auth('user')->check()) {
+            $actor = auth('user')->user();
+            $isManager = false;
+            if ($actor->role !== UserRole::Employee->value) {
+                abort(403, 'Unauthorized');
+            }
+            $managerId = $actor->manager_id;
+        } else {
+            abort(403, 'Unauthorized');
+        }
 
-        $user = User::where('manager_id', $manager->id)->findOrFail($id);
+        // تأكد أن المستخدم المراد تحديثه يتبع نفس المدير
+        $user = User::where('manager_id', $managerId)->findOrFail($id);
 
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'fullName' => 'required|string|max:255',
             'email' => ['required', 'string', 'email', Rule::unique('users')->ignore($user->id)],
             'username' => ['required', 'string', Rule::unique('users')->ignore($user->id)],
             'password' => 'nullable|string|min:8',
             'role' => ['required', Rule::in(UserRole::values())],
-            'permissions' => 'array',
-            'permissions.*' => [Rule::in(UserPermission::values())],
+            // permissions مسموحة فقط للـ manager، وموظف سيحرم من إرسالها
+            'permissions' => $isManager ? 'nullable|array' : 'exclude',
+            'permissions.*' => $isManager ? [Rule::in(UserPermission::values())] : [],
         ]);
 
-        $user->name = $validated['name'];
+        $fullName = trim($validated['fullName']);
+        $nameParts = preg_split('/\s+/', $fullName, 2);
+
+        $firstName = $nameParts[0];
+        $lastName = $nameParts[1] ?? null;
+
+        $user->full_name = $fullName;
+        $user->first_name = $firstName;
+        $user->last_name = $lastName;
         $user->email = $validated['email'];
         $user->username = $validated['username'];
         $user->role = $validated['role'];
@@ -146,7 +218,8 @@ class UserManagementController extends Controller
 
         $user->save();
 
-        if (isset($validated['permissions'])) {
+        // إدارة الصلاحيات: فقط manager يقدر يعدلها
+        if ($isManager && isset($validated['permissions'])) {
             $permissionValues = collect($validated['permissions'])->map(function ($p) {
                 return ['permission' => $p];
             });
@@ -157,25 +230,51 @@ class UserManagementController extends Controller
 
         return response()->json([
             'message' => 'User updated successfully.',
-            'user' => $user->only(['id', 'name', 'email', 'username', 'role']),
+            'user' => $user->only(['id', 'full_name', 'email', 'username', 'role']),
             'permissions' => $user->permissions()->pluck('permission'),
         ]);
-
     }
+
 
     /**
      * Remove the specified user from storage.
      */
     public function destroy(string $id): JsonResponse
     {
-        $manager = Auth::guard('manager')->user();
+        // تحديد الفاعل
+        if (Auth::guard('manager')->check()) {
+            $actor = Auth::guard('manager')->user();
+            $isManager = true;
+            $managerId = $actor->id;
+        } elseif (auth('user')->check()) {
+            $actor = auth('user')->user();
+            $isManager = false;
+            if ($actor->role !== UserRole::Employee->value) {
+                abort(403, 'Unauthorized');
+            }
+            $managerId = $actor->manager_id;
+        } else {
+            abort(403, 'Unauthorized');
+        }
 
-        $user = User::where('manager_id', $manager->id)->findOrFail($id);
+        $user = User::where('manager_id', $managerId)->findOrFail($id);
 
         $user->delete();
 
         return response()->json([
             'message' => 'User deleted successfully.',
         ], 200);
+    }
+
+    /**
+     * Display the specified user with their permissions.
+     */
+    public function show(string $id): JsonResponse
+    {
+        $user = User::with('permissions')->findOrFail($id);
+
+        return response()->json([
+            'user' => $user->only(['id', 'full_name', 'email', 'username', 'role']),
+        ]);
     }
 }

@@ -6,3 +6,14 @@ $manager1->email = 'adminM@example.com';
 $manager1->password = bcrypt('00000000');
 $manager1->remember_token = \Illuminate\Support\Str::random(60);
 $manager1->save();
+
+$customer1 = new \App\Models\User;
+$customer1->full_name = 'customer 1';
+$customer1->first_name = 'customer';
+$customer1->role = 'customer';
+$customer1->username = 'customer1';
+$customer1->email = 'customer1@example.com';
+$customer1->password = bcrypt('11111111');
+$customer1->manager_id = 1;
+$customer1->remember_token = \Illuminate\Support\Str::random(60);
+$customer1->save();

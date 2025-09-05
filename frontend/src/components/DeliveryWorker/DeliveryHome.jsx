@@ -110,7 +110,7 @@ export default function DeliveryHome() {
         }
       );
 
-      setWorkerName(response.data.name || "Delivery Worker");
+      setWorkerName(response.data.firstName || "Delivery Worker");
     } catch (error) {
       // toast.error("Failed to fetch worker name");
     }

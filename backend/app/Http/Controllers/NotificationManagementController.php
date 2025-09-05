@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Notification;
+use App\UserRole;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class NotificationManagementController extends Controller
 {
@@ -15,7 +17,25 @@ class NotificationManagementController extends Controller
      */
     public function getAllManagerNotifications(): JsonResponse
     {
-        $managerId = auth('manager')->id();
+        if (Auth::guard('manager')->check()) {
+            $actor = Auth::guard('manager')->user();
+            $isManager = true;
+            $managerId = $actor->id;
+
+        } elseif (auth('user')->check()) {
+            $actor = auth('user')->user();
+            $isManager = false;
+
+            // السماح فقط للموظف أو المورد
+            if (!in_array($actor->role, [UserRole::Employee->value, UserRole::Supplier->value])) {
+                abort(403, 'Unauthorized');
+            }
+
+            $managerId = $actor->manager_id;
+
+        } else {
+            abort(403, 'Unauthorized');
+        }
 
         $offerNotifications = Notification::where('manager_id', $managerId)
             ->where('sent_by', 'supplier')
@@ -56,7 +76,7 @@ class NotificationManagementController extends Controller
                 if ($notification->sent_by === 'system') {
                     $data['sent_by'] = 'System';
                 } elseif ($notification->sent_by === 'supplier' && $notification->user) {
-                    $data['sent_by'] = $notification->user->name;
+                    $data['sent_by'] = $notification->user->full_name;
                 } else {
                     $data['sent_by'] = 'Unknown';
                 }
@@ -170,7 +190,7 @@ class NotificationManagementController extends Controller
         $supplyRequest->status = $request->response;
 
         if ($request->response === 'rejected') {
-            $supplyRequest->rejection_reason = $request->rejection_reason;
+            $supplyRequest->reject_reason = $request->rejection_reason;
         }
 
         $supplyRequest->save();

@@ -18,10 +18,9 @@ import styles from "./styles/SidebarToggle.module.css";
 import { usePermissions } from "../context/PermissionsContext";
 
 export default function SidebarToggle({
-  roleProp,
   initialOpen = false,
-  introDurationMs = 3000,
-  introDelayMs = 1000,
+  introDurationMs = 4400,
+  introDelayMs = 2000,
 }) {
   const { permissions, role, loading } = usePermissions();
   const [isOpen, setIsOpen] = useState(initialOpen);
@@ -29,7 +28,7 @@ export default function SidebarToggle({
   const [showIntro, setShowIntro] = useState(false);
   const [starAnimationComplete, setStarAnimationComplete] = useState(false);
   const location = useLocation();
-  const effectiveRole = roleProp ?? role;
+  const effectiveRole = role;
 
   useEffect(() => {
     const showTimer = setTimeout(() => {
@@ -119,8 +118,13 @@ export default function SidebarToggle({
     setIsOpen(false);
   }, [effectiveRole, location.pathname]);
 
-  if (roleProp && role !== roleProp) return null;
-  if (!roleProp && !role) return null;
+  // useEffect(() => {
+  //   if (permissions && permissions.length > 0) {
+  //     setIsOpen(true);
+  //   }
+  // }, [permissions]);
+
+  if (!role) return null;
   if (loading) return null;
   const allowedRoles = ["employee", "supplier"];
   if (!allowedRoles.includes(effectiveRole)) {
@@ -199,8 +203,8 @@ export default function SidebarToggle({
                 transition={{
                   duration: 1,
                   ease: "backOut",
-                  onComplete: () => setStarAnimationComplete(true),
                 }}
+                onAnimationComplete={() => setStarAnimationComplete(true)}
                 className={styles.starIcon}
               >
                 <FaStar />
@@ -213,6 +217,7 @@ export default function SidebarToggle({
                   animate={{ opacity: 1, x: 0, scale: 1 }}
                   exit={{ opacity: 0, x: -8, scale: 0.95 }}
                   transition={{
+                    delay: 0.2,
                     type: "spring",
                     stiffness: 500,
                     damping: 20,

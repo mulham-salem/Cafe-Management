@@ -59,7 +59,7 @@ export default function ComplaintModal({ open, onClose }) {
           </label>
 
           <label className={styles.modalTextareaLabel}>
-            Desciption
+            Description
             <textarea
               className={styles.modalTextarea}
               rows="4"

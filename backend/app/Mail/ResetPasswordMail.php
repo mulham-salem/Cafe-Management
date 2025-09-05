@@ -22,7 +22,7 @@ class ResetPasswordMail extends Mailable
 
     public function build()
     {
-        $url = url("/reset-password?token={$this->token}&email={$this->email}");
+        $url = "http://localhost:5173/login/reset-password?token={$this->token}&email={$this->email}";
 
         return $this->subject('Reset Your Password')
             ->view('emails.reset-password')

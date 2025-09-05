@@ -29,15 +29,8 @@ import { SearchContext } from "./ManagerDashboard";
 import { SupplierSearchContext } from "../Supplier/SupplierHome";
 import { EmpSearchContext } from "../Employee/EmployeeHome";
 import { usePermissions } from "../../context/PermissionsContext";
-
-const token =
-  sessionStorage.getItem("authToken") || localStorage.getItem("authToken");
-
-axios.defaults.withCredentials = true;
-axios.defaults.baseURL = "http://localhost:8000/api";
-axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-axios.defaults.headers.post["Content-Type"] = "application/json";
-axios.defaults.headers.put["Content-Type"] = "application/json";
+import SimpleBar from "simplebar-react";
+import "simplebar-react/dist/simplebar.min.css";
 
 const mockInventory = [
   {
@@ -123,6 +116,23 @@ const mockInventory = [
 ];
 
 const InventorySupply = () => {
+  function getCurrentToken() {
+    const role = sessionStorage.getItem("currentRole");
+    if (!role) return null;
+    return (
+      sessionStorage.getItem(`${role}Token`) ||
+      localStorage.getItem(`${role}Token`)
+    );
+  }
+
+  const token = getCurrentToken();
+
+  axios.defaults.withCredentials = true;
+  axios.defaults.baseURL = "http://localhost:8000/api";
+  axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+  axios.defaults.headers.post["Content-Type"] = "application/json";
+  axios.defaults.headers.put["Content-Type"] = "application/json";
+
   useEffect(() => {
     document.title = "Cafe Delights - Inventory & Supply";
   }, []);
@@ -180,12 +190,12 @@ const InventorySupply = () => {
 
   const fetchInventory = async () => {
     try {
-      // const response = await axios.get("/manager/inventory");
-      // setInventory(response.data.inventory_items);
-      setInventory(mockInventory);
+      const response = await axios.get("/admin/inventory");
+      setInventory(response.data.inventory_items);
     } catch (error) {
       console.error("Error fetching inventory:", error);
-      //toast.error('Failed to load inventory items.');
+      toast.error("Failed to load inventory items. mockData will be displayed");
+      setInventory(mockInventory);
     } finally {
       setLoadingInventory(false);
     }
@@ -201,7 +211,7 @@ const InventorySupply = () => {
     return inventory.filter(
       (item) =>
         searchQuery === "" ||
-        item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.name.toLowerCase().includes(searchQuery) ||
         item.quantity.toString().includes(searchQuery)
     );
   }, [inventory, searchQuery]);
@@ -227,7 +237,7 @@ const InventorySupply = () => {
     if (!item) return;
 
     try {
-      await axios.delete(`/manager/inventory/${id}`);
+      await axios.delete(`/admin/inventory/${id}`);
       toast.info(`🗑️ ${item.name} deleted`);
       fetchInventory();
     } catch (error) {
@@ -268,7 +278,7 @@ const InventorySupply = () => {
     try {
       if (editItem) {
         const response = await axios.put(
-          `/manager/inventory/${editItem.id}`,
+          `/admin/inventory/${editItem.id}`,
           itemData
         );
         toast.success(`✏️ ${itemName} updated`);
@@ -277,7 +287,7 @@ const InventorySupply = () => {
           toast.warning(response.data.low_stock_alert, { icon: "⚠️" });
         }
       } else {
-        const response = await axios.post("/manager/inventory", itemData);
+        const response = await axios.post("/admin/inventory", itemData);
         toast.success(`✅ ${itemName} added`);
 
         if (response.data.low_stock_alert) {
@@ -438,31 +448,31 @@ const InventorySupply = () => {
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
-        // const suppliersResponse = await axios.get("/manager/suppliers");
-        // setSuppliers(suppliersResponse.data);
+        const suppliersResponse = await axios.get("/admin/suppliers");
+        setSuppliers(suppliersResponse.data);
 
-        // const offersResponse = await axios.get("/manager/supply");
-        // setOffers(
-        //   offersResponse.data.map((offer) => ({
-        //     id: offer.id,
-        //     title: offer.title,
-        //     supplier: offer.supplier_name,
-        //     totalPrice: offer.total_price,
-        //     deliveryDate: offer.delivery_date.split(" ")[0],
-        //     note: offer.note,
-        //     status: offer.status,
-        //     items: offer.items.map((item) => ({
-        //       name: item.item_name,
-        //       quantity: item.quantity,
-        //       unit: item.unit,
-        //       unitPrice: item.unit_price,
-        //     })),
-        //   }))
-        // );
-        setOffers(mockSupplyOffers);
+        const offersResponse = await axios.get("/admin/supply");
+        setOffers(
+          offersResponse.data.map((offer) => ({
+            id: offer.id,
+            title: offer.title,
+            supplier: offer.supplier_name,
+            totalPrice: offer.total_price,
+            deliveryDate: offer.delivery_date.split(" ")[0],
+            note: offer.note,
+            status: offer.status,
+            items: offer.items.map((item) => ({
+              name: item.item_name,
+              quantity: item.quantity,
+              unit: item.unit,
+              unitPrice: item.unit_price,
+            })),
+          }))
+        );
       } catch (error) {
-        // toast.error("Failed to fetch initial data.");
+        toast.error("Failed to fetch initial data.");
         console.error("Error fetching initial data:", error);
+        setOffers(mockSupplyOffers);
       } finally {
         setLoadingOffer(false);
       }
@@ -506,7 +516,7 @@ const InventorySupply = () => {
           quantity: item.quantity,
         })),
       };
-      await axios.post("/manager/supply", payload);
+      await axios.post("/admin/supply", payload);
       toast.success("📦 Supply request sent!");
       setShowRequestModal(false);
       setSelectedSupplier("");
@@ -586,14 +596,13 @@ const InventorySupply = () => {
   const filteredOffer = useMemo(() => {
     return offers.filter(
       (offer) =>
-        searchQuery === "" ||
-        offer.title.toLowerCase().includes(searchQuery.toLowerCase())
+        searchQuery === "" || offer.title.toLowerCase().includes(searchQuery)
     );
   }, [offers, searchQuery]);
 
   const handleAcceptOffer = async (id) => {
     try {
-      await axios.post(`/manager/supply-offers/${id}/accept`);
+      await axios.post(`/admin/supply-offers/${id}/accept`);
       setOffers((prev) =>
         prev.map((offer) =>
           offer.id === id ? { ...offer, status: "accepted" } : offer
@@ -608,7 +617,7 @@ const InventorySupply = () => {
 
   const handleRejectOffer = async (id) => {
     try {
-      await axios.post(`/manager/supply-offers/${id}/reject`, {
+      await axios.post(`/admin/supply-offers/${id}/reject`, {
         reason: rejectionReason,
       });
       setOffers((prev) =>
@@ -753,18 +762,19 @@ const InventorySupply = () => {
   const [showBillModal, setShowBillModal] = useState(false);
   const [selectedOfferId, setSelectedOfferId] = useState("");
   const [billDate, setBillDate] = useState("");
-  const [bills, setBills] = useState(mockBills);
+  const [bills, setBills] = useState([]);
   const [approvedOffers, setApprovedOffers] = useState([]);
   const [billedOfferIds, setBilledOfferIds] = useState([]);
   const [loadingBill, setLoadingBill] = useState(true);
 
   const fetchBills = async () => {
     try {
-      // const res = await fetch("/api/purchase-bills");
-      // const data = await res.data;
-      // setBills(data);
+      const res = await axios.get("/admin/purchase-bills");
+      const data = await res.data;
+      setBills(data);
     } catch (err) {
       toast.error("Error fetching bills:", err);
+      setBills(mockBills);
     } finally {
       setLoadingBill(false);
     }
@@ -809,14 +819,11 @@ const InventorySupply = () => {
     try {
       const payload = {
         supply_offer_id: offer.id,
-        supplier_id: suppliers.find((s) => s.name === offer.supplier)?.id,
+        supplier_id: suppliers.find((s) => s.full_name === offer.supplier)?.id,
         purchase_date: billDate,
         item_calculated_prices: itemCalculatedPricesString,
       };
-      const response = await axios.post(
-        "/manager/supply-purchase-bill",
-        payload
-      );
+      const response = await axios.post("/admin/supply-purchase-bill", payload);
       const newBillId = response.data.purchase_bill_id;
 
       const newBill = {
@@ -1008,15 +1015,16 @@ const InventorySupply = () => {
       rejectionReason: "Requested quantity is not available",
     },
   ];
-  const [supplyHistory, setSupplyHistory] = useState(mockSupplyHistory);
+  const [supplyHistory, setSupplyHistory] = useState([]);
   const [loadingSupplyHistory, setLoadingSupplyHistory] = useState(true);
 
   const fetchSupplyHistory = async () => {
     try {
-      // const response = await axios.get("/api/supply-history");
-      // setSupplyHistory(response.data);
+      const response = await axios.get("/admin/supply-history");
+      setSupplyHistory(response.data);
     } catch (err) {
       toast.error("Error fetching supply records:", err);
+      setSupplyHistory(mockSupplyHistory);
     } finally {
       setLoadingSupplyHistory(false);
     }
@@ -1052,10 +1060,13 @@ const InventorySupply = () => {
     setExpandedRecords((prev) => (prev === id ? null : id));
   };
 
-  const hasInventory = permissions.includes("Inventory Management");
-  const hasSupply = permissions.includes("Supply Management");
+  let showBackBtn = true;
+  if (role !== "manager") {
+    const hasInventory = permissions.includes("Inventory Management");
+    const hasSupply = permissions.includes("Supply Management");
 
-  const showBackBtn = (hasInventory && hasSupply) || role === "manager";
+    showBackBtn = hasInventory && hasSupply;
+  }
 
   return (
     <div className="pageWrapper">
@@ -1210,13 +1221,22 @@ const InventorySupply = () => {
                       onChange={(e) => setQuantity(e.target.value)}
                       required
                     />
-                    <input
-                      type="text"
-                      placeholder="Unit"
+                    <select
                       value={unit}
                       onChange={(e) => setUnit(e.target.value)}
                       required
-                    />
+                    >
+                      <option value="" disabled>
+                        Unit
+                      </option>
+                      <option value="kg">kg</option>
+                      <option value="g">g</option>
+                      <option value="liter">liter</option>
+                      <option value="ml">ml</option>
+                      <option value="dozen">dozen</option>
+                      <option value="box">box</option>
+                      <option value="piece">piece</option>
+                    </select>
                     <input
                       type="date"
                       value={expiryDate}
@@ -1322,7 +1342,7 @@ const InventorySupply = () => {
 
         {showRequestModal && (
           <div className={styles.overlayRequest}>
-            <div className={styles.modalContainer}>
+            <SimpleBar className={styles.modalContainer}>
               <div className={styles.modalHeader}>📋 New Supply Request</div>
 
               <div className={styles.modalContent}>
@@ -1443,7 +1463,7 @@ const InventorySupply = () => {
                     <option value="">-- Choose Supplier --</option>
                     {suppliers.map((s) => (
                       <option key={s.id} value={s.id}>
-                        {s.name}
+                        {s.full_name}
                       </option>
                     ))}
                   </select>
@@ -1475,7 +1495,7 @@ const InventorySupply = () => {
                   </button>
                 </div>
               </div>
-            </div>
+            </SimpleBar>
           </div>
         )}
 
@@ -1509,8 +1529,7 @@ const InventorySupply = () => {
                       <strong>Supplier:</strong> {offer.supplier}
                     </p>
                     <p>
-                      <strong>Total Price:</strong> $
-                      {offer.totalPrice.toFixed(2)}
+                      <strong>Total Price:</strong> ${offer.totalPrice}
                     </p>
                     <p>
                       <strong>Delivery Date:</strong> {offer.deliveryDate}
@@ -1645,25 +1664,30 @@ const InventorySupply = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredBills.map((bill, index) => (
-                    <tr key={bill.id}>
-                      <td>{index + 1}</td>
-                      <td>{bill.id}</td>
-                      <td>{bill.date}</td>
-                      <td>{bill.supplier}</td>
-                      <td>
-                        {bill.items.map((item, idx) => (
-                          <div key={idx} className={styles.billItemRowData}>
-                            {item.name}: {item.quantity} {item.unit} × $
-                            {item.unitPrice} = ${item.quantity * item.unitPrice}
-                          </div>
-                        ))}
-                      </td>
-                      <td className={styles.billTotalPrice}>
-                        ${bill.total.toFixed(2)}
-                      </td>
-                    </tr>
-                  ))}
+                  {filteredBills.map((bill, index) => {
+                    const prices = bill.unit_price
+                      ? bill.unit_price
+                          .split(", ")
+                          .map((p) => parseFloat(p.trim()))
+                      : [];
+                    return (
+                      <tr key={bill.id}>
+                        <td>{index + 1}</td>
+                        <td>{bill.id}</td>
+                        <td>{bill.date}</td>
+                        <td>{bill.supplier}</td>
+                        <td>
+                          {bill.items.map((item, idx) => (
+                            <div key={idx} className={styles.billItemRowData}>
+                              {item.name}: {item.quantity} 
+                              {item.unit} × {prices[idx]/item.quantity}  = ${prices[idx]}
+                            </div>
+                          ))}
+                        </td>
+                        <td className={styles.billTotalPrice}>${bill.total}</td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             )}
@@ -1719,9 +1743,11 @@ const InventorySupply = () => {
                           ))}
                         <p className={styles.totalPrice}>
                           Total: $
-                          {approvedOffers
-                            .find((o) => o.id.toString() === selectedOfferId)
-                            .totalPrice.toFixed(2)}
+                          {
+                            approvedOffers.find(
+                              (o) => o.id.toString() === selectedOfferId
+                            ).totalPrice
+                          }
                         </p>
                       </div>
                     )}
@@ -1836,7 +1862,12 @@ const InventorySupply = () => {
                       </div>
                       <div className={styles.metaItem}>
                         <FontAwesomeIcon icon={faDollarSign} />
-                        <span>${record.totalPrice.toFixed(2)}</span>
+                        <span>
+                          $
+                          {record.totalPrice !== null
+                            ? `${record.totalPrice}`
+                            : "N/A"}
+                        </span>
                       </div>
                     </div>
 

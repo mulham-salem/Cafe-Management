@@ -78,7 +78,7 @@ const mockdata = [
 ];
 const TableManagement = () => {
   const token =
-    sessionStorage.getItem("authToken") || localStorage.getItem("authToken");
+    sessionStorage.getItem("employeeToken") || localStorage.getItem("employeeToken");
 
   const axiosInstance = axios.create({
     baseURL: "http://localhost:8000/api",

@@ -52,14 +52,14 @@ class SupplierController extends Controller
                     return response()->json("Error inserting item #$index: ".$e->getMessage());
                 }
             }
-            $managerIds = [1, 2];
+            $managerIds = [1];
             foreach ($managerIds as $index => $managerId) {
                 Notification::create([
                     'manager_id' => $managerId,
                     'user_id' => $user->id,
                     'sent_by' => 'supplier',
                     'purpose' => 'Supply Offer',
-                    'message' => "Supplier '{$user->name}' submitted a new supply offer (#{$supplyOffer->id})",
+                    'message' => "Supplier '{$user->full_name}' submitted a new supply offer (#{$supplyOffer->id})",
                     'createdAt' => now(),
                     'seen' => false,
                 ]);

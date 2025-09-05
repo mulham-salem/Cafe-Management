@@ -13,7 +13,7 @@ return new class extends Migration
             $table->foreignId('manager_id')->constrained('managers')->onDelete('cascade');
             $table->foreignId('supply_offer_id')->constrained('supply_offers')->onDelete('cascade');
             $table->foreignId('supplier_id')->constrained('suppliers')->onDelete('cascade');
-            $table->decimal('unit_price', 5, 2)->nullable();
+            $table->string('unit_price')->nullable();
             $table->decimal('total_amount', 10, 2);
             $table->dateTime('purchase_date');
             $table->timestamps();

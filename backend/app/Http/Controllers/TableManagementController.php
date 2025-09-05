@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Validator;
 class TableManagementController extends Controller
 {
     /**
-     * Display a listing of all tables with their associated manager.
+     * Display a listing of all tables with their associated employee.
      */
     public function index(): JsonResponse
     {
@@ -48,7 +48,7 @@ class TableManagementController extends Controller
     }
 
     /**
-     * Display the specified table with its associated manager.
+     * Display the specified table with its associated employee.
      */
     public function show(string $id): JsonResponse
     {

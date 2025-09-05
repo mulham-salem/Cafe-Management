@@ -376,6 +376,7 @@
   top: clamp(4px, 1.5vw, 8px);
   max-width: 100%;
 }
+
 .offerForm input:focus,
 .offerForm textarea:focus {
   border-color: #a9744f;
@@ -395,6 +396,10 @@
     minmax(clamp(120px, 20vw, 180px), 1fr)
   );
   gap: clamp(15px, 3vw, 30px);
+}
+
+.itemRow input {
+  height: 80%;
 }
 
 .addItemBtn,

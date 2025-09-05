@@ -18,7 +18,6 @@ return new class extends Migration
             $table->enum('permission', [
                 'User Management',
                 'Menu Management',
-                'Table Management',
                 'Inventory Management',
                 'Supply Management',
                 'Promotion Management',

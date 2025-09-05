@@ -54,12 +54,16 @@ function Login() {
       const role = response.data.role || null;
       const successMessage = response.data.message || "Logged in successfully";
 
+      const storageKey = `${role}Token`; // managerToken, employeeToken, supplierToken, customerToken, deliveryWorkerToken
+
       if (rememberMe) {
-        localStorage.setItem("authToken", token);
+        localStorage.setItem(storageKey, token);
       } else {
-        sessionStorage.setItem("authToken", token);
+        sessionStorage.setItem(storageKey, token);
       }
 
+      sessionStorage.setItem("currentRole", role);
+      
       if (isManager) {
         navigate("/login/manager-dashboard", { state: { successMessage } });
       } else if (role === "employee") {

@@ -97,7 +97,7 @@ const ManagerDashboard = () => {
 
   const handleLogout = async () => {
     const token =
-      sessionStorage.getItem("authToken") || localStorage.getItem("authToken");
+      sessionStorage.getItem("managerToken") || localStorage.getItem("managerToken");
 
     try {
       const response = await axios.post(
@@ -110,8 +110,8 @@ const ManagerDashboard = () => {
         }
       );
 
-      localStorage.removeItem("authToken");
-      sessionStorage.removeItem("authToken");
+      localStorage.removeItem("managerToken");
+      sessionStorage.removeItem("managerToken");
       const successMessage = response.data.message || "Logged out successfully";
       navigate("/login", { state: { message: successMessage } });
     } catch (error) {
@@ -125,7 +125,7 @@ const ManagerDashboard = () => {
 
   const profile = async () => {
     const token =
-      sessionStorage.getItem("authToken") || localStorage.getItem("authToken");
+      sessionStorage.getItem("managerToken") || localStorage.getItem("managerToken");
 
     try {
       const response = await axios.get(
@@ -139,85 +139,83 @@ const ManagerDashboard = () => {
 
       setManagerName(response.data.name || "Manager");
     } catch (error) {
-     // toastify.error("Failed to fetch manager name");
+     toastify.error("Failed to fetch manager name");
     }
   };
 
-  useEffect(() => {
-    const checkNewNotifications = async () => {
-      try {
-        const token =
-          localStorage.getItem("authToken") ||
-          sessionStorage.getItem("authToken");
+useEffect(() => {
+  const checkNewNotifications = async () => {
+    try {
+      const token =
+        localStorage.getItem("managerToken") ||
+        sessionStorage.getItem("managerToken");
 
-        const response = await axios.get(
-          "http://localhost:8000/api/manager/notifications",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-
-        const allNotifications = response.data.notifications;
-
-        const unseenSupplyOffers = allNotifications.filter(
-          (n) => n.seen === 0 && n.purpose === "Supply Offer"
-        );
-
-        const unseenSupplyResponses = allNotifications.filter(
-          (n) => n.seen === 0 && n.purpose === "Response For Supply Request"
-        );
-
-        if (unseenSupplyOffers.length > 0) {
-          toastify.info(
-            `You received ${unseenSupplyOffers.length} new supply offer${
-              unseenSupplyOffers.length > 1 ? "s" : ""
-            }.`
-          );
-
-          const ids = unseenSupplyOffers.map((n) => n.id);
-          await Promise.all(
-            ids.map((id) =>
-              axios.patch(
-                `http://localhost:8000/api/manager/notifications/${id}/seen`,
-                {},
-                {
-                  headers: { Authorization: `Bearer ${token}` },
-                }
-              )
-            )
-          );
+      const response = await axios.get(
+        "http://localhost:8000/api/admin/notifications",
+        {
+          headers: { Authorization: `Bearer ${token}` },
         }
+      );
 
-        if (unseenSupplyResponses.length > 0) {
-          toastify.info(
-            `You received ${unseenSupplyResponses.length} new response${
-              unseenSupplyResponses.length > 1 ? "s" : ""
-            } for your supply request.`
-          );
+      const allNotifications = response.data.notifications;
 
-          const ids = unseenSupplyResponses.map((n) => n.id);
-          await Promise.all(
-            ids.map((id) =>
-              axios.patch(
-                `http://localhost:8000/api/manager/notifications/${id}/seen`,
-                {},
-                {
-                  headers: { Authorization: `Bearer ${token}` },
-                }
-              )
-            )
-          );
-        }
-      } catch (err) {
-        console.error("Failed to load notifications: ", err);
+      // جلب الإشعارات المخزنة مسبقاً
+      const shownNotifications =
+        JSON.parse(localStorage.getItem("shownManagerNotifications")) || [];
+
+      // تصفية الإشعارات الجديدة غير المعروضة سابقاً
+      const unseenSupplyOffers = allNotifications.filter(
+        (n) =>
+          n.seen === 0 &&
+          n.purpose === "Supply Offer" &&
+          !shownNotifications.includes(n.id)
+      );
+
+      const unseenSupplyResponses = allNotifications.filter(
+        (n) =>
+          n.seen === 0 &&
+          n.purpose === "Response For Supply Request" &&
+          !shownNotifications.includes(n.id)
+      );
+
+      if (unseenSupplyOffers.length > 0) {
+        toastify.info(
+          `You received ${unseenSupplyOffers.length} new supply offer${
+            unseenSupplyOffers.length > 1 ? "s" : ""
+          }.`
+        );
+
+        // خزّن IDs لتفادي التكرار
+        const ids = unseenSupplyOffers.map((n) => n.id);
+        localStorage.setItem(
+          "shownManagerNotifications",
+          JSON.stringify([...shownNotifications, ...ids])
+        );
       }
-    };
 
-    checkNewNotifications();
+      if (unseenSupplyResponses.length > 0) {
+        toastify.info(
+          `You received ${unseenSupplyResponses.length} new response${
+            unseenSupplyResponses.length > 1 ? "s" : ""
+          } for your supply request.`
+        );
 
-    const interval = setInterval(checkNewNotifications, 10000);
-    return () => clearInterval(interval);
-  }, []);
+        // خزّن IDs لتفادي التكرار
+        const ids = unseenSupplyResponses.map((n) => n.id);
+        localStorage.setItem(
+          "shownManagerNotifications",
+          JSON.stringify([...shownNotifications, ...ids])
+        );
+      }
+    } catch (err) {
+      console.error("Failed to load notifications: ", err);
+    }
+  };
+
+  checkNewNotifications();
+  const interval = setInterval(checkNewNotifications, 10000);
+  return () => clearInterval(interval);
+}, []);
 
   // search state
   const [searchQuery, setSearchQuery] = useState("");

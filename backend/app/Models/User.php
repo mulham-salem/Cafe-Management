@@ -84,14 +84,14 @@ class User extends Authenticatable
 
     protected $fillable = [
         'manager_id',
-        'name',
+        'full_name',
+        'first_name',
+        'last_name',
+        'image_url',
         'username',
         'email',
         'password',
         'role',
-        'first_name',
-        'last_name',
-        'image_url',
     ];
 
     protected $hidden = ['password', 'remember_token'];

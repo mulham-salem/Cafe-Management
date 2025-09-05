@@ -82,7 +82,8 @@ const SupplierHome = () => {
     }
 
     const token =
-      sessionStorage.getItem("authToken") || localStorage.getItem("authToken");
+      sessionStorage.getItem("supplierToken") ||
+      localStorage.getItem("supplierToken");
 
     try {
       const response = await axios.post(
@@ -128,7 +129,8 @@ const SupplierHome = () => {
 
   const fetchMyOffers = async () => {
     const token =
-      sessionStorage.getItem("authToken") || localStorage.getItem("authToken");
+      sessionStorage.getItem("supplierToken") ||
+      localStorage.getItem("supplierToken");
     try {
       const response = await axios.get(
         "http://localhost:8000/api/user/supplier/view-offers",
@@ -179,7 +181,8 @@ const SupplierHome = () => {
 
   const handleLogout = async () => {
     const token =
-      sessionStorage.getItem("authToken") || localStorage.getItem("authToken");
+      sessionStorage.getItem("supplierToken") ||
+      localStorage.getItem("supplierToken");
 
     try {
       const response = await axios.post(
@@ -192,8 +195,8 @@ const SupplierHome = () => {
         }
       );
 
-      localStorage.removeItem("authToken");
-      sessionStorage.removeItem("authToken");
+      localStorage.removeItem("supplierToken");
+      sessionStorage.removeItem("supplierToken");
       const successMessage = response.data.message || "Logged out successfully";
       navigate("/login", { state: { message: successMessage } });
     } catch (error) {
@@ -207,7 +210,8 @@ const SupplierHome = () => {
 
   const profile = async () => {
     const token =
-      sessionStorage.getItem("authToken") || localStorage.getItem("authToken");
+      sessionStorage.getItem("supplierToken") ||
+      localStorage.getItem("supplierToken");
 
     try {
       const response = await axios.get(
@@ -219,9 +223,9 @@ const SupplierHome = () => {
         }
       );
 
-      setUserName(response.data.name || "User");
+      setUserName(response.data.firstName || "User");
     } catch (error) {
-      //toastify.error("Failed to fetch user name");
+      toastify.error("Failed to fetch user name");
     }
   };
 
@@ -229,8 +233,8 @@ const SupplierHome = () => {
     const checkNewNotifications = async () => {
       try {
         const token =
-          localStorage.getItem("authToken") ||
-          sessionStorage.getItem("authToken");
+          localStorage.getItem("supplierToken") ||
+          sessionStorage.getItem("supplierToken");
 
         const response = await axios.get(
           "http://localhost:8000/api/user/supplier/notifications",
@@ -241,53 +245,48 @@ const SupplierHome = () => {
 
         const allNotifications = response.data.notifications;
 
-        const unseenSupplyOfferResponses = allNotifications.filter(
-          (n) => n.seen === 0 && n.purpose === "Supply Offer Response"
+        const shownNotifications =
+          JSON.parse(localStorage.getItem("shownNotificationsSupplier")) || [];
+
+        const unseenOfferResponses = allNotifications.filter(
+          (n) =>
+            n.seen === 0 &&
+            n.purpose === "Supply Offer Response" &&
+            !shownNotifications.includes(n.id)
         );
 
-        const unseenSupplyRequests = allNotifications.filter(
-          (n) => n.seen === 0 && n.purpose === "Supply Request"
+        const unseenRequests = allNotifications.filter(
+          (n) =>
+            n.seen === 0 &&
+            n.purpose === "Supply Request" &&
+            !shownNotifications.includes(n.id)
         );
 
-        if (unseenSupplyOfferResponses.length > 0) {
+        if (unseenOfferResponses.length > 0) {
           toastify.info(
-            `You received ${unseenSupplyOfferResponses.length} response${
-              unseenSupplyOfferResponses.length > 1 ? "s" : ""
+            `You received ${unseenOfferResponses.length} response${
+              unseenOfferResponses.length > 1 ? "s" : ""
             } for your supply offer.`
           );
 
-          const ids = unseenSupplyOfferResponses.map((n) => n.id);
-          await Promise.all(
-            ids.map((id) =>
-              axios.patch(
-                `http://localhost:8000/api/user/supplier/notifications/${id}/seen`,
-                {},
-                {
-                  headers: { Authorization: `Bearer ${token}` },
-                }
-              )
-            )
+          const ids = unseenOfferResponses.map((n) => n.id);
+          localStorage.setItem(
+            "shownNotificationsSupplier",
+            JSON.stringify([...shownNotifications, ...ids])
           );
         }
 
-        if (unseenSupplyRequests.length > 0) {
+        if (unseenRequests.length > 0) {
           toastify.info(
-            `You received ${unseenSupplyRequests.length} new supply request${
-              unseenSupplyRequests.length > 1 ? "s" : ""
+            `You received ${unseenRequests.length} new supply request${
+              unseenRequests.length > 1 ? "s" : ""
             }.`
           );
 
-          const ids = unseenSupplyRequests.map((n) => n.id);
-          await Promise.all(
-            ids.map((id) =>
-              axios.patch(
-                `http://localhost:8000/api/user/supplier/notifications/${id}/seen`,
-                {},
-                {
-                  headers: { Authorization: `Bearer ${token}` },
-                }
-              )
-            )
+          const ids = unseenRequests.map((n) => n.id);
+          localStorage.setItem(
+            "shownNotificationsSupplier",
+            JSON.stringify([...shownNotifications, ...ids])
           );
         }
       } catch (err) {
@@ -296,7 +295,6 @@ const SupplierHome = () => {
     };
 
     checkNewNotifications();
-
     const interval = setInterval(checkNewNotifications, 10000);
     return () => clearInterval(interval);
   }, []);
@@ -495,6 +493,7 @@ const SupplierHome = () => {
   const toggleExpand = (id) => {
     setExpandedRecords((prev) => (prev === id ? null : id));
   };
+
   return (
     <div className={styles.container}>
       <ToastContainer />
@@ -651,15 +650,24 @@ const SupplierHome = () => {
                   }
                 />
 
-                <input
-                  type="text"
-                  placeholder="Unit"
+                <select
                   value={item.unit}
                   onChange={(e) =>
                     handleItemChange(item.id, "unit", e.target.value)
                   }
-                />
-
+                  required
+                >
+                  <option value="" disabled>
+                    Unit
+                  </option>
+                  <option value="kg">kg</option>
+                  <option value="g">g</option>
+                  <option value="liter">liter</option>
+                  <option value="ml">ml</option>
+                  <option value="dozen">dozen</option>
+                  <option value="box">box</option>
+                  <option value="piece">piece</option>
+                </select>
                 <input
                   type="number"
                   placeholder="Unit Price"
@@ -871,10 +879,8 @@ const SupplierHome = () => {
           </section>
         )}
 
-        {currentPath === "/login/supplier-home" && (
-          <SidebarToggle roleProp="supplier" />
-        )}
-        
+        {currentPath === "/login/supplier-home" && <SidebarToggle />}
+
         <SupplierSearchContext.Provider
           value={{
             searchQuery,

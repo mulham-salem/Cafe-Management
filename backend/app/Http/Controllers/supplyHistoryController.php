@@ -9,7 +9,7 @@ class supplyHistoryController extends Controller
 {
     public function index()
     {
-        // ====== جلب عروض التوريد (supply offers) ======
+        // ====== جلب عروض التوريد ======
         $offers = SupplyOffer::with('supplyOfferItems')->get()->map(function ($offer) {
             return [
                 'id' => $offer->id,
@@ -29,7 +29,7 @@ class supplyHistoryController extends Controller
             ];
         });
 
-        // ====== جلب طلبات التوريد (supply requests) ======
+        // ====== جلب طلبات التوريد ======
         $requests = SupplyRequest::with(['supplyRequestItems.inventoryItem'])->get()->map(function ($request) {
             return [
                 'id' => $request->id,
@@ -44,14 +44,18 @@ class supplyHistoryController extends Controller
                         'unit' => $item->inventoryItem->unit ?? null,
                     ];
                 }),
-                'totalPrice' => null, // الطلب ما فيه total price
+                'totalPrice' => null,
                 'rejectionReason' => $request->reject_reason,
             ];
         });
 
-        // ====== دمج الطلبات والعروض مع بعض ======
-        $history = $offers->merge($requests)->sortBy('id')->values();
+        // ====== دمج الطلبات والعروض ======
+        $history = collect($offers)
+            ->concat($requests) // بدل merge
+            ->sortBy('id')
+            ->values();
 
         return response()->json($history);
     }
+
 }

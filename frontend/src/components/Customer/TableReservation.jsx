@@ -109,7 +109,7 @@ const TableReservation = () => {
   const [editingReservationId, setEditingReservationId] = useState(null);
 
   const token =
-    sessionStorage.getItem("authToken") || localStorage.getItem("authToken");
+    sessionStorage.getItem("customerToken") || localStorage.getItem("customerToken");
 
   axios.defaults.withCredentials = true;
   axios.defaults.baseURL = "http://localhost:8000/api";

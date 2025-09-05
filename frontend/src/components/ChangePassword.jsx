@@ -44,11 +44,17 @@ const ChangePassword = () => {
     apiBase = "http://localhost:8000/api/customer";
   }
 
+  function getCurrentToken() {
+    const role = sessionStorage.getItem("currentRole");
+    if ( !role ) return null;
+    return sessionStorage.getItem(`${role}Token`) || localStorage.getItem(`${role}Token`);
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const token =
-      sessionStorage.getItem("authToken") || localStorage.getItem("authToken");
+    const token = getCurrentToken();
+    if ( !token ) return;
 
     try {
       const response = await axios.post(

@@ -38,9 +38,11 @@
   transform-origin: left center;
   will-change: transform;
 }
+
 .edgeButton:active {
   transform: translateX(4px);
 }
+
 .edgeButton:hover {
   background: rgba(15, 23, 42, 0.04);
 }
@@ -83,10 +85,12 @@
   0% {
     opacity: 0.8;
   }
+
   50% {
     opacity: 1;
     transform: scale(1.1);
   }
+
   100% {
     opacity: 0.8;
   }
@@ -156,6 +160,7 @@
   padding-bottom: 8px;
   border-bottom: 1px dashed rgba(15, 23, 42, 0.04);
 }
+
 .headerTitle {
   font-family: "Ubuntu";
   margin: 0;
@@ -184,6 +189,7 @@
   justify-content: center;
   color: #475569;
 }
+
 .closeSmall:hover {
   color: #0f172a;
   transform: translateX(-2px);
@@ -214,6 +220,7 @@
   transition: transform 140ms ease, background 140ms ease, box-shadow 140ms ease;
   will-change: transform;
 }
+
 .linkItem:hover {
   transform: translateX(6px);
   background: rgba(66, 45, 12, 0.06); /* subtle indigo hover */
@@ -258,6 +265,7 @@
 .linkList::-webkit-scrollbar {
   width: 8px;
 }
+
 .linkList::-webkit-scrollbar-thumb {
   background: rgba(15, 23, 42, 0.06);
   border-radius: 6px;
@@ -268,16 +276,19 @@
   :global(.edgeWrapper) {
     top: 68px;
   }
+
   :global(.sidebar) {
     top: 56px;
     height: calc(100vh - 56px);
     width: 220px;
     padding: 12px;
   }
+
   .tipBubble {
     font-size: 12px;
     padding: 6px 8px;
   }
+
   .edgeButton {
     width: 34px;
     height: 44px;
@@ -288,10 +299,12 @@
   :global(.sidebar) {
     width: 200px;
   }
+
   .linkItem {
     padding: 8px 10px;
     font-size: 13px;
   }
+
   .iconWrap {
     min-width: 32px;
     min-height: 32px;

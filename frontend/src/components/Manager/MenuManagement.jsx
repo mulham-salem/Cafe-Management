@@ -1,11 +1,11 @@
-import React, { useState, useRef, useEffect, useContext, useMemo } from 'react';
+import { useState, useRef, useEffect, useContext, useMemo } from "react";
 import styles from "../styles/MenuManagement.module.css";
 import "../styles/toastStyles.css";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPen, faTrash, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPen, faTrash, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import axios from 'axios'; 
+import axios from "axios";
 import { SearchContext } from "./ManagerDashboard";
 import { EmpSearchContext } from "../Employee/EmployeeHome";
 import { usePermissions } from "../../context/PermissionsContext";
@@ -18,16 +18,16 @@ const mockMenu = [
     price: 8.99,
     category: "snacks",
     image_url: "https://example.com/images/burger.jpg",
-    available: true
+    available: true,
   },
   {
     id: 2,
     name: "Mojito",
     description: "Refreshing mint lime cocktail with rum",
-    price: 7.50,
+    price: 7.5,
     category: "drinks",
     image_url: "https://example.com/images/mojito.jpg",
-    available: true
+    available: true,
   },
   {
     id: 3,
@@ -36,7 +36,7 @@ const mockMenu = [
     price: 3.99,
     category: "snacks",
     image_url: "https://example.com/images/fries.jpg",
-    available: true
+    available: true,
   },
   {
     id: 4,
@@ -45,7 +45,7 @@ const mockMenu = [
     price: 4.25,
     category: "drinks",
     image_url: "https://example.com/images/iced-coffee.jpg",
-    available: true
+    available: true,
   },
   {
     id: 5,
@@ -54,16 +54,16 @@ const mockMenu = [
     price: 6.75,
     category: "snacks",
     image_url: "https://example.com/images/wings.jpg",
-    available: false
+    available: false,
   },
   {
     id: 6,
     name: "Orange Juice",
     description: "Freshly squeezed orange juice",
-    price: 3.50,
+    price: 3.5,
     category: "drinks",
     image_url: "https://example.com/images/orange-juice.jpg",
-    available: true
+    available: true,
   },
   {
     id: 7,
@@ -72,16 +72,16 @@ const mockMenu = [
     price: 5.99,
     category: "snacks",
     image_url: "https://example.com/images/nachos.jpg",
-    available: true
+    available: true,
   },
   {
     id: 8,
     name: "Craft Beer",
     description: "Local IPA with citrus notes",
-    price: 6.00,
+    price: 6.0,
     category: "drinks",
     image_url: "https://example.com/images/beer.jpg",
-    available: true
+    available: true,
   },
   {
     id: 9,
@@ -90,27 +90,36 @@ const mockMenu = [
     price: 7.25,
     category: "snacks",
     image_url: "https://example.com/images/salad.jpg",
-    available: true
+    available: true,
   },
   {
     id: 10,
     name: "Mineral Water",
     description: "Sparkling water with lemon slice",
-    price: 2.00,
+    price: 2.0,
     category: "drinks",
     image_url: "https://example.com/images/water.jpg",
-    available: true
-  }
+    available: true,
+  },
 ];
 
 const MenuManagement = () => {
+  
+  function getCurrentToken() {
+    const role = sessionStorage.getItem("currentRole");
+    if (!role) return null;
+    return (
+      sessionStorage.getItem(`${role}Token`) ||
+      localStorage.getItem(`${role}Token`)
+    );
+  }
 
-  const token = sessionStorage.getItem('authToken') || localStorage.getItem('authToken');
+  const token = getCurrentToken();
   const axiosInstance = axios.create({
-    baseURL: "http://localhost:8000/api", 
-    withCredentials: true, 
+    baseURL: "http://localhost:8000/api",
+    withCredentials: true,
     headers: {
-      Authorization: `Bearer ${token}`, 
+      Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
       Accept: "application/json",
     },
@@ -118,13 +127,13 @@ const MenuManagement = () => {
 
   useEffect(() => {
     document.title = "Cafe Delights - Menu Management";
-    fetchMenuItems(); 
+    fetchMenuItems();
   }, []);
 
   const [editingId, setEditingId] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const formRef = useRef(null);
-  const [loading, setLoading] = useState(true); 
+  const [loading, setLoading] = useState(true);
   const { permissions, role } = usePermissions();
 
   useEffect(() => {
@@ -135,37 +144,36 @@ const MenuManagement = () => {
       }
     };
     if (showForm) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside);
     }
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [showForm]);
 
   const [menuItems, setMenuItems] = useState([]);
 
- 
   const [newItem, setNewItem] = useState({
-    name: '',
-    description: '',
-    price: '',
-    category: 'drinks', 
-    image_url: '', 
+    name: "",
+    description: "",
+    price: "",
+    category: "drinks",
+    image_url: "",
     available: true,
   });
 
   const fetchMenuItems = async () => {
     try {
-      const response = await axiosInstance.get('/manager/menuitem');
-      const formattedItems = response.data.map(item => ({
+      const response = await axiosInstance.get("/admin/menuitem");
+      const formattedItems = response.data.map((item) => ({
         ...item,
-        category: item.category_name ? item.category_name.toLowerCase() : '',
-        image_url: item.image_url || '', 
+        category: item.category_name ? item.category_name.toLowerCase() : "",
+        image_url: item.image_url || "",
       }));
       setMenuItems(formattedItems);
-      // setMenuItems(mockMenu);
     } catch (error) {
-      toast.error('Failed to load menu items. Please ensure you are logged in.');
+      toast.error("Failed to load menu items. mockData will be displayed.");
+      setMenuItems(mockMenu);
     } finally {
       setLoading(false);
     }
@@ -175,7 +183,7 @@ const MenuManagement = () => {
     const { name, value, type, checked } = e.target;
     setNewItem((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value,
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
@@ -183,7 +191,7 @@ const MenuManagement = () => {
     const { name, description, price, image_url, category } = newItem;
 
     if (!name || !description || !price || !image_url || !category) {
-      toast.error('Please fill out all required fields');
+      toast.error("Please fill out all required fields");
       return;
     }
 
@@ -191,28 +199,36 @@ const MenuManagement = () => {
       const itemData = {
         name,
         description,
-        price: parseFloat(price), 
-        category, 
-        image_url, 
+        price: parseFloat(price),
+        category,
+        image_url,
         available: newItem.available,
       };
 
       if (editingId !== null) {
-        const response = await axiosInstance.put(`/manager/menuitem/${editingId}`, itemData);
-        toast.success(response.data.message || 'Item updated successfully');
+        const response = await axiosInstance.put(
+          `/admin/menuitem/${editingId}`,
+          itemData
+        );
+        toast.success(response.data.message || "Item updated successfully");
       } else {
-        const response = await axiosInstance.post('/manager/menuitem', itemData);
-        toast.success(response.data.message || 'Item added successfully');
+        const response = await axiosInstance.post("/admin/menuitem", itemData);
+        toast.success(response.data.message || "Item added successfully");
       }
-      fetchMenuItems(); 
-      clearForm(); 
+      fetchMenuItems();
+      clearForm();
       setShowForm(false);
     } catch (error) {
-      console.error('Error saving menu item:', error);
+      console.error("Error saving menu item:", error);
       if (error.response && error.response.data && error.response.data.errors) {
-        Object.values(error.response.data.errors).forEach(([msg]) => toast.error(msg));
+        Object.values(error.response.data.errors).forEach(([msg]) =>
+          toast.error(msg)
+        );
       } else {
-        toast.error(error.response?.data?.message || 'Failed to save menu item. Check server logs.');
+        toast.error(
+          error.response?.data?.message ||
+            "Failed to save menu item. Check server logs."
+        );
       }
     }
   };
@@ -224,11 +240,13 @@ const MenuManagement = () => {
         name: itemToEdit.name,
         description: itemToEdit.description,
         price: itemToEdit.price,
-        category: itemToEdit.category_name ? itemToEdit.category_name.toLowerCase() : '',
+        category: itemToEdit.category_name
+          ? itemToEdit.category_name.toLowerCase()
+          : "",
         image_url: itemToEdit.image_url,
         available: itemToEdit.available,
       });
-      setEditingId(id); 
+      setEditingId(id);
       setShowForm(true);
     } else {
       toast.error("Item not found for editing.");
@@ -244,25 +262,32 @@ const MenuManagement = () => {
             <button
               onClick={async () => {
                 try {
-                  const response = await axiosInstance.delete(`/manager/menuitem/${id}`); 
-                  toast.success(response.data.message || 'Item deleted successfully');
-                  fetchMenuItems(); 
+                  const response = await axiosInstance.delete(
+                    `/admin/menuitem/${id}`
+                  );
+                  toast.success(
+                    response.data.message || "Item deleted successfully"
+                  );
+                  fetchMenuItems();
                 } catch (error) {
-                  console.error('Error deleting menu item:', error);
+                  console.error("Error deleting menu item:", error);
                   if (error.response && error.response.status === 403) {
-                    toast.error(error.response.data.message || 'Failed to delete item due to active orders.');
+                    toast.error(
+                      error.response.data.message ||
+                        "Failed to delete item due to active orders."
+                    );
                   } else {
-                    toast.error(error.response?.data?.message || 'Failed to delete item.');
+                    toast.error(
+                      error.response?.data?.message || "Failed to delete item."
+                    );
                   }
                 }
-                closeToast(); 
+                closeToast();
               }}
             >
               Yes
             </button>
-            <button onClick={closeToast} >
-              Cancel
-            </button>
+            <button onClick={closeToast}>Cancel</button>
           </div>
         </div>
       ),
@@ -279,17 +304,16 @@ const MenuManagement = () => {
     );
   };
 
-
   const clearForm = () => {
     setNewItem({
-      name: '',
-      description: '',
-      price: '',
-      category: 'drinks',
-      image_url: '',
+      name: "",
+      description: "",
+      price: "",
+      category: "drinks",
+      image_url: "",
       available: true,
     });
-    setEditingId(null); 
+    setEditingId(null);
   };
 
   const managerContext = useContext(SearchContext);
@@ -298,22 +322,17 @@ const MenuManagement = () => {
   const { searchQuery, setSearchPlaceholder } = context;
 
   const filteredItems = useMemo(() => {
-    return menuItems.filter(item => 
-      searchQuery === "" || 
-      item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.category.toLowerCase().includes(searchQuery.toLowerCase())
+    return menuItems.filter(
+      (item) =>
+        searchQuery === "" ||
+        item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.category.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [menuItems, searchQuery]);
 
   useEffect(() => {
     setSearchPlaceholder("Search by item or category...");
   }, [setSearchPlaceholder]);
-
-  const visibleCategories = useMemo(() => {
-    const categories = new Set();
-    filteredItems.forEach(item => categories.add(item.category));
-    return Array.from(categories);
-  }, [filteredItems]);
 
   if (loading) {
     return (
@@ -332,24 +351,47 @@ const MenuManagement = () => {
       <h3 className="sectionTitle">{title}</h3>
       <hr className="sectionDivider" />
       <div className="menuGrid">
-        { filteredItems.filter((item) => item.category === category).length === 0 ? (
-          <p className={styles.noItemsMessage}>No menu items available in this category.</p>
+        {filteredItems.filter((item) => item.category === category).length ===
+        0 ? (
+          <p className={styles.noItemsMessage}>
+            No menu items available in this category.
+          </p>
         ) : (
           filteredItems
             .filter((item) => item.category === category)
             .map((item) => (
-              <div className={styles.card} key={item.id}> 
-                <img src={`/${item.image_url}`} alt={item.name} className={styles.cardImage} />
+              <div className={styles.card} key={item.id}>
+                <img
+                  src={`/${item.image_url}`}
+                  alt={item.name}
+                  className={styles.cardImage}
+                />
                 <div className={styles.cardContent}>
                   <h4>{item.name}</h4>
                   <p>{item.description}</p>
-                  <p><strong>Price:</strong> ${item.price}</p>
-                  <p><strong>Category:</strong> {item.category_name}</p> 
-                  <p><strong>Available:</strong> {item.available ? 'Yes' : 'No'}</p>
+                  <p>
+                    <strong>Price:</strong> ${item.price}
+                  </p>
+                  <p>
+                    <strong>Category:</strong> {item.category_name}
+                  </p>
+                  <p>
+                    <strong>Available:</strong> {item.available ? "Yes" : "No"}
+                  </p>
                 </div>
                 <div className={styles.cardActions}>
-                  <FontAwesomeIcon icon={faPen} onClick={() => handleEdit(item.id)} data-action="Edit" title="Edit" />
-                  <FontAwesomeIcon icon={faTrash} onClick={() => handleDelete(item.id)} data-action="Delete" title="Delete" />
+                  <FontAwesomeIcon
+                    icon={faPen}
+                    onClick={() => handleEdit(item.id)}
+                    data-action="Edit"
+                    title="Edit"
+                  />
+                  <FontAwesomeIcon
+                    icon={faTrash}
+                    onClick={() => handleDelete(item.id)}
+                    data-action="Delete"
+                    title="Delete"
+                  />
                 </div>
               </div>
             ))
@@ -361,7 +403,13 @@ const MenuManagement = () => {
   return (
     <div className="menuContainer">
       <ToastContainer />
-      <button onClick={() => { clearForm(); setShowForm(true); }} className="addButton">
+      <button
+        onClick={() => {
+          clearForm();
+          setShowForm(true);
+        }}
+        className="addButton"
+      >
         <FontAwesomeIcon icon={faPlus} /> Add New Item
       </button>
       {showForm && (
@@ -389,13 +437,18 @@ const MenuManagement = () => {
               onChange={handleInputChange}
               required
             />
-            <select name="category" value={newItem.category} onChange={handleInputChange} required>
+            <select
+              name="category"
+              value={newItem.category}
+              onChange={handleInputChange}
+              required
+            >
               <option value="drinks">Drinks</option>
               <option value="snacks">Snacks</option>
             </select>
             <input
               type="text"
-              name="image_url" 
+              name="image_url"
               placeholder="Image Path (e.g., Drinks/coffee.jpg)"
               value={newItem.image_url}
               onChange={handleInputChange}
@@ -411,13 +464,14 @@ const MenuManagement = () => {
               Available
             </label>
             <button onClick={handleAddOrEditItem} className={styles.saveButton}>
-              {editingId !== null ? 'Update Item' : 'Add Item'}
+              {editingId !== null ? "Update Item" : "Add Item"}
             </button>
           </div>
         </div>
       )}
-    {visibleCategories.includes('drinks') && renderSection('Drinks', 'drinks')}
-    {visibleCategories.includes('snacks') && renderSection('Snacks', 'snacks')}
+
+      {renderSection("Drinks", "drinks")}
+      {renderSection("Snacks", "snacks")}
     </div>
   );
 };

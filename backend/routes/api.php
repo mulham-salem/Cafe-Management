@@ -17,21 +17,24 @@ use App\Http\Controllers\UserAuthController;
 use App\Http\Controllers\UserManagementController;
 use Illuminate\Support\Facades\Route;
 
-// .......................................................User Routes.........................................................
+// ......................................................User Routes.........................................................
 
 Route::post('/user/login', [UserAuthController::class, 'login'])->middleware('throttle:3,1');
 Route::post('/user/reset-password-link', [UserAuthController::class, 'sendResetLink'])->middleware('throttle:3,1');
 Route::post('/user/reset-password', [UserAuthController::class, 'resetPassword'])->middleware('throttle:3,1');
 
 Route::middleware('auth:sanctum')->prefix('user')->group(function () {
+
     Route::get('/me', [UserAuthController::class, 'me']);
     Route::get('/profile', [UserAuthController::class, 'profile']);
     Route::post('/logout', [UserAuthController::class, 'logout']);
     Route::post('/change-password', [UserAuthController::class, 'changePassword']);
-    // .................................MyAccount...........................................................
-    Route::get('/user/profile', [UserAuthController::class, 'profile']);
-    Route::put('/user/profile', [UserAuthController::class, 'updateProfile']);
-    Route::post('/user/upload-avatar', [UserAuthController::class, 'uploadAvatar']);
+
+    // ....................................................MyAccount...........................................................
+
+    Route::get('/account', [UserAuthController::class, 'myAccount']);
+    Route::put('edit/account', [UserAuthController::class, 'updateMyAccount']);
+    Route::post('/upload-avatar', [UserAuthController::class, 'uploadAvatar']);
 });
 
 // ......................................................Manager Routes......................................................
@@ -44,28 +47,31 @@ Route::middleware(['auth:manager', 'isManager'])->prefix('manager')->group(funct
     Route::post('/logout', [ManagerAuthController::class, 'logout']);
     Route::post('/change-password', [ManagerAuthController::class, 'changePassword']);
 
-    Route::get('/purchase-bills', [BillManagementController::class, 'index']);
-
-    Route::get('/notifications', [NotificationManagementController::class, 'getAllManagerNotifications']);
-    Route::patch('/notifications/{id}/seen', [NotificationManagementController::class, 'markAsSeen']);
 });
-// ....................................................if you gave new permission to a certain user he will pass from here ..............................
-Route::prefix('Admin')->group(function () {
+
+// ...........................if you gave new permission to a certain user he will pass from here ..............................
+
+Route::prefix('admin')->group(function () {
     Route::apiResource('/users', UserManagementController::class)->middleware('CheckPermission:User Management');
     Route::apiResource('/menuitem', MenuManagementController::class)->middleware('CheckPermission:Menu Management');
+
     Route::middleware('CheckPermission:Supply Management')->group(function () {
 
         Route::apiResource('/supply', SupplyManagementController::class);
         Route::get('/suppliers', [SupplyManagementController::class, 'getSuppliers']);
         Route::post('/supply-offers/{id}/accept', [SupplyManagementController::class, 'acceptOffer']);
         Route::post('/supply-offers/{id}/reject', [SupplyManagementController::class, 'rejectOffer']);
+        Route::get('/purchase-bills', [BillManagementController::class, 'index']);
         Route::post('/supply-purchase-bill', [SupplyManagementController::class, 'storePurchaseBill']);
         Route::get('/supply-history', [supplyHistoryController::class, 'index']);
 
     });
-    Route::apiResource('/inventory', InventoryManagementController::class)->middleware('CheckPermission:Inventory Management');
 
+    Route::apiResource('/inventory', InventoryManagementController::class)->middleware('CheckPermission:Inventory Management');
+    Route::get('/notifications', [NotificationManagementController::class, 'getAllManagerNotifications']);
+    Route::patch('/notifications/{id}/seen', [NotificationManagementController::class, 'markAsSeen']);
     Route::apiResource('/promotion', PromotionManagementController::class)->middleware('CheckPermission:Promotion Management');
+
     Route::middleware(['CheckPermission:Report Dashboard'])->group(function () {
         Route::post('/reports/sales', [ReportDashboardController::class, 'salesReport']);
         Route::post('/reports/finance', [ReportDashboardController::class, 'financialReport']);

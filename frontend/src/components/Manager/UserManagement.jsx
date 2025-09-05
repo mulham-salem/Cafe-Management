@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useMemo } from "react";
+import { useState, useEffect, useContext, useMemo } from "react";
 import styles from "../styles/UserManagement.module.css";
 import "../styles/toastStyles.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -20,7 +20,7 @@ import { usePermissions } from "../../context/PermissionsContext";
 const mockUsers = [
   {
     id: 1,
-    name: "John Smith",
+    fullName: "John Smith",
     email: "john.smith@example.com",
     username: "john2023",
     password: "P@ssw0rd123",
@@ -29,25 +29,25 @@ const mockUsers = [
   },
   {
     id: 2,
-    name: "Emily Johnson",
+    fullName: "Emily Johnson",
     email: "emily.j@example.com",
     username: "emily_tech",
     password: "SecurePass!2023",
-    role: "admin",
+    role: "customer",
     permission: "Default",
   },
   {
     id: 3,
-    name: "Michael Brown",
+    fullName: "Michael Brown",
     email: "michael.b@example.com",
     username: "mike_brown",
     password: "Mike@12345",
-    role: "supplier",
+    role: "customer",
     permission: "Default",
   },
   {
     id: 4,
-    name: "Sarah Wilson",
+    fullName: "Sarah Wilson",
     email: "sarah.w@example.com",
     username: "sarah_w",
     password: "Sarah#2023",
@@ -56,7 +56,7 @@ const mockUsers = [
   },
   {
     id: 5,
-    name: "David Miller",
+    fullName: "David Miller",
     email: "david.m@example.com",
     username: "david_m",
     password: "Dav1d$Pass",
@@ -65,7 +65,7 @@ const mockUsers = [
   },
   {
     id: 6,
-    name: "Jessica Davis",
+    fullName: "Jessica Davis",
     email: "jessica.d@example.com",
     username: "jessica_d",
     password: "J3ssica!2023",
@@ -74,7 +74,7 @@ const mockUsers = [
   },
   {
     id: 7,
-    name: "Robert Taylor",
+    fullName: "Robert Taylor",
     email: "robert.t@example.com",
     username: "robert_t",
     password: "R0bert@2023",
@@ -83,7 +83,7 @@ const mockUsers = [
   },
   {
     id: 8,
-    name: "Jennifer Anderson",
+    fullName: "Jennifer Anderson",
     email: "jennifer.a@example.com",
     username: "jennifer_a",
     password: "J3nn!fer123",
@@ -92,16 +92,16 @@ const mockUsers = [
   },
   {
     id: 9,
-    name: "William Thomas",
+    fullName: "William Thomas",
     email: "william.t@example.com",
     username: "will_t",
     password: "W1ll@Pass2023",
-    role: "admin",
+    role: "customer",
     permission: "Default",
   },
   {
     id: 10,
-    name: "Elizabeth Martinez",
+    fullName: "Elizabeth Martinez",
     email: "elizabeth.m@example.com",
     username: "liz_m",
     password: "L!z2023",
@@ -110,16 +110,16 @@ const mockUsers = [
   },
   {
     id: 11,
-    name: "William Thomas",
+    fullName: "William Thomas",
     email: "william.t@example.com",
     username: "will_t",
     password: "W1ll@Pass2023",
-    role: "admin",
+    role: "delivery_worker",
     permission: "Default",
   },
   {
     id: 12,
-    name: "Elizabeth Martinez",
+    fullName: "Elizabeth Martinez",
     email: "elizabeth.m@example.com",
     username: "liz_m",
     password: "L!z2023",
@@ -128,20 +128,20 @@ const mockUsers = [
   },
   {
     id: 13,
-    name: "William Thomas",
+    fullName: "William Thomas",
     email: "william.t@example.com",
     username: "will_t",
     password: "W1ll@Pass2023",
-    role: "admin",
+    role: "customer",
     permission: "Default",
   },
   {
     id: 14,
-    name: "Elizabeth Martinez",
+    fullName: "Elizabeth Martinez",
     email: "elizabeth.m@example.com",
     username: "liz_m",
     password: "L!z2023",
-    role: "supplier",
+    role: "customer",
     permission: "Default",
   },
 ];
@@ -150,7 +150,7 @@ const UserManagement = () => {
   const [users, setUsers] = useState([]);
   const [showInputs, setShowInputs] = useState(false);
   const [newUser, setNewUser] = useState({
-    name: "",
+    fullName: "",
     email: "",
     username: "",
     password: "",
@@ -174,8 +174,16 @@ const UserManagement = () => {
     "Report Dashboard",
   ];
 
-  const token =
-    sessionStorage.getItem("authToken") || localStorage.getItem("authToken");
+  function getCurrentToken() {
+    const role = sessionStorage.getItem("currentRole");
+    if (!role) return null;
+    return (
+      sessionStorage.getItem(`${role}Token`) ||
+      localStorage.getItem(`${role}Token`)
+    );
+  }
+
+  const token = getCurrentToken();
   const axiosInstance = axios.create({
     baseURL: "http://localhost:8000/api",
     withCredentials: true,
@@ -193,15 +201,16 @@ const UserManagement = () => {
 
   const fetchUsers = async () => {
     try {
-      // const res = await axiosInstance.get("/manager/users");
-      // const formattedUsers = res.data.map((u) => ({
-      //   ...u,
-      //   permission: Array.isArray(u.permissions) ? u.permissions : [],
-      // }));
-      // setUsers(formattedUsers);
-      setUsers(mockUsers);
+      const res = await axiosInstance.get("/admin/users");
+      const formattedUsers = res.data.map((u) => ({
+        ...u,
+        permission: Array.isArray(u.permissions) ? u.permissions : [],
+      }));
+      setUsers(formattedUsers);
     } catch (error) {
-      toast.error("Failed to load users.");
+      console.error(error);
+      toast.error("Failed to load users. mockData will be displayed");
+      setUsers(mockUsers);
     } finally {
       setLoading(false);
     }
@@ -228,14 +237,18 @@ const UserManagement = () => {
       updated = selectedPermissions.filter((p) => p !== perm);
     } else {
       if (selectedPermissions.length >= 3) return;
-      updated = [...selectedPermissions, perm];
+      const tempPermissions = selectedPermissions.includes("Default")
+        ? selectedPermissions.filter((p) => p !== "Default")
+        : [...selectedPermissions];
+      updated = [...tempPermissions, perm];
     }
+    if (updated.length === 0) updated = ["Default"];
     setSelectedPermissions(updated);
   };
 
   const handleAddUser = async () => {
-    const { name, email, username, password, role } = newUser;
-    if (!name || !email || !username || !password || !role) {
+    const { fullName, email, username, password, role } = newUser;
+    if (!fullName || !email || !username || !password || !role) {
       toast.error("Please fill in all fields.");
       return;
     }
@@ -247,13 +260,13 @@ const UserManagement = () => {
       permissions = selectedPermissions.includes("Inventory Management")
         ? ["Inventory Management"]
         : [];
-    } else if (role === "customer") {
+    } else {
       permissions = ["Default"];
     }
 
     try {
-      const res = await axiosInstance.post("/manager/users", {
-        name,
+      const res = await axiosInstance.post("/admin/users", {
+        fullName,
         email,
         username,
         password,
@@ -263,6 +276,7 @@ const UserManagement = () => {
 
       const newUserFromServer = {
         ...res.data.user,
+        fullName: res.data.user.full_name,
         permission: res.data.permissions,
       };
 
@@ -271,7 +285,13 @@ const UserManagement = () => {
       setShowInputs(false);
       setShowPermissionPopup(false);
       setSelectedPermissions([]);
-      setNewUser({ name: "", email: "", username: "", password: "", role: "" });
+      setNewUser({
+        fullName: "",
+        email: "",
+        username: "",
+        password: "",
+        role: "",
+      });
     } catch (err) {
       if (err.response?.data?.errors) {
         Object.values(err.response.data.errors).forEach(([msg]) =>
@@ -299,7 +319,13 @@ const UserManagement = () => {
     setSelectedPermissions([]);
 
     setShowInputs(false);
-    setNewUser({ name: "", email: "", username: "", password: "", role: "" });
+    setNewUser({
+      fullName: "",
+      email: "",
+      username: "",
+      password: "",
+      role: "",
+    });
 
     setUserToAssign(null);
     setIsAssigningPermissions(false);
@@ -332,8 +358,8 @@ const UserManagement = () => {
   };
 
   const handleSaveEdit = async () => {
-    const { id, name, email, username, password, role } = editedUser;
-    if (!name || !email || !username || !role) {
+    const { id, fullName, email, username, password, role } = editedUser;
+    if (!fullName || !email || !username || !role) {
       toast.error("Please fill in all fields.");
       return;
     }
@@ -346,13 +372,13 @@ const UserManagement = () => {
       permissions = selectedPermissions.includes("Inventory Management")
         ? ["Inventory Management"]
         : ["Default"];
-    } else if (role === "customer") {
+    } else {
       permissions = ["Default"];
     }
 
     try {
-      const res = await axiosInstance.put(`/manager/users/${id}`, {
-        name,
+      const res = await axiosInstance.put(`/admin/users/${id}`, {
+        fullName,
         email,
         username,
         password: password || undefined,
@@ -362,6 +388,7 @@ const UserManagement = () => {
 
       const updatedUser = {
         ...res.data.user,
+        fullName: res.data.user.full_name,
         permission: res.data.permissions,
       };
 
@@ -372,13 +399,19 @@ const UserManagement = () => {
       setSelectedPermissions([]);
       setShowPermissionPopup(false);
     } catch (err) {
-      toast.error("Failed to update user.");
+      if (err.response?.data?.errors) {
+        Object.values(err.response.data.errors).forEach(([msg]) =>
+          toast.error(msg)
+        );
+      } else {
+        toast.error("Failed to update user.");
+      }
     }
   };
 
   const handleDeleteUser = async (user) => {
     try {
-      await axiosInstance.delete(`/manager/users/${user.id}`);
+      await axiosInstance.delete(`/admin/users/${user.id}`);
       setUsers(users.filter((u) => u.id !== user.id));
       toast.success("User deleted successfully.");
     } catch {
@@ -416,12 +449,12 @@ const UserManagement = () => {
         permissionsToSend = selectedPermissions.includes("Inventory Management")
           ? ["Inventory Management"]
           : ["Default"];
-      } else if (userToAssign.role === "customer") {
+      } else {
         permissionsToSend = ["Default"];
       }
 
-      const res = await axiosInstance.put(`/manager/users/${userToAssign.id}`, {
-        name: userToAssign.name,
+      const res = await axiosInstance.put(`/admin/users/${userToAssign.id}`, {
+        fullName: userToAssign.fullName,
         email: userToAssign.email,
         username: userToAssign.username,
         password: undefined,
@@ -431,6 +464,7 @@ const UserManagement = () => {
 
       const updatedUser = {
         ...res.data.user,
+        fullName: res.data.user.full_name,
         permission: res.data.permissions,
       };
 
@@ -451,7 +485,7 @@ const UserManagement = () => {
       ({ closeToast }) => (
         <div className="custom-toast">
           <p>
-            Are you sure you want to delete <strong>{user.name}</strong>?
+            Are you sure you want to delete <strong>{user.fullName}</strong>?
           </p>
           <div className="toast-buttons">
             <button
@@ -484,12 +518,11 @@ const UserManagement = () => {
   const context = role === "manager" ? managerContext : empContext;
   const { searchQuery, setSearchPlaceholder } = context;
 
-
   const filteredUsers = useMemo(() => {
     return users.filter(
       (user) =>
         searchQuery === "" ||
-        user.name.toLowerCase().includes(searchQuery.toLowerCase())
+        user.fullName.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [users, searchQuery]);
 
@@ -497,12 +530,12 @@ const UserManagement = () => {
     setSearchPlaceholder("Search by user name...");
   }, [setSearchPlaceholder]);
 
+  const formatRole = (role) => {
+    return role.split("_").join(" ");
+  };
+
   return (
-    <div
-      className={`userContainer ${
-        showInputs ? styles.open : styles.close
-      }`}
-    >
+    <div className={`userContainer ${showInputs ? styles.open : styles.close}`}>
       <ToastContainer />
       {loading ? (
         <div className={styles.loadingOverlay}>
@@ -510,7 +543,7 @@ const UserManagement = () => {
         </div>
       ) : (
         <>
-          {!showInputs && filteredUsers.length > 0 && (
+          {!showInputs && (
             <button
               className="createButton"
               onClick={() => setShowInputs(true)}
@@ -520,7 +553,7 @@ const UserManagement = () => {
             </button>
           )}
 
-          {filteredUsers.length === 0 ? (
+          {filteredUsers.length === 0 && !showInputs ? (
             <p className={styles.noResults}>
               {searchQuery
                 ? `No user match "${searchQuery}"`
@@ -547,8 +580,8 @@ const UserManagement = () => {
                     <td>
                       <input
                         type="text"
-                        name="name"
-                        value={newUser.name}
+                        name="fullName"
+                        value={newUser.fullName}
                         onChange={handleInputChange}
                         className={styles.input}
                       />
@@ -591,6 +624,7 @@ const UserManagement = () => {
                         <option value="customer">Customer</option>
                         <option value="employee">Employee</option>
                         <option value="supplier">Supplier</option>
+                        <option value="delivery_worker">Delivery Worker</option>
                       </select>
                     </td>
                     <td className={styles.dash}>—</td>
@@ -621,8 +655,8 @@ const UserManagement = () => {
                       <td>{user.id}</td>
                       <td>
                         <input
-                          name="name"
-                          value={editedUser.name}
+                          name="fullName"
+                          value={editedUser.fullName}
                           onChange={handleInputEditChange}
                           className={styles.input}
                         />
@@ -663,6 +697,9 @@ const UserManagement = () => {
                           <option value="customer">Customer</option>
                           <option value="employee">Employee</option>
                           <option value="supplier">Supplier</option>
+                          <option value="delivery_worker">
+                            Delivery Worker
+                          </option>
                         </select>
                       </td>
                       <td>
@@ -692,11 +729,11 @@ const UserManagement = () => {
                   ) : (
                     <tr key={user.id}>
                       <td>{user.id}</td>
-                      <td>{user.name}</td>
+                      <td>{user.fullName}</td>
                       <td>{user.email}</td>
                       <td>{user.username}</td>
                       <td>••••••••</td>
-                      <td>{user.role}</td>
+                      <td>{formatRole(user.role)}</td>
                       <td>
                         {Array.isArray(user.permission)
                           ? user.permission.join(", ")

@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\InventoryItem;
 use App\Models\Notification;
+use App\UserRole;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class InventoryManagementController extends Controller
 {
@@ -18,7 +20,25 @@ class InventoryManagementController extends Controller
      */
     public function index()
     {
-        $managerId = auth('manager')->id();
+        if (Auth::guard('manager')->check()) {
+            $actor = Auth::guard('manager')->user();
+            $isManager = true;
+            $managerId = $actor->id;
+
+        } elseif (auth('user')->check()) {
+            $actor = auth('user')->user();
+            $isManager = false;
+
+            // السماح فقط للموظف أو المورد
+            if (!in_array($actor->role, [UserRole::Employee->value, UserRole::Supplier->value])) {
+                abort(403, 'Unauthorized');
+            }
+
+            $managerId = $actor->manager_id;
+
+        } else {
+            abort(403, 'Unauthorized');
+        }
 
         $items = InventoryItem::where('manager_id', $managerId)->get();
 
@@ -31,8 +51,27 @@ class InventoryManagementController extends Controller
      */
     protected function checkAndCreateLowStockNotification(InventoryItem $item): ?string
     {
+        if (Auth::guard('manager')->check()) {
+            $actor = Auth::guard('manager')->user();
+            $isManager = true;
+            $managerId = $actor->id;
+
+        } elseif (auth('user')->check()) {
+            $actor = auth('user')->user();
+            $isManager = false;
+
+            // السماح فقط للموظف أو المورد
+            if (!in_array($actor->role, [UserRole::Employee->value, UserRole::Supplier->value])) {
+                abort(403, 'Unauthorized');
+            }
+
+            $managerId = $actor->manager_id;
+
+        } else {
+            abort(403, 'Unauthorized');
+        }
+
         if ($item->quantity <= $item->threshold_level) {
-            $managerId = auth('manager')->id();
             $message = "{$item->name} only has {$item->quantity} {$item->unit} left.\n(threshold: {$item->threshold_level} {$item->unit}).";
 
             $existingNotification = Notification::where('manager_id', $managerId)
@@ -68,7 +107,25 @@ class InventoryManagementController extends Controller
     public function show($id)
     {
         try {
-            $managerId = auth('manager')->id();
+            if (Auth::guard('manager')->check()) {
+                $actor = Auth::guard('manager')->user();
+                $isManager = true;
+                $managerId = $actor->id;
+
+            } elseif (auth('user')->check()) {
+                $actor = auth('user')->user();
+                $isManager = false;
+
+                // السماح فقط للموظف أو المورد
+                if (!in_array($actor->role, [UserRole::Employee->value, UserRole::Supplier->value])) {
+                    abort(403, 'Unauthorized');
+                }
+
+                $managerId = $actor->manager_id;
+
+            } else {
+                abort(403, 'Unauthorized');
+            }
 
             $item = InventoryItem::where('manager_id', $managerId)
                 ->with('menuInventoryItems')
@@ -92,6 +149,26 @@ class InventoryManagementController extends Controller
      */
     public function store(Request $request)
     {
+        if (Auth::guard('manager')->check()) {
+            $actor = Auth::guard('manager')->user();
+            $isManager = true;
+            $managerId = $actor->id;
+
+        } elseif (auth('user')->check()) {
+            $actor = auth('user')->user();
+            $isManager = false;
+
+            // السماح فقط للموظف أو المورد
+            if (!in_array($actor->role, [UserRole::Employee->value, UserRole::Supplier->value])) {
+                abort(403, 'Unauthorized');
+            }
+
+            $managerId = $actor->manager_id;
+
+        } else {
+            abort(403, 'Unauthorized');
+        }
+
         $data = $request->validate([
             'name' => 'required|string',
             'quantity' => 'required|integer|min:0',
@@ -100,7 +177,7 @@ class InventoryManagementController extends Controller
             'threshold_level' => 'required|integer|min:0',
         ]);
 
-        $data['manager_id'] = auth('manager')->id();
+        $data['manager_id'] = $managerId;
 
         $item = InventoryItem::create($data);
 
@@ -127,7 +204,27 @@ class InventoryManagementController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $item = InventoryItem::where('manager_id', auth('manager')->id())->findOrFail($id);
+        if (Auth::guard('manager')->check()) {
+            $actor = Auth::guard('manager')->user();
+            $isManager = true;
+            $managerId = $actor->id;
+
+        } elseif (auth('user')->check()) {
+            $actor = auth('user')->user();
+            $isManager = false;
+
+            // السماح فقط للموظف أو المورد
+            if (!in_array($actor->role, [UserRole::Employee->value, UserRole::Supplier->value])) {
+                abort(403, 'Unauthorized');
+            }
+
+            $managerId = $actor->manager_id;
+
+        } else {
+            abort(403, 'Unauthorized');
+        }
+
+        $item = InventoryItem::where('manager_id', $managerId)->findOrFail($id);
 
         $data = $request->validate([
             'name' => 'sometimes|required|string',
@@ -162,7 +259,26 @@ class InventoryManagementController extends Controller
      */
     public function destroy($id)
     {
-        $item = InventoryItem::where('manager_id', auth('manager')->id())->findOrFail($id);
+        if (Auth::guard('manager')->check()) {
+            $actor = Auth::guard('manager')->user();
+            $isManager = true;
+            $managerId = $actor->id;
+
+        } elseif (auth('user')->check()) {
+            $actor = auth('user')->user();
+            $isManager = false;
+
+            // السماح فقط للموظف أو المورد
+            if (!in_array($actor->role, [UserRole::Employee->value, UserRole::Supplier->value])) {
+                abort(403, 'Unauthorized');
+            }
+
+            $managerId = $actor->manager_id;
+
+        } else {
+            abort(403, 'Unauthorized');
+        }
+        $item = InventoryItem::where('manager_id', $managerId)->findOrFail($id);
 
         //        if ($item->menuInventoryItems()->count() > 0) {
         //            return response()->json([

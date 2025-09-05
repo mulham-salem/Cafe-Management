@@ -113,7 +113,7 @@ const CustomerHome = () => {
 
   const handleLogout = async () => {
     const token =
-      sessionStorage.getItem("authToken") || localStorage.getItem("authToken");
+      sessionStorage.getItem("customerToken") || localStorage.getItem("customerToken");
 
     try {
       const response = await axios.post(
@@ -126,8 +126,8 @@ const CustomerHome = () => {
         }
       );
 
-      localStorage.removeItem("authToken");
-      sessionStorage.removeItem("authToken");
+      localStorage.removeItem("customerToken");
+      sessionStorage.removeItem("customerToken");
       const successMessage = response.data.message || "Logged out successfully";
       navigate("/login", { state: { message: successMessage } });
     } catch (error) {
@@ -141,7 +141,7 @@ const CustomerHome = () => {
 
   const profile = async () => {
     const token =
-      sessionStorage.getItem("authToken") || localStorage.getItem("authToken");
+      sessionStorage.getItem("customerToken") || localStorage.getItem("customerToken");
 
     try {
       const response = await axios.get(
@@ -153,9 +153,9 @@ const CustomerHome = () => {
         }
       );
 
-      setUserName(response.data.name || "User");
+      setUserName(response.data.firstName || "User");
     } catch (error) {
-      //toastify.error("Failed to fetch user name");
+      toastify.error("Failed to fetch user name");
     }
   };
 

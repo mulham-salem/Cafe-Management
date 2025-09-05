@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Requests\PromotionRequest;
 use App\Models\MenuItem;
 use App\Models\Promotion;
+use App\UserRole;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class PromotionManagementController extends Controller
 {
@@ -14,13 +17,30 @@ class PromotionManagementController extends Controller
      */
     public function index(): JsonResponse
     {
-        $managerId = auth('manager')->id();
+        // احصل على الفاعل: إمّا manager عبر غارد manager، أو user عبر الغارد الافتراضي
+        if (Auth::guard('manager')->check()) {
+            $actor = Auth::guard('manager')->user();
+            $isManager = true;
+            $managerId = $actor->id;
+        } elseif (auth('user')->check()) {
+            $actor = auth('user')->user();
+            $isManager = false;
+            // السماح فقط اذا الـ user هو employee
+            if ($actor->role !== UserRole::Employee->value) {
+                abort(403, 'Unauthorized');
+            }
+            // الموظف من المفترض أن له manager_id
+            $managerId = $actor->manager_id;
+        } else {
+            abort(403, 'Unauthorized');
+        }
 
-        $promotions = Promotion::with(['menuItems:id,name,promotion_id'])
+        // 1. جيب كل العروض مع عناصر جدول الكسر ومنه المنتج
+        $promotions = Promotion::with(['promotionMenuItems.menuItem'])
             ->where('manager_id', $managerId)
             ->get(['id', 'title', 'discount_percentage', 'start_date', 'end_date', 'description', 'manager_id']);
 
-        $formatted = $promotions->map(function ($promotion) {
+        $formattedPromotions = $promotions->map(function ($promotion) {
             return [
                 'id' => $promotion->id,
                 'title' => $promotion->title,
@@ -28,11 +48,23 @@ class PromotionManagementController extends Controller
                 'start_date' => $promotion->start_date,
                 'end_date' => $promotion->end_date,
                 'description' => $promotion->description,
-                'products' => $promotion->menuItems->pluck('name'),
+                'products' => $promotion->promotionMenuItems->map(function ($pmi) {
+                    return [
+                        'id' => $pmi->menuItem->id,
+                        'name' => $pmi->menuItem->name,
+                        'quantity' => $pmi->quantity,
+                    ];
+                }),
             ];
         });
 
-        return response()->json($formatted);
+        // 2. كل المنتجات
+        $products = MenuItem::select('id', 'name')->get();
+
+        return response()->json([
+            'promotions' => $formattedPromotions,
+            'products' => $products,
+        ]);
     }
 
     /**
@@ -40,34 +72,180 @@ class PromotionManagementController extends Controller
      */
     public function store(PromotionRequest $request): JsonResponse
     {
-        $managerId = auth('manager')->id();
+        // تحديد الفاعل/نوعه وmanagerId المرجعي
+        if (Auth::guard('manager')->check()) {
+            $actor = Auth::guard('manager')->user();
+            $isManager = true;
+            $managerId = $actor->id;
+        } elseif (auth('user')->check()) {
+            $actor = auth('user')->user();
+            $isManager = false;
+            if ($actor->role !== UserRole::Employee->value) {
+                abort(403, 'Unauthorized');
+            }
+            $managerId = $actor->manager_id;
+        } else {
+            abort(403, 'Unauthorized');
+        }
 
-        $productIds = MenuItem::where('manager_id', $managerId)
-            ->whereIn('name', $request->product_names)
-            ->pluck('id')
-            ->toArray();
+        return DB::transaction(function () use ($request, $managerId) {
+            // إنشاء البروموشن
+            $promotion = Promotion::create([
+                'manager_id'           => $managerId,
+                'title'                => $request->title,
+                'discount_percentage'  => $request->discount_percentage,
+                'start_date'           => $request->start_date,
+                'end_date'             => $request->end_date,
+                'description'          => $request->description,
+            ]);
 
-        $promotion = Promotion::create([
-            'manager_id' => $managerId,
-            'title' => $request->title,
-            'discount_percentage' => $request->discount_percentage,
-            'start_date' => $request->start_date,
-            'end_date' => $request->end_date,
-            'description' => $request->description,
-        ]);
+            // تجهيز الصفوف للجدول الوسيط
+            $rows = collect($request->products)->map(fn ($p) => [
+                'promotion_id'  => $promotion->id,
+                'menu_item_id'  => $p['product_id'],
+                'quantity'      => $p['quantity'],
+            ])->all();
 
-        MenuItem::whereIn('id', $productIds)
-            ->update(['promotion_id' => $promotion->id]);
+            // إدراج الصفوف
+            DB::table('promotion_menu_item')->insert($rows);
 
-        return response()->json([
-            'message' => 'Promotion created successfully.',
-            'promotion' => $promotion,
-            'products' => $request->product_names,
-        ], 201);
+            // تحميل المنتجات مع الكميات
+            $promotion->load(['promotionMenuItems.menuItem:id,name']);
+
+            return response()->json([
+                'message'   => 'Promotion created successfully.',
+                'promotion' => [
+                    'id'                  => $promotion->id,
+                    'title'               => $promotion->title,
+                    'discount_percentage' => $promotion->discount_percentage,
+                    'start_date'          => $promotion->start_date,
+                    'end_date'            => $promotion->end_date,
+                    'description'         => $promotion->description,
+                    'products'            => $promotion->promotionMenuItems->map(fn ($pmi) => [
+                        'id'       => $pmi->menuItem->id,
+                        'name'     => $pmi->menuItem->name,
+                        'quantity' => $pmi->quantity,
+                    ]),
+                ],
+            ], 201);
+        });
     }
 
     /**
-     * Display the specified promotion.
+     * Update the specified promotion in storage.
+     *
+     * @param  \App\Http\Requests\PromotionRequest  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function update(PromotionRequest $request, int $id): JsonResponse
+    {
+        // تحديد الفاعل
+        if (Auth::guard('manager')->check()) {
+            $actor = Auth::guard('manager')->user();
+            $isManager = true;
+            $managerId = $actor->id;
+        } elseif (auth('user')->check()) {
+            $actor = auth('user')->user();
+            $isManager = false;
+            if ($actor->role !== UserRole::Employee->value) {
+                abort(403, 'Unauthorized');
+            }
+            $managerId = $actor->manager_id;
+        } else {
+            abort(403, 'Unauthorized');
+        }
+
+        $promotion = Promotion::where('id', $id)
+            ->where('manager_id', $managerId)
+            ->firstOrFail();
+
+        return DB::transaction(function () use ($promotion, $request) {
+            // تحديث بيانات البروموشن
+            $promotion->update([
+                'title'                => $request->title,
+                'discount_percentage'  => $request->discount_percentage,
+                'start_date'           => $request->start_date,
+                'end_date'             => $request->end_date,
+                'description'          => $request->description,
+            ]);
+
+            // حذف الصفوف القديمة من الجدول الوسيط
+            DB::table('promotion_menu_item')->where('promotion_id', $promotion->id)->delete();
+
+            // إعادة إدراج المنتجات الجديدة
+            $rows = collect($request->products)->map(fn ($p) => [
+                'promotion_id'  => $promotion->id,
+                'menu_item_id'  => $p['product_id'],
+                'quantity'      => $p['quantity'],
+            ])->all();
+
+            DB::table('promotion_menu_item')->insert($rows);
+
+            // تحميل المنتجات الجديدة
+            $promotion->load(['promotionMenuItems.menuItem:id,name']);
+
+            return response()->json([
+                'message'   => 'Promotion updated successfully.',
+                'promotion' => [
+                    'id'                  => $promotion->id,
+                    'title'               => $promotion->title,
+                    'discount_percentage' => $promotion->discount_percentage,
+                    'start_date'          => $promotion->start_date,
+                    'end_date'            => $promotion->end_date,
+                    'description'         => $promotion->description,
+                    'products'            => $promotion->promotionMenuItems->map(fn ($pmi) => [
+                        'id'       => $pmi->menuItem->id,
+                        'name'     => $pmi->menuItem->name,
+                        'quantity' => $pmi->quantity,
+                    ]),
+                ],
+            ]);
+        });
+    }
+
+
+    /**
+     * Remove the specified promotion from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function destroy(int $id): JsonResponse
+    {
+        // تحديد الفاعل
+        if (Auth::guard('manager')->check()) {
+            $actor = Auth::guard('manager')->user();
+            $isManager = true;
+            $managerId = $actor->id;
+        } elseif (auth('user')->check()) {
+            $actor = auth('user')->user();
+            $isManager = false;
+            if ($actor->role !== UserRole::Employee->value) {
+                abort(403, 'Unauthorized');
+            }
+            $managerId = $actor->manager_id;
+        } else {
+            abort(403, 'Unauthorized');
+        }
+
+        $promotion = Promotion::where('id', $id)
+            ->where('manager_id', $managerId)
+            ->firstOrFail();
+
+        DB::transaction(function () use ($promotion) {
+            // حذف كل صفوف جدول الكسر المرتبطة بهالعرض
+            $promotion->promotionMenuItems()->delete();
+
+            // حذف العرض نفسه
+            $promotion->delete();
+        });
+
+        return response()->json(['message' => 'Promotion deleted successfully.']);
+    }
+
+    /**
+     * Display all menu items (products)
      */
     public function show(string $id): JsonResponse
     {
@@ -87,55 +265,4 @@ class PromotionManagementController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified promotion in storage.
-     *
-     * @param  mixed  $id
-     */
-    public function update(PromotionRequest $request, $id): JsonResponse
-    {
-        $promotion = Promotion::findOrFail($id);
-        $managerId = auth('manager')->id();
-
-        $productIds = MenuItem::where('manager_id', $managerId)
-            ->whereIn('name', $request->product_names)
-            ->pluck('id')
-            ->toArray();
-
-        $promotion->update([
-            'title' => $request->title,
-            'discount_percentage' => $request->discount_percentage,
-            'start_date' => $request->start_date,
-            'end_date' => $request->end_date,
-            'description' => $request->description,
-        ]);
-
-        MenuItem::where('promotion_id', $promotion->id)
-            ->update(['promotion_id' => null]);
-
-        MenuItem::whereIn('id', $productIds)
-            ->update(['promotion_id' => $promotion->id]);
-
-        return response()->json([
-            'message' => 'Promotion updated successfully.',
-            'promotion' => $promotion,
-            'products' => $request->product_names,
-        ]);
-    }
-
-    /**
-     * Remove the specified promotion from storage.
-     */
-    public function destroy(string $id): JsonResponse
-    {
-        $promotion = Promotion::where('id', $id)
-            ->where('manager_id', auth('manager')->id())
-            ->firstOrFail();
-
-        MenuItem::where('promotion_id', $promotion->id)->update(['promotion_id' => null]);
-
-        $promotion->delete();
-
-        return response()->json(['message' => 'Promotion deleted successfully.']);
-    }
 }

@@ -79,6 +79,10 @@ const EmployeeHome = () => {
   const currentPath = location.pathname;
   const { activeTab } = useActiveTab();
 
+  const token =
+    sessionStorage.getItem("employeeToken") ||
+    localStorage.getItem("employeeToken");
+
   // search state
   const [searchQuery, setSearchQuery] = useState("");
   const [searchPlaceholder, setSearchPlaceholder] = useState("Search...");
@@ -113,9 +117,6 @@ const EmployeeHome = () => {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
-    const token =
-      sessionStorage.getItem("authToken") || localStorage.getItem("authToken");
-
     try {
       const response = await axios.post(
         "http://localhost:8000/api/user/logout",
@@ -127,8 +128,8 @@ const EmployeeHome = () => {
         }
       );
 
-      localStorage.removeItem("authToken");
-      sessionStorage.removeItem("authToken");
+      localStorage.removeItem("employeeToken");
+      sessionStorage.removeItem("employeeToken");
       const successMessage = response.data.message || "Logged out successfully";
       navigate("/login", { state: { message: successMessage } });
     } catch (error) {
@@ -141,9 +142,6 @@ const EmployeeHome = () => {
   const [userName, setUserName] = useState("User");
 
   const profile = async () => {
-    const token =
-      sessionStorage.getItem("authToken") || localStorage.getItem("authToken");
-
     try {
       const response = await axios.get(
         "http://localhost:8000/api/user/profile",
@@ -154,9 +152,9 @@ const EmployeeHome = () => {
         }
       );
 
-      setUserName(response.data.name || "User");
+      setUserName(response.data.firstName || "User");
     } catch (error) {
-      //toastify.error("Failed to fetch user name");
+      toastify.error("Failed to fetch user name");
     }
   };
 
@@ -281,7 +279,7 @@ const EmployeeHome = () => {
 
       {currentPath === "/login/employee-home" && (
         <div className={styles.sidebarWrapper}>
-          <SidebarToggle roleProp="employee" />
+          <SidebarToggle />
         </div>
       )}
       <EmpSearchContext.Provider

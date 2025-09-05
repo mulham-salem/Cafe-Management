@@ -6,10 +6,11 @@ enum UserPermission: string
 {
     case UserManagement = 'User Management';
     case MenuManagement = 'Menu Management';
-    case TableManagement = 'Table Management';
-    case InventorySupply = 'Inventory & Supply';
+    case TableManagement = 'Inventory Management';
+    case InventorySupply = 'Supply Management';
     case PromotionManagement = 'Promotion Management';
-    case ManagersNotifications = "Manager's Notifications";
+    case ManagersNotifications = "Report Dashboard";
+
     case Default = 'Default';
 
     public static function values(): array

@@ -13,7 +13,7 @@ const CustomerNotification = () => {
   const [loading, setLoading] = useState(true); 
   const [error, setError] = useState(null);
 
-  const token = sessionStorage.getItem('authToken') || localStorage.getItem('authToken'); 
+  const token = sessionStorage.getItem('customerToken') || localStorage.getItem('customerToken'); 
 
   useEffect(() => {
      document.title = "Cafe Delights - Customer Notifications";

@@ -62,7 +62,7 @@ class Manager extends Authenticatable
     protected static function booted(): void
     {
         static::creating(function ($manager) {
-            $manager->role = 'Manager';
+            $manager->role = 'manager';
         });
     }
 

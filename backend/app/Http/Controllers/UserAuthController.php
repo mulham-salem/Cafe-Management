@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Mail\ResetPasswordMail;
+use App\Models\Manager;
 use App\Models\User;
 use Carbon\Carbon;
+use http\Env\Response;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -41,19 +43,27 @@ class UserAuthController extends Controller
         return response()->json([
             'token' => $token,
             'role' => $user->role,
-            'permissions' => $user->permissions()->pluck('permission'),
-            'message' => 'Welcome back '.$user->name,
+            'message' => 'Welcome back '.$user->first_name,
         ]);
     }
 
     public function me()
     {
-        $user = auth('user')->user();
+        $manager = auth('manager')->user();
+        if($manager) {
+            return response()->json([
+               'role' => strtolower($manager->role),
+            ]);
+        }
 
-        return response()->json([
-            'role' => $user->role,
-            'permissions' => $user->permissions()->pluck('permission'), // بيرجع Array من أسماء الصلاحيات
-        ]);
+        $user = auth('user')->user();
+        if($user) {
+            return response()->json([
+                'role' => $user->role,
+                'permissions' => $user->permissions()->pluck('permission'), // بيرجع Array من أسماء الصلاحيات
+            ]);
+        }
+        return response()->json(['message' => 'Unauthenticated'], 401);
     }
 
     public function logout(Request $request): JsonResponse
@@ -87,7 +97,7 @@ class UserAuthController extends Controller
         $user = $request->user();
 
         return response()->json([
-            'name' => $user->name,
+            'firstName' => $user->first_name,
         ]);
     }
 
@@ -95,7 +105,7 @@ class UserAuthController extends Controller
     {
         $request->validate(['email' => 'required|email']);
 
-        $user = User::where('email', $request->email)->first();
+        $user = User::where('email', $request->email)->first() ?? Manager::where('email', $request->email)->first();
         if (! $user) {
             return response()->json(['message' => 'Email not found.'], 404);
         }
@@ -132,7 +142,7 @@ class UserAuthController extends Controller
             return response()->json(['message' => 'Invalid token.'], 400);
         }
 
-        $user = User::where('email', $request->email)->first();
+        $user = User::where('email', $request->email)->first() ?? Manager::where('email', $request->email)->first();
         if (! $user) {
             return response()->json(['message' => 'User not found.'], 404);
         }
@@ -148,6 +158,24 @@ class UserAuthController extends Controller
     // GET /api/user/profile
     public function myAccount(Request $request)
     {
+        if (auth('manager')->check()) {
+            // المدير عامل تسجيل دخول
+            $manager = auth('manager')->user();
+
+            // افتراضياً نفصل الاسم عند أول فراغ
+            $parts = explode(' ', $manager->name, 2);
+            $firstName = $parts[0];
+            $lastName = $parts[1] ?? ''; // إذا ما فيه جزء ثاني، نتركه فارغ
+
+            return response()->json([
+                'first_name' => $firstName,
+                'last_name' => $lastName,
+                'username' => $manager->username,
+                'email' => $manager->email,
+            ]);
+        }
+
+        // إذا كان user عادي
         $user = $request->user();
 
         return response()->json([
@@ -159,18 +187,50 @@ class UserAuthController extends Controller
         ]);
     }
 
+
     // PUT /api/user/profile
     public function updateMyAccount(Request $request)
     {
+        // تحقق إذا المدير عامل تسجيل دخول
+        if (auth('manager')->check()) {
+            $manager = auth('manager')->user();
+
+            $validated = $request->validate([
+                'first_name' => 'string|max:255',
+                'last_name' => 'string|max:255|nullable',
+                'username' => 'string|max:255|unique:managers,username,'.$manager->id,
+                'email' => 'email|unique:managers,email,'.$manager->id,
+            ]);
+
+            // دمج الاسم الأول والأخير
+            $manager->name = $validated['first_name'] . ' ' . $validated['last_name'];
+            $manager->username = $validated['username'];
+            $manager->email = $validated['email'];
+
+            $manager->save();
+
+            return response()->json([
+                'message' => 'Profile updated successfully',
+                'user' => [
+                    'first_name' => $validated['first_name'],
+                    'last_name' => $validated['last_name'],
+                    'username' => $manager->username,
+                    'email' => $manager->email,
+                ],
+            ]);
+        }
+
+        // إذا كان user
         $user = $request->user();
 
         $validated = $request->validate([
             'first_name' => 'string|max:255',
-            'last_name' => 'string|max:255',
+            'last_name' => 'string|max:255|nullable',
             'username' => 'string|max:255|unique:users,username,'.$user->id,
             'email' => 'email|unique:users,email,'.$user->id,
         ]);
 
+        // بناءً على الدور، يمكن هنا عمل أي تخصيص إضافي إذا لزم
         $user->update($validated);
 
         return response()->json([

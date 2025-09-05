@@ -14,7 +14,7 @@ const EmployeeNotification = () => {
   const [loading, setLoading] = useState(true); 
   const [error, setError] = useState(null);
 
-  const token = sessionStorage.getItem('authToken') || localStorage.getItem('authToken'); 
+  const token = sessionStorage.getItem('employeeToken') || localStorage.getItem('employeeToken'); 
 
   useEffect(() => {
      document.title = "Cafe Delights - Employee Notifications";

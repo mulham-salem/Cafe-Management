@@ -16,8 +16,8 @@ return new class extends Migration
             $table->integer('quantity');
             $table->enum('unit', ['kg', 'g', 'liter', 'ml', 'dozen', 'box', 'piece'])->default('kg');
             $table->string('note', 255)->nullable();
-            $table->integer('threshold_level');
-            $table->date('expiry_date');
+            $table->integer('threshold_level')->nullable();
+            $table->date('expiry_date')->nullable();
             $table->timestamps();
         });
     }

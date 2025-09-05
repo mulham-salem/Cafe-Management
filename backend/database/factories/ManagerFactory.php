@@ -18,7 +18,7 @@ class ManagerFactory extends Factory
             'password' => Hash::make('password123'), // كلمة سر افتراضية
             'name' => $this->faker->name,
             'email' => $this->faker->unique()->safeEmail,
-            'role' => 'Manager', // ثابت حسب الـ migration
+            'role' => 'manager', // ثابت حسب الـ migration
             'remember_token' => Str::random(10),
         ];
     }

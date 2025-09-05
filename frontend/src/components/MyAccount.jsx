@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import styles from "./styles/MyAccount.module.css";
 
 /**
@@ -52,6 +52,27 @@ export default function MyAccount() {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
 
+  const role = sessionStorage.getItem("currentRole");
+
+  function getCurrentToken() {
+    if (!role) return null;
+    return (
+      sessionStorage.getItem(`${role}Token`) ||
+      localStorage.getItem(`${role}Token`)
+    );
+  }
+
+  const token = getCurrentToken();
+  const axiosInstance = axios.create({
+    baseURL: "http://localhost:8000/api",
+    withCredentials: true,
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+  });
+
   // file upload state
   const [localFile, setLocalFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState("");
@@ -68,10 +89,7 @@ export default function MyAccount() {
   const fetchProfile = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem("authToken");
-      const res = await axios.get("/api/user/profile", {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      });
+      const res = await axiosInstance.get("/user/account");
 
       const data = res?.data ?? mockProfile;
       setProfile(data);
@@ -121,13 +139,16 @@ export default function MyAccount() {
   const validate = () => {
     const e = {};
     if (!form.first_name.trim()) e.first_name = "First name is required";
-    if (!form.last_name.trim()) e.last_name = "Last name is required";
     if (!form.username.trim()) e.username = "Username is required";
-    if (!form.phone_number.trim()) e.phone_number = "Phone number is required";
-    if (!form.company_name.trim()) e.company_name = "Company name is required";
-    if (!form.address.trim()) e.address = "Address is required";
 
-    if (!form.license.trim()) e.license = "license is required";
+    if (role !== "manager") {
+      if (!form.phone_number.trim())
+        e.phone_number = "Phone number is required";
+      if (!form.company_name.trim())
+        e.company_name = "Company name is required";
+      if (!form.address.trim()) e.address = "Address is required";
+      if (!form.license.trim()) e.license = "license is required";
+    }
 
     if (form.username && form.username.length < 3)
       e.username = "Username must be at least 3 characters";
@@ -176,15 +197,9 @@ export default function MyAccount() {
     if (!file) return null;
     const formData = new FormData();
     formData.append("avatar", file); // backend should expect 'avatar' field name
-    const token = localStorage.getItem("authToken");
 
     try {
-      const res = await axios.post("/api/user/upload-avatar", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-      });
+      const res = await axiosInstance.post("/user/upload-avatar", formData);
 
       // backend might return image_url or url or path
       const imageUrl =
@@ -236,10 +251,7 @@ export default function MyAccount() {
       };
 
       // 3) update profile
-      const token = localStorage.getItem("authToken");
-      const res = await axios.put("/api/user/profile", payload, {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      });
+      const res = await axiosInstance.put("/user/edit/account", payload);
 
       // use returned user object or fallback to payload
       const updated = res?.data ?? payload;
@@ -265,7 +277,7 @@ export default function MyAccount() {
         setPreviewUrl("");
       }
       setLocalFile(null);
-
+      fetchProfile();
       toast.success("Profile updated successfully");
     } catch (err) {
       console.error("Update profile failed:", err);
@@ -322,7 +334,6 @@ export default function MyAccount() {
 
   return (
     <div className="profilePage">
-      <ToastContainer />
       <header className="header">
         <h1 className="profileTitle">My Account</h1>
         <p className={styles.subtitle}>
@@ -415,9 +426,6 @@ export default function MyAccount() {
                   placeholder="Last name"
                   disabled={saving}
                 />
-                {errors.last_name && (
-                  <small className={styles.error}>{errors.last_name}</small>
-                )}
               </label>
             </div>
 
@@ -593,7 +601,7 @@ export default function MyAccount() {
                 </div>
               </>
             )}
-            
+
             {/* File input + preview - Redesigned with fixed alignment */}
             <div className={styles.imageUploadContainer}>
               <div className={styles.uploadColumn}>

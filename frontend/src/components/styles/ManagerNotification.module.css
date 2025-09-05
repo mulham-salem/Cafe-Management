@@ -1,12 +1,12 @@
 :global(.mngNotPageWrapper) {
-  padding-top: 40px; 
+  padding-top: 50px; 
   background-color: white;
   font-family: "Segoe UI", sans-serif;
   max-height: 94vh;
   min-height: 94vh;
   overflow-y: auto;
   overflow-x: hidden;
-  min-width: 96%;
+  min-width: 90%;
   box-sizing: border-box; 
 }
 

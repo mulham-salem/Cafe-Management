@@ -77,6 +77,26 @@ export default function SalesReport() {
     return d.toLocaleDateString();
   };
 
+  function getCurrentToken() {
+    const role = sessionStorage.getItem("currentRole");
+    if (!role) return null;
+    return (
+      sessionStorage.getItem(`${role}Token`) ||
+      localStorage.getItem(`${role}Token`)
+    );
+  }
+
+  const token = getCurrentToken();
+  const axiosInstance = axios.create({
+    baseURL: "http://localhost:8000/api",
+    withCredentials: true,
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+  });
+
   /**
    * fetchReport
    * accepts optional opts: { t, start, end }
@@ -86,13 +106,12 @@ export default function SalesReport() {
       const { t = type, start = startDate, end = endDate } = opts;
       setLoading(true);
       try {
-        const res = await axios.get("/api/reports/sales", {
+        const res = await axiosInstance.post("/admin/reports/sales", {
           params: {
             type: t,
             start_date: start,
             end_date: end,
           },
-          // headers: { Authorization: `Bearer ${token}` } // add if needed
         });
 
         // expect res.data to be in the format we described

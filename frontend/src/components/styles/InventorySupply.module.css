@@ -397,7 +397,7 @@
   font-size: clamp(14px, 1.3vw, 17px);
 }
 
-.modal input {
+.modal input, select {
   display: block;
   width: 90%;
   padding: clamp(8px, 2vw, 10px);
@@ -406,6 +406,10 @@
   margin-bottom: clamp(6px, 0.7vw, 14px);
   border-radius: clamp(6px, 1.2vw, 8px);
   border: 1px solid #ccc;
+}
+
+.modal select {
+  width: 95%;
 }
 
 .modal input:hover {
@@ -613,6 +617,7 @@ min-height: 200px;
     opacity: 0;
     transform: translateY(30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -638,7 +643,7 @@ min-height: 200px;
   background-color: white;
   width: clamp(300px, 90vw, 600px);
   max-width: 600px;
-  max-height: 80vh;
+  max-height: 85vh;
   overflow-y: auto;
   border-radius: 16px;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
@@ -1533,13 +1538,13 @@ min-height: 200px;
   border-top: 4px solid #3498db;
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  margin-bottom: 1rem;
 }
 
 @keyframes spin {
   0% {
     transform: rotate(0deg);
   }
+  
   100% {
     transform: rotate(360deg);
   }

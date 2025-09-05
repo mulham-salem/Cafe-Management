@@ -1,13 +1,30 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./styles/ResetPasswordWizard.module.css";
 import axios from "axios";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import { FaEnvelope, FaLock } from "react-icons/fa";
+
+
+const axiosInstance = axios.create({
+  baseURL: "http://localhost:8000/api",
+  withCredentials: true,
+  headers: {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+  },
+});
 
 const ResetPasswordWizard = () => {
   useEffect(() => {
     document.title = "Cafe Delights - Reset Password";
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get("token");
+    const email = urlParams.get("email");
+    if (token && email) {
+      setStep(3);
+      setFormData((prev) => ({ ...prev, email }));
+    }
   }, []);
 
   const navigate = useNavigate();
@@ -22,12 +39,13 @@ const ResetPasswordWizard = () => {
   // API Calls
   const handleForgotPassword = async () => {
     try {
-      // await axios.post("/api/forgot-password", {
-      //   email: formData.email,
-      // });
+      await axiosInstance.post("/user/reset-password-link", {
+        email: formData.email,
+      });
       toast.success("Reset link has been sent to your email");
       setStep(2);
     } catch (error) {
+      console.error(error);
       toast.error("Failed to send the link. Please check your email.");
     }
   };
@@ -36,18 +54,19 @@ const ResetPasswordWizard = () => {
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get("token");
     try {
-      //   await axios.post("/api/reset-password", {
-      //     token,
-      //     email: formData.email,
-      //     password: formData.password,
-      //     password_confirmation: formData.password_confirmation,
-      //   });
+      await axiosInstance.post("/user/reset-password", {
+        token,
+        email: formData.email,
+        password: formData.password,
+        password_confirmation: formData.password_confirmation,
+      });
       toast.success("Password changed successfully");
       setStep(3);
       setTimeout(() => {
         navigate("/login");
       }, 4000);
     } catch (error) {
+      console.error(error);
       toast.error("Failed to change password.");
     }
   };
@@ -78,21 +97,24 @@ const ResetPasswordWizard = () => {
       case 2:
         return (
           <div className={styles.stepContent}>
-          <div className={styles.emailIcon}>
-            <FaEnvelope />
+            <div className={styles.emailIcon}>
+              <FaEnvelope />
+            </div>
+            <h2>Check Your Email</h2>
+            <p>We've sent a password reset link to your email address.</p>
+            <p className={styles.note}>
+              If you didn't receive the link, please check your spam folder or
+              click the button below to resend.
+            </p>
+
+            <button className={styles.btn} onClick={handleForgotPassword}>
+              Resend Link
+            </button>
+
+            <div className={styles.supportLink}>
+              Still having trouble? <a href="#support">Contact support</a>
+            </div>
           </div>
-          <h2>Check Your Email</h2>
-          <p>We've sent a password reset link to your email address.</p>
-          <p className={styles.note}>If you didn't receive the link, please check your spam folder or click the button below to resend.</p>
-          
-          <button className={styles.btn} onClick={handleForgotPassword}>
-            Resend Link
-          </button>
-          
-          <div className={styles.supportLink}>
-            Still having trouble? <a href="#support">Contact support</a>
-          </div>
-        </div>
         );
       case 3:
         return (
@@ -143,7 +165,6 @@ const ResetPasswordWizard = () => {
 
   return (
     <div className={styles.container}>
-      <ToastContainer autoClose={3000} />
       <div className={styles.cardContainer}>
         <div className={styles.progressbar}>
           <div

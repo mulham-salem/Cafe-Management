@@ -2,13 +2,20 @@
 
 namespace App\Http\Requests;
 
+use App\UserRole;
 use Illuminate\Foundation\Http\FormRequest;
 
 class PromotionRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return auth('manager')->check();
+        if (auth('manager')->check()) {
+            return true;
+        }
+        if (auth('user')->check() && auth('user')->user()->role === UserRole::Employee->value) {
+            return true;
+        }
+        return false;
     }
 
     public function rules(): array
@@ -19,8 +26,9 @@ class PromotionRequest extends FormRequest
             'start_date' => 'required|date',
             'end_date' => 'required|date|after:start_date',
             'description' => 'nullable|string',
-            'product_names' => 'required|array',
-            'product_names.*' => 'string|distinct|min:1',
+            'products' => 'required|array|min:1',
+            'products.*.product_id' => 'required|integer|exists:menu_items,id',
+            'products.*.quantity' => 'required|integer|min:1',
         ];
     }
 

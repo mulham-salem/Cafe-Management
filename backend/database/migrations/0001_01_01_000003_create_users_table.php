@@ -15,7 +15,10 @@ return new class extends Migration
                 ->constrained('managers')
                 ->cascadeOnDelete(); // FK -> managers.id
 
-            $table->string('name', 255);
+            $table->string('full_name', 100);
+            $table->string('first_name', 50);
+            $table->string('last_name', 50)->nullable();
+            $table->string('image_url', 2083)->nullable();
             $table->string('username', 50);
             $table->string('email', 255)->unique();
             $table->string('password', 255);
@@ -25,16 +28,12 @@ return new class extends Migration
                 'customer',
                 'employee',
                 'supplier',
-                'deliveryWorker',
+                'delivery_worker',
             ])->default('customer');
 
             $table->rememberToken(); // varchar(100) nullable
 
             $table->timestamps(); // created_at, updated_at
-
-            $table->string('first_name', 50);
-            $table->string('last_name', 50)->nullable();
-            $table->string('image_url', 2083)->nullable();
         });
 
         Schema::create('sessions', function (Blueprint $table) {

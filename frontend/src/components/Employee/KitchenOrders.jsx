@@ -158,7 +158,7 @@ const KitchenOrders = () => {
   const [isSearching, setIsSearching] = useState(false);
 
   const token =
-    sessionStorage.getItem("authToken") || localStorage.getItem("authToken");
+    sessionStorage.getItem("employeeToken") || localStorage.getItem("employeeToken");
 
   const fetchOrders = useCallback(async () => {
     try {

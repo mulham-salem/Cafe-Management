@@ -17,7 +17,7 @@ class ManagersTableSeeder extends Seeder
             'password' => bcrypt('admin123'), // كلمة سر مشفرة
             'name' => 'System Admin',
             'email' => 'admin@example.com',
-            'role' => 'Manager',
+            'role' => 'manager',
         ]);
 
         // إنشاء مدراء عشوائيين عبر الـ factory

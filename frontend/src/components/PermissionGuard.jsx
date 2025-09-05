@@ -39,20 +39,20 @@ export default function PermissionGuard({
 
   const { permissions, role, loading } = usePermissions();
   const [showLoading, setShowLoading] = useState(true);
-    
+  
   useEffect (() => {
     if (!loading) {
-        const timer = setTimeout(() => setShowLoading(false), 500);
+        const timer = setTimeout(() => setShowLoading(false), 200);
         return () => clearTimeout(timer);
     }
   }, [loading]);
 
   if (loading || showLoading) {
     return (
-      <div style={{...modalStyle, opacity: (loading || showLoading) ? 1 : 0, transition: "opacity 0.5s ease-in-out"}}>
+      <div style={{...modalStyle, opacity: (loading || showLoading) ? 1 : 0, transition: "opacity 0.4s ease-in-out"}}>
         <div style={boxStyle}>
           <p style={textStyle}>
-           {loading ? "" : "⏳ Loading permission..."}  
+           {loading ? "⏳ Loading..." : "⏳ Loading permission..."}  
           </p>
         </div>
       </div>

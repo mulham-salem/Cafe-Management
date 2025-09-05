@@ -7,6 +7,7 @@ enum UserRole: string
     case Employee = 'employee';
     case Customer = 'customer';
     case Supplier = 'supplier';
+    case DeliveryWorker = 'delivery_worker';
 
     public static function values(): array
     {

@@ -1,34 +1,49 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import styles from '../styles/ManagerNotification.module.css';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBell, faCheckCircle, faClock } from '@fortawesome/free-solid-svg-icons';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import styles from "../styles/ManagerNotification.module.css";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faBell,
+  faCheckCircle,
+  faClock,
+} from "@fortawesome/free-solid-svg-icons";
 
 const ManagerNotification = () => {
-
   const [notifications, setNotifications] = useState([]);
-  const [loading, setLoading] = useState(true); 
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const token = sessionStorage.getItem('authToken') || localStorage.getItem('authToken'); 
+  function getCurrentToken() {
+    const role = sessionStorage.getItem("currentRole");
+    if (!role) return null;
+    return (
+      sessionStorage.getItem(`${role}Token`) ||
+      localStorage.getItem(`${role}Token`)
+    );
+  }
+
+  const token = getCurrentToken();
+  const axiosInstance = axios.create({
+    baseURL: "http://localhost:8000/api",
+    withCredentials: true,
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+  });
 
   useEffect(() => {
     document.title = "Cafe Delights - Manager Notifications";
 
     const fetchNotifications = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/manager/notifications', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            Accept: 'application/json',
-          },
-          withCredentials: true,
-        });
+        const response = await axiosInstance.get("/admin/notifications");
 
         setNotifications(response.data.notifications);
       } catch (err) {
-        console.error('Error fetching notifications:', err);
-        setError('Failed to load notifications.');
+        console.error("Error fetching notifications:", err);
+        setError("Failed to load notifications.");
       } finally {
         setLoading(false);
       }
@@ -39,28 +54,23 @@ const ManagerNotification = () => {
 
   const markAsSeen = async (id) => {
     try {
-      await axios.patch(`http://localhost:8000/api/manager/notifications/${id}/seen`, {}, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: 'application/json',
-        },
-      });
+      await axiosInstance.patch(`/admin/notifications/${id}/seen`);
 
-  
       setNotifications((prev) =>
         prev.map((notif) =>
           notif.id === id ? { ...notif, seen: true } : notif
         )
       );
     } catch (err) {
-      console.error('Error marking as seen:', err);
+      console.error("Error marking as seen:", err);
     }
   };
 
   return (
     <div className="mngNotPageWrapper">
       <h2 className="pageTitle">
-        <FontAwesomeIcon icon={faBell} className={styles.bellIcon} /> Notifications
+        <FontAwesomeIcon icon={faBell} className={styles.bellIcon} />{" "}
+        Notifications
       </h2>
 
       {loading ? (
@@ -76,7 +86,9 @@ const ManagerNotification = () => {
           {notifications.map((notif) => (
             <div
               key={notif.id}
-              className={`${styles.card} ${notif.seen ? styles.seen : styles.unseen}`}
+              className={`${styles.card} ${
+                notif.seen ? styles.seen : styles.unseen
+              }`}
               onClick={() => !notif.seen && markAsSeen(notif.id)}
             >
               <div className={styles.icon}>

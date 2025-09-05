@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id(); // bigint unsigned auto increment
 
             $table->foreignId('delivery_worker_id')
-                ->constrained('delivery_worker', 'user_id')
+                ->constrained('delivery_worker', 'id')
                 ->cascadeOnDelete();
 
             $table->foreignId('order_id')

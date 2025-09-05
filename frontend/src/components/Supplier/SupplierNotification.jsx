@@ -12,7 +12,7 @@ const SupplierNotification = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const token = sessionStorage.getItem('authToken') || localStorage.getItem('authToken');
+  const token = sessionStorage.getItem('supplierToken') || localStorage.getItem('supplierToken');
 
   const fetchNotifications = useCallback(async () => {
     try {
@@ -83,7 +83,7 @@ const SupplierNotification = () => {
 
       fetchNotifications();
     } catch (err) {
-      console.error('Error submitting response:', err);
+      console.error('Error submitting response:', err.response.data);
       alert('Failed to send response.');
     }
   };

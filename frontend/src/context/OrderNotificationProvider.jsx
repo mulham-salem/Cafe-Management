@@ -9,7 +9,7 @@ const OrderNotificationContext = createContext();
 export const OrderNotificationProvider = ({ children }) => {
 
   const previousOrdersRef = useRef([]);
-  const token = sessionStorage.getItem('authToken') || localStorage.getItem('authToken');
+  const token = sessionStorage.getItem('customerToken') || localStorage.getItem('customerToken');
 
   useEffect(() => {
 

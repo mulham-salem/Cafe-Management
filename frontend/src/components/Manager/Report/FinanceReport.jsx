@@ -82,18 +82,38 @@ export default function FinanceReport() {
     return d.toLocaleDateString();
   };
 
+  function getCurrentToken() {
+    const role = sessionStorage.getItem("currentRole");
+    if (!role) return null;
+    return (
+      sessionStorage.getItem(`${role}Token`) ||
+      localStorage.getItem(`${role}Token`)
+    );
+  }
+
+  const token = getCurrentToken();
+  const axiosInstance = axios.create({
+    baseURL: "http://localhost:8000/api",
+    withCredentials: true,
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+  });
+
   const fetchReport = useCallback(
     async (opts = {}) => {
       const { t = type, start = startDate, end = endDate, signal } = opts;
       setLoading(true);
       try {
-        const res = await axios.get("/api/reports/finance", {
+        const res = await axiosInstance.post("/admin/reports/finance", {
           params: {
             type: t,
             start_date: start,
             end_date: end,
           },
-        // headers: { Authorization: `Bearer ${token}` } // add if needed
+          // headers: { Authorization: `Bearer ${token}` } // add if needed
         });
 
         setData(res.data);

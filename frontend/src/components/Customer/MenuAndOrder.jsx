@@ -302,7 +302,7 @@ const MenuAndOrder = () => {
   const [etaText, setEtaText] = useState("N/A");
 
   const token =
-    sessionStorage.getItem("authToken") || localStorage.getItem("authToken");
+    sessionStorage.getItem("customerToken") || localStorage.getItem("customerToken");
 
   axios.defaults.withCredentials = true;
   axios.defaults.baseURL = "http://localhost:8000/api";
@@ -313,49 +313,49 @@ const MenuAndOrder = () => {
   useEffect(() => {
     const fetchMenu = async () => {
       try {
-        const response = await axios.get("/user/customer/menuitem");
-        if (response.data.data) {
-          setMenu(
-            response.data.data.map((item) => ({
-              ...item,
-              id: item.id,
-              imageUrl: item.image,
-              category: item.category,
-              available: item.available,
-              isFavorite: item.isFavorite,
-            }))
-          );
-          setFilteredMenu(
-            response.data.data.map((item) => ({
-              ...item,
-              id: item.id,
-              imageUrl: item.image,
-              category: item.category,
-              available: item.available,
-              isFavorite: item.isFavorite,
-            }))
-          );
-          // if (mockMenu) {
-          //   setMenu(
-          //     mockMenu.map((item) => ({
-          //       ...item,
-          //       id: item.id,
-          //       imageUrl: item.imageUrl,
-          //       category: item.category,
-          //       available: item.available,
-          //       isFavorite: item.isFavorite,
-          //     }))
-          //   );
-          //   setFilteredMenu(
-          //     mockMenu.map((item) => ({
-          //       ...item,
-          //       id: item.id,
-          //       imageUrl: item.imageUrl,
-          //       category: item.category,
-          //       available: item.available,
-          //       isFavorite: item.isFavorite,
-          //     }))
-          //   );
+        //const response = await axios.get("/user/customer/menuitem");
+        // if (response.data.data) {
+        //   setMenu(
+        //     response.data.data.map((item) => ({
+        //       ...item,
+        //       id: item.id,
+        //       imageUrl: item.image,
+        //       category: item.category,
+        //       available: item.available,
+        //       isFavorite: item.isFavorite,
+        //     }))
+        //   );
+        //   setFilteredMenu(
+        //     response.data.data.map((item) => ({
+        //       ...item,
+        //       id: item.id,
+        //       imageUrl: item.image,
+        //       category: item.category,
+        //       available: item.available,
+        //       isFavorite: item.isFavorite,
+        //     }))
+        //   );
+          if (mockMenu) {
+            setMenu(
+              mockMenu.map((item) => ({
+                ...item,
+                id: item.id,
+                imageUrl: item.imageUrl,
+                category: item.category,
+                available: item.available,
+                isFavorite: item.isFavorite,
+              }))
+            );
+            setFilteredMenu(
+              mockMenu.map((item) => ({
+                ...item,
+                id: item.id,
+                imageUrl: item.imageUrl,
+                category: item.category,
+                available: item.available,
+                isFavorite: item.isFavorite,
+              }))
+            );
         } else {
           toast.info(response.data.message);
           setMenu([]);
@@ -489,6 +489,7 @@ const MenuAndOrder = () => {
               items: itemsForBackend,
               address: deliveryInfo.address,
               city: deliveryInfo.city,
+              phone: deliveryInfo.phone,
             }
           );
 

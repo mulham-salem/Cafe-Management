@@ -21,27 +21,51 @@ export function PermissionsProvider({ children }) {
   const [role, setRole] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  function getCurrentToken() {
+    const role = sessionStorage.getItem("currentRole");
+    if ( !role ) return null;
+    return sessionStorage.getItem(`${role}Token`) || localStorage.getItem(`${role}Token`);
+  }
+  const token = getCurrentToken();
+
+  const axiosInstance = axios.create({
+    baseURL: "http://localhost:8000/api",
+    withCredentials: true,
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+  });
+
   useEffect(() => {
+    if ( !token ) return;
     async function fetchPermissions() {
       try {
-        //const res = await axios.get("/api/user/permissions", {withCredentials: true,});
-        //setRole(res.data.role);
-        //setPermissions(res.data.permissions);
+        const res = await axiosInstance.get("/user/me", {
+          withCredentials: true,
+        });
+        setRole(res.data.role);
+        if (role === "manager") {
+          setPermissions(["Default"]);
+        } else {
+          setPermissions(res.data.permissions);
+        }
+      } catch (err) {
+        console.error("Error fetching permissions", err);
+        toast.error("Error fetching permissions, mockData will be applied");
         setRole(mockRole);
         if (mockRole === "manager") {
           setPermissions(["Default"]);
         } else {
           setPermissions(mockPermissions);
         }
-      } catch (err) {
-        console.error("Error fetching permissions", err);
-        toast.error("Error fetching permissions");
       } finally {
         setLoading(false);
       }
     }
     fetchPermissions();
-  }, []);
+  }, [token]);
 
   return (
     <PermissionsContext.Provider value={{ permissions, role, loading }}>
