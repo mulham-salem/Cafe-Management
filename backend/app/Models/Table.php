@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 /**
  * @method static inRandomOrder()
  * @method static where(string $string, string $string1)
+ *
+ * @mixin IdeHelperTable
  */
 class Table extends Model
 {
@@ -25,5 +27,5 @@ class Table extends Model
         return $this->hasMany(Reservation::class, 'table_id');
     }
 
-    protected $fillable = ['number', 'capacity', 'employee_id', 'status'];
+    protected $fillable = ['number', 'capacity', 'employee_id', 'status', 'x', 'y'];
 }

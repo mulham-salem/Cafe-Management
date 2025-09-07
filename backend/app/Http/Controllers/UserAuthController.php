@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
 class UserAuthController extends Controller
@@ -178,13 +179,31 @@ class UserAuthController extends Controller
         // إذا كان user عادي
         $user = $request->user();
 
-        return response()->json([
+        $baseData = [
             'first_name' => $user->first_name,
             'last_name' => $user->last_name,
             'username' => $user->username,
             'email' => $user->email,
             'image_url' => $user->image_url,
-        ]);
+            'role' => $user->role,
+        ];
+        if ($user->role === 'supplier') {
+            $baseData['phone_number'] = $user->supplier->phone_number;
+            $baseData['company_name'] = $user->supplier->company_name;
+        }
+        if ($user->role === 'customer') {
+            $baseData['phone_number'] = $user->customer->phone_number;
+            $baseData['address'] = $user->customer->address;
+            $baseData['points_balance'] = $user->customer->loyalityAccount->points_balance;
+            $baseData['tier'] = $user->customer->loyalityAccount->tier;
+        }
+        if ($user->role === 'delivery_worker') {
+            $baseData['transport'] = $user->DeliveryWorker->transport;
+            $baseData['license'] = $user->DeliveryWorker->license;
+            $baseData['status'] = $user->DeliveryWorker->status;
+            $baseData['rating'] = $user->DeliveryWorker->rating;
+        }
+        return response()->json($baseData);
     }
 
 
@@ -223,19 +242,95 @@ class UserAuthController extends Controller
         // إذا كان user
         $user = $request->user();
 
-        $validated = $request->validate([
+        $rules = [
             'first_name' => 'string|max:255',
             'last_name' => 'string|max:255|nullable',
             'username' => 'string|max:255|unique:users,username,'.$user->id,
             'email' => 'email|unique:users,email,'.$user->id,
-        ]);
+        ];
+        // Supplier-specific validation
+        if ($user->role === 'supplier') {
+            $rules['phone_number'] = [
+                'string',
+                'max:20',
+                Rule::unique('suppliers', 'phone_number')->ignore(optional($user->supplier)->id),
+            ];
+            $rules['company_name'] = [
+                'string',
+                'max:255',
+                Rule::unique('suppliers', 'company_name')->ignore(optional($user->supplier)->id),
+            ];
+        }
 
-        // بناءً على الدور، يمكن هنا عمل أي تخصيص إضافي إذا لزم
+        // Customer-specific validation
+        if ($user->role === 'customer') {
+            $rules['phone_number'] = [
+                'string',
+                'max:20',
+                Rule::unique('customers', 'phone_number')->ignore(optional($user->customer)->id),
+            ];
+            $rules['address'] = 'string|max:255|nullable';
+        }
+
+        // Delivery Worker-specific validation
+        if ($user->role === 'delivery_worker') {
+            $rules['transport'] = 'string|max:50';
+            $rules['license'] = [
+                'string',
+                'max:20',
+                Rule::unique('delivery_worker', 'license')->ignore(optional($user->deliveryWorker)->id),
+            ];
+            $rules['status'] = 'in:Available,OnDelivery,Inactive';
+        }
+
+        $validated = $request->validate($rules);
+
+        // Update User basic info
         $user->update($validated);
+
+        // Update Supplier info if supplier
+        if ($user->role === 'supplier') {
+            $supplierData = collect($validated)->only(['phone_number', 'company_name'])->toArray();
+            if ($user->supplier) {
+                $user->supplier->update($supplierData);
+            } else {
+                $user->supplier()->create($supplierData);
+            }
+        }
+
+        // Update Customer info if customer
+        if ($user->role === 'customer') {
+            $customerData = collect($validated)->only(['phone_number', 'address'])->toArray();
+            if ($user->customer) {
+                $user->customer->update($customerData);
+            } else {
+                $user->customer()->create($customerData);
+            }
+        }
+
+        // Delivery Worker
+        if ($user->role === 'delivery_worker') {
+            $deliveryData = collect($validated)->only(['transport', 'license', 'status'])->toArray();
+            if ($user->deliveryWorker) {
+                $user->deliveryWorker->update($deliveryData);
+            } else {
+                $user->deliveryWorker()->create($deliveryData);
+            }
+        }
 
         return response()->json([
             'message' => 'Profile updated successfully',
-            'user' => $user->only(['first_name', 'last_name', 'username', 'email', 'image_url']),
+            'user' => $user->only([
+                'role',
+                'first_name',
+                'last_name',
+                'username',
+                'email',
+                'image_url',
+            ]),
+            'supplier' => $user->supplier ? $user->supplier->only(['phone_number', 'company_name']) : null,
+            'customer' => $user->customer ? $user->customer->only(['phone_number', 'address']) : null,
+            'delivery_worker' => $user->deliveryWorker ? $user->deliveryWorker->only(['transport', 'license', 'status', 'rating']) : null,
         ]);
     }
 

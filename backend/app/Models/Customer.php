@@ -6,9 +6,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * @method static inRandomOrder()
+ *
+ * @mixin IdeHelperCustomer
  */
 class Customer extends Model
 {
@@ -39,9 +42,9 @@ class Customer extends Model
         return $this->hasMany(FavoriteItem::class, 'customer_id');
     }
 
-    public function loyalityAccount(): HasMany
+    public function loyalityAccount(): HasOne
     {
-        return $this->hasMany(LoyalityAccount::class, 'customer_id');
+        return $this->hasOne(LoyalityAccount::class, 'customer_id');
     }
 
     protected $fillable = [

@@ -118,12 +118,6 @@ export default function SidebarToggle({
     setIsOpen(false);
   }, [effectiveRole, location.pathname]);
 
-  // useEffect(() => {
-  //   if (permissions && permissions.length > 0) {
-  //     setIsOpen(true);
-  //   }
-  // }, [permissions]);
-
   if (!role) return null;
   if (loading) return null;
   const allowedRoles = ["employee", "supplier"];

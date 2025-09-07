@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id(); // bigint unsigned auto increment
 
             $table->foreignId('delivery_worker_id')
+                ->nullable()
                 ->constrained('delivery_worker', 'id')
                 ->cascadeOnDelete();
 
@@ -23,10 +24,12 @@ return new class extends Migration
                 ->constrained('orders')
                 ->nullOnDelete();
 
-            $table->enum('status', ['Pending', 'Assigned', 'InTransit', 'Delivered'])->default('Pending');
-            $table->decimal('cost', 5, 2);
+            $table->enum('status', ['unassigned', 'assigned', 'inTransit', 'delivered'])->default('unassigned');
+            $table->decimal('delivery_fee', 5, 2);
             $table->string('address', 100);
-            $table->dateTime('pickup_time');
+            $table->string('city', 50);
+            $table->string('phone', 20);
+            $table->time('pickup_time');
             $table->dateTime('estimated_time');
             $table->decimal('rating_score', 2, 1)->nullable();
             $table->string('rating_comment', 200)->nullable();

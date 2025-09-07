@@ -125,10 +125,19 @@ class UserManagementController extends Controller
         // إنشاء الصف الخاص بالدور في الجداول الوريثة
         switch ($user->role) {
             case UserRole::Customer->value:
+                // Create customer record
                 DB::table('customers')->insert([
                     'id' => $user->id,
                     'phone_number' => null,
                     'address' => null,
+                ]);
+
+                // Create loyalty account record
+                DB::table('loyality_account')->insert([
+                    'customer_id' => $user->id,
+                    'points_balance' => 0.00,
+                    'tier' => 'Bronze',
+                    'last_update' => now(),
                 ]);
                 break;
 

@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * @method static inRandomOrder()
+ *
+ * @mixin IdeHelperSupplyRequest
  */
 class SupplyRequest extends Model
 {
@@ -28,6 +30,11 @@ class SupplyRequest extends Model
     public function supplyHistory(): HasOne
     {
         return $this->hasOne(SupplyHistory::class, 'supply_request_id');
+    }
+
+    public function supplier(): BelongsTo
+    {
+        return $this->belongsTo(Supplier::class, 'supplier_id');
     }
 
     protected $fillable = ['manager_id', 'title', 'note', 'request_date', 'status'];

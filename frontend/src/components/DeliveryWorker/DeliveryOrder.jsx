@@ -4,7 +4,12 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "../styles/toastStyles.css";
 import axios from "axios";
-import { FaClipboardList, FaCheck, FaTruck, FaCheckCircle } from "react-icons/fa";
+import {
+  FaClipboardList,
+  FaCheck,
+  FaTruck,
+  FaCheckCircle,
+} from "react-icons/fa";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes, faTruck, faBox } from "@fortawesome/free-solid-svg-icons";
 import styles from "../styles/DeliveryOrder.module.css";
@@ -12,7 +17,7 @@ import styles from "../styles/DeliveryOrder.module.css";
 const mockOrders = [
   {
     id: 101,
-    status: "Pending",
+    status: "unassigned",
     items: [
       { name: "Cappuccino", quantity: 2, unitPrice: 3.5, totalPrice: 7 },
       {
@@ -34,7 +39,7 @@ const mockOrders = [
   },
   {
     id: 102,
-    status: "Assigned",
+    status: "assigned",
     items: [
       { name: "Latte", quantity: 1, unitPrice: 4, totalPrice: 4 },
       { name: "Croissant", quantity: 2, unitPrice: 2, totalPrice: 4 },
@@ -51,7 +56,7 @@ const mockOrders = [
   },
   {
     id: 103,
-    status: "InTransit",
+    status: "inTransit",
     items: [{ name: "Espresso", quantity: 3, unitPrice: 2.5, totalPrice: 7.5 }],
     estimated_time: "2025-09-01T12:50:00",
     delivery_fee: 1,
@@ -65,7 +70,7 @@ const mockOrders = [
   },
   {
     id: 104,
-    status: "Delivered",
+    status: "delivered",
     items: [{ name: "Espresso", quantity: 3, unitPrice: 2.5, totalPrice: 7.5 }],
     estimated_time: "2025-09-01T12:50:00",
     delivery_fee: 1,
@@ -79,11 +84,23 @@ const mockOrders = [
   },
 ];
 
-const API_BASE = "https://api.example.com";
+const token =
+  sessionStorage.getItem("delivery_workerToken") ||
+  localStorage.getItem("delivery_workerToken");
+
+const axiosInstance = axios.create({
+  baseURL: "http://localhost:8000/api",
+  withCredentials: true,
+  headers: {
+    Authorization: `Bearer ${token}`,
+    "Content-Type": "application/json",
+    Accept: "application/json",
+  },
+});
 
 const updateOrderAPI = async (orderId, patch) => {
-  const res = await axios.patch(
-    `${API_BASE}/delivery-orders/${orderId}`,
+  const res = await axiosInstance.patch(
+    `/user/delivery-worker/delivery-orders/${orderId}`,
     patch
   );
   return res.data;
@@ -92,35 +109,35 @@ const updateOrderAPI = async (orderId, patch) => {
 function OrderCard({ order, onUpdate, onShowDetails }) {
   const nextAction = () => {
     switch (order.status) {
-      case "Pending":
+      case "unassigned":
         return {
           label: "Accept Order",
-          next: "Assigned",
+          next: "assigned",
           icon: <FaCheckCircle />,
         };
-      case "Assigned":
+      case "assigned":
         return {
           label: "Start Delivery",
-          next: "InTransit",
+          next: "inTransit",
           icon: <FaTruck />,
         };
-      case "InTransit":
-        return { label: "Delivered", next: "Delivered", icon: <FaCheck /> };
+      case "inTransit":
+        return { label: "Delivered", next: "delivered", icon: <FaCheck /> };
       default:
         return null;
     }
   };
 
   const action = nextAction();
-  const totalItemsPrice = order.items.reduce((sum, i) => sum + i.totalPrice, 0);
 
   const handleActionClick = async () => {
     if (!action) return;
     try {
-      //await updateOrderAPI(order.id, { status: action.next });
+      await updateOrderAPI(order.id, { status: action.next });
       onUpdate(order.id, { status: action.next });
       toast.success(`Order #${order.id} status updated to ${action.next}`);
     } catch (err) {
+      console.error(err);
       toast.error("Failed to update order status");
     }
   };
@@ -160,20 +177,20 @@ function OrderCard({ order, onUpdate, onShowDetails }) {
 
   const handleConfirmReceipt = async (orderId) => {
     try {
-      // const response = await axios.post(
-      //   `/api/orders/${orderId}/confirm-receipt`
-      // );
+      const response = await axiosInstance.post(
+        `/user/delivery-worker/orders/${orderId}/confirm-receipt`
+      );
       onUpdate(orderId, { status: action.next });
-      // if (response.status === 200) {
-      //   toast.success("Order marked as delivered!");
-      //   // تحديث الحالة محليًا إذا كنت تستخدم state
-      //   // setOrders(prev => prev.map(o => o.id === orderId ? {...o, status: 'delivered'} : o));
-      // } else {
-      //   toast.error("Something went wrong.");
-      // }
+      if (response.status === 200) {
+        toast.success("Order marked as delivered!");
+        // تحديث الحالة محليًا إذا كنت تستخدم state
+        // setOrders(prev => prev.map(o => o.id === orderId ? {...o, status: 'delivered'} : o));
+      } else {
+        toast.error("Something went wrong.");
+      }
     } catch (error) {
-      //   console.error(error);
-      //   toast.error("Failed to confirm delivery.");
+      console.error(error);
+      toast.error("Failed to confirm delivery.");
     }
   };
 
@@ -216,24 +233,24 @@ function OrderCard({ order, onUpdate, onShowDetails }) {
         <strong>Address: </strong> {order.customer.address}
       </p>
       <p className={styles.total}>
-        <strong>Total Items:</strong> ${totalItemsPrice.toFixed(2)}{" "}
+        <strong>Total Items:</strong> ${order.total_items_price.toFixed(2)}{" "}
         <strong>-</strong> <strong>Delivery Fee:</strong> ${order.delivery_fee}
       </p>
       <div className={styles.actions}>
-        {action && order.status !== "InTransit" && (
+        {action && order.status !== "inTransit" && (
           <motion.button
             className={styles.btnPrimary}
-            whileHover={{ scale: 1.03 }}
+            whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.97 }}
             onClick={handleActionClick}
           >
             {action.icon} {action.label}
           </motion.button>
         )}
-        {order.status === "InTransit" && (
+        {order.status === "inTransit" && (
           <motion.button
             className={styles.btnSecondary}
-            whileHover={{ scale: 1.03 }}
+            whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.97 }}
             onClick={() => handleConfirmReceiptClick(order.id)}
           >
@@ -243,7 +260,7 @@ function OrderCard({ order, onUpdate, onShowDetails }) {
 
         <motion.button
           className={styles.btnDetails}
-          whileHover={{ scale: 1.03 }}
+          whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.97 }}
           onClick={() => onShowDetails(order)}
         >
@@ -280,9 +297,10 @@ export default function DeliveryOrder() {
 
   const fetchOrders = async () => {
     try {
-      // const res = await axios.get(`${API_BASE}/delivery-orders`);
-      // setOrders(res.data);
-      setOrders(mockOrders);
+      const res = await axiosInstance.get(
+        "/user/delivery-worker/delivery-orders"
+      );
+      setOrders(res.data);
     } catch (error) {
       if (error.response && error.response.status === 404) {
         setOrders(mockOrders);
@@ -296,21 +314,21 @@ export default function DeliveryOrder() {
   };
 
   return (
-   <motion.main 
-    className={styles.page}
-    initial="hidden"
-    animate="visible"
-    variants={{
-      hidden: { opacity: 0 },
-      visible: {
-        opacity: 1,
-        transition: {
-          staggerChildren: 0.08,
-          delayChildren: 0.1
-        }
-      }
-    }}
-  >
+    <motion.main
+      className={styles.page}
+      initial="hidden"
+      animate="visible"
+      variants={{
+        hidden: { opacity: 0 },
+        visible: {
+          opacity: 1,
+          transition: {
+            staggerChildren: 0.08,
+            delayChildren: 0.1,
+          },
+        },
+      }}
+    >
       <header className={styles.header}>
         <div className={styles.headerLeft}>
           <button
@@ -334,7 +352,7 @@ export default function DeliveryOrder() {
         <div className={styles.loadingOverlay}>
           <p className={styles.emptyText}>Loading...</p>
         </div>
-      ) : (
+      ) : orders.length !== 0 ? (
         <section className={styles.list} aria-label="Delivery List">
           <AnimatePresence>
             {orders.map((o) => (
@@ -347,6 +365,8 @@ export default function DeliveryOrder() {
             ))}
           </AnimatePresence>
         </section>
+      ) : (
+        <p className={styles.noResults}>no ready order yet</p>
       )}
       <AnimatePresence>
         {detailOrder && (
@@ -386,6 +406,9 @@ export default function DeliveryOrder() {
                   <strong>Address:</strong> {detailOrder.customer.address}
                 </p>
                 <p>
+                  <strong>City:</strong> {detailOrder.customer.address}
+                </p>
+                <p>
                   <strong>Note:</strong> {detailOrder.note || "—"}
                 </p>
                 <p>
@@ -412,6 +435,6 @@ export default function DeliveryOrder() {
           </motion.div>
         )}
       </AnimatePresence>
-    </motion.main >
+    </motion.main>
   );
 }

@@ -3,11 +3,10 @@
   border-left: 6px solid #dc3545;
   padding: 10px 15px;
   color: #333;
-  font-weight: bold;
+  font-weight: 500;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-  width: 325px;
+  width: 333px;
   bottom: 15px;
-  margin-left: auto;
   border-radius: 6px;
   justify-content: center;
 }
@@ -20,13 +19,13 @@
 .custom-toast {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 5px;
 }
 
 .custom-toast span {
   word-break: break-word;
   text-wrap: balance;
-  padding: 10px;
+  margin-bottom: 8px;
 }
 
 .purchase-custom-toast {
@@ -95,7 +94,7 @@
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  font-weight: bold;
+  font-weight: 550;
   display: block;
   text-align: center;
   transition: background-color 0.3s ease;
@@ -112,7 +111,7 @@
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  font-weight: bold;
+  font-weight: 550;
   display: block;
   text-align: center;
   transition: background-color 0.3s ease;

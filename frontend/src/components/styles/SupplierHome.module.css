@@ -636,6 +636,7 @@
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }
@@ -647,6 +648,7 @@
   padding: 3rem;
   color: #7f8c8d;
   font-size: 0.95rem;
+  margin-top: 200px;
 }
 
 .emptyIcon {

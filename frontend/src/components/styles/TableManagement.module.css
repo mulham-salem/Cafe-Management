@@ -1,6 +1,6 @@
 
 .container {
-  padding: 1rem;
+  padding: 1.1rem;
   width: 100%;
   margin: 95px auto;
   overflow-y: auto;
@@ -70,7 +70,6 @@
 .table {
   width: 90%;
   margin: auto;
-  min-height: 60vh;
   border-collapse: collapse;
   border-radius: 16px;
   overflow: hidden;

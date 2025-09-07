@@ -12,6 +12,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  *
  * @property int $quantity
  * @property $threshold_level
+ *
+ * @mixin IdeHelperInventoryItem
  */
 class InventoryItem extends Model
 {

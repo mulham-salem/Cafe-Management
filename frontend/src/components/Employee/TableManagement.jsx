@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useMemo, useContext } from "react";
+import { useState, useRef, useEffect, useMemo, useContext } from "react";
 import styles from "../styles/TableManagement.module.css";
 import "../styles/toastStyles.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -14,7 +14,7 @@ import axios from "axios";
 import { EmpSearchContext } from "./EmployeeHome";
 import VisualTableMap from "./VisualTableMap.jsx";
 
-const mockdata = [
+const mockData = [
   {
     id: 1,
     number: 1,
@@ -78,7 +78,8 @@ const mockdata = [
 ];
 const TableManagement = () => {
   const token =
-    sessionStorage.getItem("employeeToken") || localStorage.getItem("employeeToken");
+    sessionStorage.getItem("employeeToken") ||
+    localStorage.getItem("employeeToken");
 
   const axiosInstance = axios.create({
     baseURL: "http://localhost:8000/api",
@@ -120,11 +121,12 @@ const TableManagement = () => {
 
   const fetchTables = async () => {
     try {
-      // const response = await axiosInstance.get('/manager/table');
-      // setTables(response.data.tables);
-      setTables(mockdata);
+      const response = await axiosInstance.get("/user/employee/table");
+      setTables(response.data.tables);
     } catch (error) {
+      console.error(error);
       toast.error("Failed to load tables.");
+      setTables(mockData);
     } finally {
       setLoading(false);
     }
@@ -148,8 +150,8 @@ const TableManagement = () => {
     }
 
     try {
-      const response = await axiosInstance.post("/manager/table", {
-        number: parseInt(newTable.number),
+      const response = await axiosInstance.post("/user/employee/table", {
+        number: newTable.number,
         capacity: parseInt(newTable.capacity),
         status: "available",
       });
@@ -185,7 +187,7 @@ const TableManagement = () => {
     const nextStatusValue = nextStatusLogic(currentStatus);
 
     try {
-      const response = await axiosInstance.put(`/manager/table/${id}`, {
+      const response = await axiosInstance.put(`/user/employee/table/${id}`, {
         status: nextStatusValue,
       });
       toast.success(
@@ -209,7 +211,7 @@ const TableManagement = () => {
                 onClick={async () => {
                   try {
                     const confirmResponse = await axiosInstance.put(
-                      `/manager/table/${id}`,
+                      `/user/employee/table/${id}`,
                       {
                         status: nextStatusValue,
                         confirm: true,
@@ -293,7 +295,7 @@ const TableManagement = () => {
               onClick={async () => {
                 try {
                   const response = await axiosInstance.delete(
-                    `/manager/table/${id}`
+                    `/user/employee/table/${id}`
                   );
                   toast.success(
                     response.data.message || "Table deleted successfully"
@@ -320,7 +322,7 @@ const TableManagement = () => {
                                 try {
                                   const confirmResponse =
                                     await axiosInstance.delete(
-                                      `/manager/table/${id}`,
+                                      `/user/employee/table/${id}`,
                                       {
                                         data: { confirm: true },
                                       }
@@ -408,20 +410,20 @@ const TableManagement = () => {
         </div>
       ) : (
         <>
-        {!showVisualMap && (
-          <div className={styles.headerRow}>
-            <button
-              className={styles.visualMap}
-              onClick={() => setShowVisualMap(true)}
-            >
-              <FontAwesomeIcon icon={faMap} /> Visual Map
-            </button>
+          {!showVisualMap && (
+            <div className={styles.headerRow}>
+              <button
+                className={styles.visualMap}
+                onClick={() => setShowVisualMap(true)}
+              >
+                <FontAwesomeIcon icon={faMap} /> Visual Map
+              </button>
 
-            <button className={styles.addButton} onClick={handleAddClick}>
-              <FontAwesomeIcon icon={faPlus} /> Add Table
-            </button>
-          </div>
-        )} 
+              <button className={styles.addButton} onClick={handleAddClick}>
+                <FontAwesomeIcon icon={faPlus} /> Add Table
+              </button>
+            </div>
+          )}
           {showVisualMap && (
             <div className={styles.visualMapContainer}>
               <VisualTableMap />
@@ -437,7 +439,7 @@ const TableManagement = () => {
                 <form className={styles.form} onSubmit={handleSubmit}>
                   <h3>Add New Table</h3>
                   <input
-                    type="number"
+                    type="text"
                     name="number"
                     placeholder="Table Number"
                     value={newTable.number}
@@ -461,61 +463,61 @@ const TableManagement = () => {
           )}
 
           {!showVisualMap && (
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th>Table #</th>
-                  <th>Capacity</th>
-                  <th>Status</th>
-                  <th>Operations</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredTables.length === 0 ? (
-                  <p className={styles.noResults}>
-                    {" "}
-                    {searchQuery
-                      ? `No table number match "${searchQuery}"`
-                      : "No tables available"}{" "}
-                  </p>
-                ) : (
-                  filteredTables.map((table) => (
-                    <tr key={table.id}>
-                      <td data-label="Number">{table.number}</td>
-                      <td data-label="Capacity">{table.capacity}</td>
-                      <td data-label="Status">
-                        {table.status.charAt(0).toUpperCase() +
-                          table.status.slice(1)}
-                      </td>
-                      <td data-label="Action" className={styles.actions}>
-                        <button
-                          onClick={() =>
-                            handleStatusUpdate(table.id, table.status)
-                          }
-                          className={styles.statusBtn}
-                        >
-                          <FontAwesomeIcon
-                            icon={faPen}
-                            data-action="Update Status"
-                            title="Update Status"
-                          />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(table.id)}
-                          className={styles.deleteBtn}
-                        >
-                          <FontAwesomeIcon
-                            icon={faTrash}
-                            data-action="Delete"
-                            title="Delete"
-                          />
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th>Table #</th>
+                    <th>Capacity</th>
+                    <th>Status</th>
+                    <th>Operations</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredTables.length === 0 ? (
+                    <p className={styles.noResults}>
+                      {" "}
+                      {searchQuery
+                        ? `No table number match "${searchQuery}"`
+                        : "No tables available"}{" "}
+                    </p>
+                  ) : (
+                    filteredTables.map((table) => (
+                      <tr key={table.id}>
+                        <td data-label="Number">{table.number}</td>
+                        <td data-label="Capacity">{table.capacity}</td>
+                        <td data-label="Status">
+                          {table.status.charAt(0).toUpperCase() +
+                            table.status.slice(1)}
+                        </td>
+                        <td data-label="Action" className={styles.actions}>
+                          <button
+                            onClick={() =>
+                              handleStatusUpdate(table.id, table.status)
+                            }
+                            className={styles.statusBtn}
+                          >
+                            <FontAwesomeIcon
+                              icon={faPen}
+                              data-action="Update Status"
+                              title="Update Status"
+                            />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(table.id)}
+                            className={styles.deleteBtn}
+                          >
+                            <FontAwesomeIcon
+                              icon={faTrash}
+                              data-action="Delete"
+                              title="Delete"
+                            />
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
           )}
         </>
       )}

@@ -348,3 +348,76 @@
   background: rgba(255, 255, 255, 0.28);
   color: white;
 }
+
+
+.toastCard {
+  max-width: 90%;
+  width: clamp(260px, 18vw, 360px);
+  background:  #f6efd9;
+  padding: clamp(8px, 0.5vw, 10px) clamp(8px, 2vw, 12px);
+  border-radius: 18px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+  font-family: 'Georgia', serif;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border: 1px solid rgb(103, 49, 13);
+  animation-duration: 300ms;
+  animation-fill-mode: forwards;
+  overflow: hidden;
+}
+
+.textContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.messageTitle {
+  font-size: clamp(0.9rem, 1.2vw, 1.3rem);
+  font-weight: bold;
+  color: rgb(103, 49, 13);
+  display: block;
+  text-align: center;
+}
+
+.message {
+  font-size: clamp(0.7rem, 0.9vw, 1rem);
+  color: #545454;
+  display: block;
+  text-align: center;
+}
+
+@keyframes enterAnimation {
+  from {
+    opacity: 0;
+    transform: translate(40px, -40px) scale(1);
+  }
+  to {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+}
+
+@keyframes leaveAnimation {
+  from {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translate(40px, -40px) scale(0);
+  }
+}
+
+.enter {
+  animation-name: enterAnimation;
+  animation-timing-function: ease-out;
+  animation-fill-mode: forwards;
+}
+
+.leave {
+  animation-name: leaveAnimation;
+  animation-duration: 300ms;
+  animation-timing-function: ease-in;
+  animation-fill-mode: forwards;
+}

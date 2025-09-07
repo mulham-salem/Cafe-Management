@@ -19,6 +19,7 @@ return new class extends Migration
                 ->cascadeOnDelete();
 
             $table->enum('status', ['open', 'closed'])->default('open');
+            $table->dateTime('resume_at')->nullable();
             $table->timestamp('timestamp')->useCurrent()->useCurrentOnUpdate();
             $table->timestamps();
 

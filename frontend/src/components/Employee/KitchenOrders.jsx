@@ -158,31 +158,31 @@ const KitchenOrders = () => {
   const [isSearching, setIsSearching] = useState(false);
 
   const token =
-    sessionStorage.getItem("employeeToken") || localStorage.getItem("employeeToken");
+    sessionStorage.getItem("employeeToken") ||
+    localStorage.getItem("employeeToken");
 
   const fetchOrders = useCallback(async () => {
     try {
-      // const response = await axios.get('http://localhost:8000/api/user/employee/kitchen/orders', {
-      //   headers: {
-      //     Authorization: `Bearer ${token}`,
-      //   },
-      // });
-
-      // setOrders(response.data.data.map(order => ({
-      //   id: order.order_id,
-      //   status: order.status,
-      //   receiptTime: order.receiptTime,
-      //   receiptMethod: order.receiptMethod,
-      //   note: order.note,
-      //   items: order.orderItems.map(item => ({
-      //     name: item.item_name,
-      //     quantity: item.quantity,
-      //   }))
-      // })));
-      setOrders(mockData);
+      const response = await axios.get('http://localhost:8000/api/user/employee/kitchen/orders', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setOrders(response.data.data.map(order => ({
+        id: order.order_id,
+        status: order.status,
+        receiptTime: order.pickup_time,
+        receiptMethod: order.pickup_method,
+        note: order.note,
+        items: order.orderItems.map(item => ({
+          name: item.item_name,
+          quantity: item.quantity,
+        }))
+      })));
     } catch (error) {
       console.error("Error fetching kitchen orders:", error);
       toast.error("Failed to load orders. Please try again.");
+      setOrders(mockData);
     } finally {
       setLoading(false);
     }
@@ -268,7 +268,7 @@ const KitchenOrders = () => {
     setSearchPlaceholder("Search by ID...");
   }, [setSearchPlaceholder]);
 
-  const validStatusFlow = ["confirmed", "preparing", "ready", "delivered"];
+  const validStatusFlow = ["confirmed", "preparing", "ready"];
 
   useEffect(() => {
     if (searchQuery.trim() === "") {
@@ -278,26 +278,26 @@ const KitchenOrders = () => {
       setIsSearching(true);
       const searchSingleOrder = async () => {
         try {
-          // const response = await axios.get(
-          //   `http://localhost:8000/api/user/employee/orders/search?order_id=${searchQuery}&statuses=${validStatusFlow}`,
-          //   {
-          //     headers: {
-          //       Authorization: `Bearer ${token}`,
-          //     },
-          //   }
-          // );
-          // const fetchedOrder = response.data.data;
-          // setFilteredOrders([
-          //   {
-          //     id: fetchedOrder.order_id,
-          //     status: fetchedOrder.status,
-          //     receiptTime: fetchedOrder.receiptTime,
-          //     receiptMethod: fetchedOrder.receiptMethod,
-          //     note: fetchedOrder.note,
-          //     items:
-          //       orders.find((o) => o.id === fetchedOrder.order_id)?.items || [],
-          //   },
-          // ]);
+          const response = await axios.get(
+            `http://localhost:8000/api/user/employee/orders/search?order_id=${searchQuery}&statuses=${validStatusFlow}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          const fetchedOrder = response.data.data;
+          setFilteredOrders([
+            {
+              id: fetchedOrder.order_id,
+              status: fetchedOrder.status,
+              receiptTime: fetchedOrder.pickup_time,
+              receiptMethod: fetchedOrder.pickup_method,
+              note: fetchedOrder.note,
+              items:
+                orders.find((o) => o.id === fetchedOrder.order_id)?.items || [],
+            },
+          ]);
         } catch (error) {
           console.error("Error searching order:", error);
           if (error.response && error.response.status === 404) {
@@ -412,7 +412,9 @@ const KitchenOrders = () => {
                     <option value=""> ⚙️ Update Status </option>
                     <option value="preparing"> ⏳ Preparing </option>
                     <option value="ready"> 🚀 Ready </option>
-                    <option value="delivered"> 🚚 Delivered </option>
+                    {order.receiptMethod !== "delivery" && (
+                      <option value="delivered"> 🚚 Delivered </option>
+                    )}
                   </select>
                 </div>
               </div>
@@ -495,7 +497,9 @@ const KitchenOrders = () => {
                   <option value=""> ⚙️ Update Status </option>
                   <option value="preparing"> ⏳ Preparing </option>
                   <option value="ready"> 🚀 Ready </option>
-                  <option value="delivered"> 🚚 Delivered </option>
+                  {order.receiptMethod !== "delivery" && (
+                    <option value="delivered"> 🚚 Delivered </option>
+                  )}
                 </select>
               </div>
             </div>

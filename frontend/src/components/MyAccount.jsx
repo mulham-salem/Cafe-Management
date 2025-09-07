@@ -108,7 +108,7 @@ export default function MyAccount() {
         transport: data.transport || "Motorbike",
         license: data.license || "",
         status: data.status || "Available",
-        rating: data.rating || 1.0,
+        rating: data.rating || "",
       });
     } catch (err) {
       console.warn("Could not fetch profile, using mock:", err?.message || err);
@@ -141,13 +141,21 @@ export default function MyAccount() {
     if (!form.first_name.trim()) e.first_name = "First name is required";
     if (!form.username.trim()) e.username = "Username is required";
 
-    if (role !== "manager") {
-      if (!form.phone_number.trim())
-        e.phone_number = "Phone number is required";
-      if (!form.company_name.trim())
-        e.company_name = "Company name is required";
-      if (!form.address.trim()) e.address = "Address is required";
-      if (!form.license.trim()) e.license = "license is required";
+    if (role !== "manager" && role !== "employee") {
+      if (role !== "delivery_worker") {
+        if (!form.phone_number.trim())
+          e.phone_number = "Phone number is required";
+      }
+      if (role === "supplier") {
+        if (!form.company_name.trim())
+          e.company_name = "Company name is required";
+      }
+      if (role === "customer") {
+        if (!form.address.trim()) e.address = "Address is required";
+      }
+      if (role === "delivery_worker") {
+        if (!form.license.trim()) e.license = "license is required";
+      }
     }
 
     if (form.username && form.username.length < 3)
@@ -199,7 +207,17 @@ export default function MyAccount() {
     formData.append("avatar", file); // backend should expect 'avatar' field name
 
     try {
-      const res = await axiosInstance.post("/user/upload-avatar", formData);
+      const res = await axios.post(
+        "http://localhost:8000/api/user/upload-avatar",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data", // 👈 ضروري
+          },
+          withCredentials: true,
+        }
+      );
 
       // backend might return image_url or url or path
       const imageUrl =
@@ -226,12 +244,17 @@ export default function MyAccount() {
     try {
       // 1) upload image if user selected a local file
       let uploadedUrl = null;
+
       if (localFile) {
         uploadedUrl = await uploadProfileImage(localFile);
         if (!uploadedUrl) {
           // stop if upload failed
           throw new Error("Image upload failed");
         }
+        setForm((prev) => ({
+          ...prev,
+          image_url: uploadedUrl,
+        }));
       }
 
       // 2) prepare payload for profile update
@@ -261,7 +284,7 @@ export default function MyAccount() {
         last_name: updated.last_name || "",
         username: updated.username || "",
         email: updated.email || "",
-        image_url: updated.image_url || "",
+        image_url: updated.image_url || uploadedUrl || form.image_url || "",
         phone_number: updated.phone_number || "",
         company_name: updated.company_name || "",
         address: updated.address || "",
@@ -368,8 +391,7 @@ export default function MyAccount() {
             {customerPath && (
               <div className={styles.loyaltyInfo}>
                 <p className={styles.points}>
-                  <strong>Points Balance:</strong>{" "}
-                  {profile.points_balance?.toFixed(2)}
+                  <strong>Points Balance:</strong> {profile.points_balance}
                 </p>
                 <p className={styles.tier}>
                   <strong>Tier:</strong> {profile.tier}

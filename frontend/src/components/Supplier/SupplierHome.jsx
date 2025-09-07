@@ -52,6 +52,9 @@ const SupplierHome = () => {
   const [items, setItems] = useState([
     { id: uuidv4(), name: "", quantity: "", unit: "", unitPrice: "" },
   ]);
+  const token =
+    sessionStorage.getItem("supplierToken") ||
+    localStorage.getItem("supplierToken");
 
   const handleAddItem = () => {
     setItems([
@@ -80,10 +83,6 @@ const SupplierHome = () => {
         return;
       }
     }
-
-    const token =
-      sessionStorage.getItem("supplierToken") ||
-      localStorage.getItem("supplierToken");
 
     try {
       const response = await axios.post(
@@ -229,75 +228,75 @@ const SupplierHome = () => {
     }
   };
 
-  useEffect(() => {
-    const checkNewNotifications = async () => {
-      try {
-        const token =
-          localStorage.getItem("supplierToken") ||
-          sessionStorage.getItem("supplierToken");
+  // useEffect(() => {
+  //   const checkNewNotifications = async () => {
+  //     try {
+  //       const token =
+  //         localStorage.getItem("supplierToken") ||
+  //         sessionStorage.getItem("supplierToken");
 
-        const response = await axios.get(
-          "http://localhost:8000/api/user/supplier/notifications",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+  //       const response = await axios.get(
+  //         "http://localhost:8000/api/user/supplier/notifications",
+  //         {
+  //           headers: { Authorization: `Bearer ${token}` },
+  //         }
+  //       );
 
-        const allNotifications = response.data.notifications;
+  //       const allNotifications = response.data.notifications;
 
-        const shownNotifications =
-          JSON.parse(localStorage.getItem("shownNotificationsSupplier")) || [];
+  //       const shownNotifications =
+  //         JSON.parse(localStorage.getItem("shownNotificationsSupplier")) || [];
 
-        const unseenOfferResponses = allNotifications.filter(
-          (n) =>
-            n.seen === 0 &&
-            n.purpose === "Supply Offer Response" &&
-            !shownNotifications.includes(n.id)
-        );
+  //       const unseenOfferResponses = allNotifications.filter(
+  //         (n) =>
+  //           n.seen === 0 &&
+  //           n.purpose === "Supply Offer Response" &&
+  //           !shownNotifications.includes(n.id)
+  //       );
 
-        const unseenRequests = allNotifications.filter(
-          (n) =>
-            n.seen === 0 &&
-            n.purpose === "Supply Request" &&
-            !shownNotifications.includes(n.id)
-        );
+  //       const unseenRequests = allNotifications.filter(
+  //         (n) =>
+  //           n.seen === 0 &&
+  //           n.purpose === "Supply Request" &&
+  //           !shownNotifications.includes(n.id)
+  //       );
 
-        if (unseenOfferResponses.length > 0) {
-          toastify.info(
-            `You received ${unseenOfferResponses.length} response${
-              unseenOfferResponses.length > 1 ? "s" : ""
-            } for your supply offer.`
-          );
+  //       if (unseenOfferResponses.length > 0) {
+  //         toastify.info(
+  //           `You received ${unseenOfferResponses.length} response${
+  //             unseenOfferResponses.length > 1 ? "s" : ""
+  //           } for your supply offer.`
+  //         );
 
-          const ids = unseenOfferResponses.map((n) => n.id);
-          localStorage.setItem(
-            "shownNotificationsSupplier",
-            JSON.stringify([...shownNotifications, ...ids])
-          );
-        }
+  //         const ids = unseenOfferResponses.map((n) => n.id);
+  //         localStorage.setItem(
+  //           "shownNotificationsSupplier",
+  //           JSON.stringify([...shownNotifications, ...ids])
+  //         );
+  //       }
 
-        if (unseenRequests.length > 0) {
-          toastify.info(
-            `You received ${unseenRequests.length} new supply request${
-              unseenRequests.length > 1 ? "s" : ""
-            }.`
-          );
+  //       if (unseenRequests.length > 0) {
+  //         toastify.info(
+  //           `You received ${unseenRequests.length} new supply request${
+  //             unseenRequests.length > 1 ? "s" : ""
+  //           }.`
+  //         );
 
-          const ids = unseenRequests.map((n) => n.id);
-          localStorage.setItem(
-            "shownNotificationsSupplier",
-            JSON.stringify([...shownNotifications, ...ids])
-          );
-        }
-      } catch (err) {
-        console.error("Failed to load notifications: ", err);
-      }
-    };
+  //         const ids = unseenRequests.map((n) => n.id);
+  //         localStorage.setItem(
+  //           "shownNotificationsSupplier",
+  //           JSON.stringify([...shownNotifications, ...ids])
+  //         );
+  //       }
+  //     } catch (err) {
+  //       console.error("Failed to load notifications: ", err);
+  //     }
+  //   };
 
-    checkNewNotifications();
-    const interval = setInterval(checkNewNotifications, 10000);
-    return () => clearInterval(interval);
-  }, []);
+  //   checkNewNotifications();
+  //   const interval = setInterval(checkNewNotifications, 10000);
+  //   return () => clearInterval(interval);
+  // }, []);
 
   const filteredOffers = useMemo(() => {
     return myOffers.filter(
@@ -458,15 +457,23 @@ const SupplierHome = () => {
     },
   ];
 
-  const [supplyHistory, setSupplyHistory] = useState(mockSupplyHistory);
+  const [supplyHistory, setSupplyHistory] = useState([]);
   const [loadingHistory, setLoadingHistory] = useState(true);
 
   const fetchSupplyHistory = async () => {
     try {
-      // const response = await axios.get("/api/supply-history");
-      // setSupplyHistory(response.data);
+      const response = await axios.get(
+        "http://localhost:8000/api/user/supplier/supply-history",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setSupplyHistory(response.data);
     } catch (err) {
       toast.error("Error fetching supply records:", err);
+      setSupplyHistory(mockSupplyHistory);
     } finally {
       setLoadingHistory(false);
     }
@@ -841,7 +848,7 @@ const SupplierHome = () => {
                       </div>
                       <div className={styles.metaItem}>
                         <FontAwesomeIcon icon={faDollarSign} />
-                        <span>${record.totalPrice.toFixed(2)}</span>
+                        <span>${record.totalPrice}</span>
                       </div>
                     </div>
 

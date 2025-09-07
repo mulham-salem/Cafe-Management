@@ -12,7 +12,7 @@ import logo from "/logo_1.png";
 import styles from "../styles/DeliveryHome.module.css";
 import axios from "axios";
 import { toast, Toaster } from "react-hot-toast";
-import DeliveryLocation from "./DeliveryLocation"
+import DeliveryLocation from "./DeliveryLocation";
 
 // Framer Motion variants
 const pageVariants = {
@@ -69,9 +69,37 @@ export default function DeliveryHome() {
   const location = useLocation();
   const navigate = useNavigate();
 
+  useEffect(() => {
+    if (location.state && location.state.successMessage) {
+      setTimeout(() => {
+        toast.custom(
+          (t) => (
+            <div
+              className={`${styles.toastCard} ${
+                t.visible ? styles.enter : styles.leave
+              }`}
+            >
+              <div className={styles.textContainer}>
+                <p className={styles.messageTitle}>
+                  ☕️ {location.state.successMessage}
+                </p>
+                <p className={styles.message}>
+                  Glad to see you again at Coffee House!
+                </p>
+              </div>
+            </div>
+          ),
+          { duration: 4000, position: "top-right" }
+        );
+        window.history.replaceState({}, document.title);
+      }, 1500);
+    }
+  }, [location.state]);
+
   const handleLogout = async () => {
     const token =
-      sessionStorage.getItem("authToken") || localStorage.getItem("authToken");
+      sessionStorage.getItem("delivery_workerToken") ||
+      localStorage.getItem("delivery_workerToken");
 
     try {
       const response = await axios.post(
@@ -95,14 +123,14 @@ export default function DeliveryHome() {
     }
   };
 
-
   const profile = async () => {
     const token =
-      sessionStorage.getItem("authToken") || localStorage.getItem("authToken");
+      sessionStorage.getItem("delivery_workerToken") ||
+      localStorage.getItem("delivery_workerToken");
 
     try {
       const response = await axios.get(
-        "http://localhost:8000/api/manager/profile",
+        "http://localhost:8000/api/user/profile",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -112,9 +140,32 @@ export default function DeliveryHome() {
 
       setWorkerName(response.data.firstName || "Delivery Worker");
     } catch (error) {
+      console.error(error);
       // toast.error("Failed to fetch worker name");
     }
   };
+
+  async function checkNewDeliveryOrders() {
+    try {
+      const { data } = await axios.get("http://localhost:8000/api/user/delivery-worker/delivery-orders/check-new");
+      return data; // { hasNewOrders: true/false, message?: string }
+    } catch (error) {
+      console.error(error);
+      return { hasNewOrders: false };
+    }
+  }
+
+  // مثال في useEffect
+  useEffect(() => {
+    async function fetchNotifications() {
+      const res = await checkNewDeliveryOrders();
+      if (res.hasNewOrders) {
+        toast(res.message); 
+      }
+    }
+
+    fetchNotifications();
+  }, []);
 
   return (
     <motion.div

@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, createRef } from "react";
+import { useRef, useEffect, useState, createRef } from "react";
 import Draggable from "react-draggable";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -85,15 +85,39 @@ export default function VisualTableMap({ readonly = false }) {
   const mapRef = useRef(null);
   const mapBounds = mapRef.current?.getBoundingClientRect();
 
+  function getCurrentToken() {
+    const role = sessionStorage.getItem("currentRole");
+    if (!role) return null;
+    return (
+      sessionStorage.getItem(`${role}Token`) ||
+      localStorage.getItem(`${role}Token`)
+    );
+  }
+
+  const token = getCurrentToken();
+
+  const axiosInstance = axios.create({
+    baseURL: "http://localhost:8000/api",
+    withCredentials: true,
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+  });
+
   // Fetch tables
   useEffect(() => {
+    document.title = "Cafe Delights - Visual Table Map";
+
     const fetchTables = async () => {
       try {
-        // const res = await axios.get("/api/tables");
-        // setTables(res.data);
-        setTables(mockTables);
+        const res = await axiosInstance.get("/user/employee/table");
+        setTables(res.data.tables);
       } catch (err) {
+        console.error(err);
         toast.warning("Could not load table map. Loaded mock data.");
+        setTables(mockTables);
       } finally {
         setLoading(false);
       }
@@ -103,16 +127,28 @@ export default function VisualTableMap({ readonly = false }) {
 
   // Update table (position or status)
   const updateTable = async (id, newData) => {
+    const oldTable = tables.find((t) => t.id === id);
+    if (!oldTable) return;
+
     const updatedTables = tables.map((t) =>
       t.id === id ? { ...t, ...newData } : t
     );
     setTables(updatedTables);
 
     try {
-      await axios.put(`/api/tables/${id}`, newData);
+      if (oldTable.status === "reserved" && newData.status === "cleaning") {
+        await axiosInstance.put(`/user/employee/table/${id}`, {
+          ...newData,
+          confirm: true,
+        });
+        toast.success("Updated successfully");
+        return;
+      }
+      await axiosInstance.put(`/user/employee/table/${id}`, newData);
       toast.success("Changes saved");
     } catch (err) {
-      toast.error("Error while saving. Please try again later.");
+      console.error(err);
+      toast.error(err.response.data.message);
       // استعادة الحالة الأصلية في حالة الخطأ
       setTables(tables);
     }
@@ -229,6 +265,7 @@ export default function VisualTableMap({ readonly = false }) {
               if (readonly) return;
               const snappedX = snap(data.x, GRID);
               const snappedY = snap(data.y, GRID);
+              if (snappedX === table.x && snappedY === table.y) return;
               updateTable(table.id, { x: snappedX, y: snappedY });
             }}
             disabled={readonly}

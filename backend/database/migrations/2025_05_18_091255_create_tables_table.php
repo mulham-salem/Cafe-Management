@@ -11,10 +11,11 @@ return new class extends Migration
         Schema::create('tables', function (Blueprint $table) {
             $table->id(); // bigint unsigned auto increment
 
-            $table->integer('number');
+            $table->string('number');
             $table->integer('capacity');
             $table->enum('status', ['available', 'reserved', 'cleaning'])->default('available');
-
+            $table->double('x')->nullable();
+            $table->double('y')->nullable();
             $table->timestamps(); // created_at, updated_at
 
             $table->foreignId('employee_id')

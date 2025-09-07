@@ -72,6 +72,8 @@ function Login() {
         navigate("/login/supplier-home", { state: { successMessage } });
       } else if (role === "customer") {
         navigate("/login/customer-home", { state: { successMessage } });
+      } else if (role === "delivery_worker") {
+        navigate("/login/delivery-home", { state: { successMessage } });
       } else {
         toastify.warning("Unknown role. Please contact support.");
       }

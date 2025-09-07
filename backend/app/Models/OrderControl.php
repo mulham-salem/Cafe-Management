@@ -20,5 +20,6 @@ class OrderControl extends Model
     protected $fillable = [
         'employee_id',
         'status',
+        'resume_at',
     ];
 }

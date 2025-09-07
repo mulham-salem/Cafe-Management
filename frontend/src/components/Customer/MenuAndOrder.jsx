@@ -313,53 +313,32 @@ const MenuAndOrder = () => {
   useEffect(() => {
     const fetchMenu = async () => {
       try {
-        //const response = await axios.get("/user/customer/menuitem");
-        // if (response.data.data) {
-        //   setMenu(
-        //     response.data.data.map((item) => ({
-        //       ...item,
-        //       id: item.id,
-        //       imageUrl: item.image,
-        //       category: item.category,
-        //       available: item.available,
-        //       isFavorite: item.isFavorite,
-        //     }))
-        //   );
-        //   setFilteredMenu(
-        //     response.data.data.map((item) => ({
-        //       ...item,
-        //       id: item.id,
-        //       imageUrl: item.image,
-        //       category: item.category,
-        //       available: item.available,
-        //       isFavorite: item.isFavorite,
-        //     }))
-        //   );
-          if (mockMenu) {
-            setMenu(
-              mockMenu.map((item) => ({
-                ...item,
-                id: item.id,
-                imageUrl: item.imageUrl,
-                category: item.category,
-                available: item.available,
-                isFavorite: item.isFavorite,
-              }))
-            );
-            setFilteredMenu(
-              mockMenu.map((item) => ({
-                ...item,
-                id: item.id,
-                imageUrl: item.imageUrl,
-                category: item.category,
-                available: item.available,
-                isFavorite: item.isFavorite,
-              }))
-            );
+        const response = await axios.get("/user/customer/menuitem");
+        if (response.data.data) {
+          setMenu(
+            response.data.data.map((item) => ({
+              ...item,
+              id: item.id,
+              imageUrl: item.image,
+              category: item.category,
+              available: item.available,
+              isFavorite: item.isFavorite,
+            }))
+          );
+          setFilteredMenu(
+            response.data.data.map((item) => ({
+              ...item,
+              id: item.id,
+              imageUrl: item.image,
+              category: item.category,
+              available: item.available,
+              isFavorite: item.isFavorite,
+            }))
+          );
         } else {
           toast.info(response.data.message);
-          setMenu([]);
-          setFilteredMenu([]);
+          setMenu(mockMenu);
+          setFilteredMenu(mockMenu);
         }
       } catch (error) {
         toast.error("Failed to load menu items.");

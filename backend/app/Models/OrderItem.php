@@ -23,6 +23,7 @@ class OrderItem extends Model
     protected $fillable = [
         'order_id',
         'menuItem_id',
+        'item_name',
         'quantity',
         'price',
     ];

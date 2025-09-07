@@ -1,9 +1,11 @@
 <?php
 
 use App\Http\Controllers\BillManagementController;
+use App\Http\Controllers\DeliveryController;
 use App\Http\Controllers\InventoryManagementController;
 use App\Http\Controllers\ManagerAuthController;
 use App\Http\Controllers\MenuManagementController;
+use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NotificationManagementController;
 use App\Http\Controllers\OrderManagementController;
 use App\Http\Controllers\PromotionManagementController;
@@ -30,10 +32,10 @@ Route::middleware('auth:sanctum')->prefix('user')->group(function () {
     Route::post('/logout', [UserAuthController::class, 'logout']);
     Route::post('/change-password', [UserAuthController::class, 'changePassword']);
 
-    // ....................................................MyAccount...........................................................
+// .........................................................MyAccount...........................................................
 
     Route::get('/account', [UserAuthController::class, 'myAccount']);
-    Route::put('edit/account', [UserAuthController::class, 'updateMyAccount']);
+    Route::put('/edit/account', [UserAuthController::class, 'updateMyAccount']);
     Route::post('/upload-avatar', [UserAuthController::class, 'uploadAvatar']);
 });
 
@@ -47,6 +49,12 @@ Route::middleware(['auth:manager', 'isManager'])->prefix('manager')->group(funct
     Route::post('/logout', [ManagerAuthController::class, 'logout']);
     Route::post('/change-password', [ManagerAuthController::class, 'changePassword']);
 
+    // ......................................Messaging..............................................
+
+    //    Route::get('/messages/contacts', [MessageController::class, 'contacts']);
+    //     Route::get('/messages/thread/{contactName}', [MessageController::class, 'thread']);
+    //     Route::post('/messages', [MessageController::class, 'store']);
+    //     Route::post('/messages/mark-read', [MessageController::class, 'markRead']);
 });
 
 // ...........................if you gave new permission to a certain user he will pass from here ..............................
@@ -63,7 +71,7 @@ Route::prefix('admin')->group(function () {
         Route::post('/supply-offers/{id}/reject', [SupplyManagementController::class, 'rejectOffer']);
         Route::get('/purchase-bills', [BillManagementController::class, 'index']);
         Route::post('/supply-purchase-bill', [SupplyManagementController::class, 'storePurchaseBill']);
-        Route::get('/supply-history', [supplyHistoryController::class, 'index']);
+        Route::get('/supply-history', [supplyHistoryController::class, 'managerHistory']);
 
     });
 
@@ -83,11 +91,19 @@ Route::middleware(['auth:sanctum', 'checkUserRole:supplier'])->prefix('user/supp
 
     Route::post('/offers', [SupplierController::class, 'store']);
     Route::get('/view-offers', [SupplierController::class, 'viewMyOffers']);
+    Route::get('/supply-history', [supplyHistoryController::class, 'supplierHistory']);
 
     // ** supplier notification **//
     Route::get('/notifications', [NotificationManagementController::class, 'getAllSupplierNotifications']);
     Route::patch('/notifications/{id}/seen', [NotificationManagementController::class, 'markAsSeen']);
     Route::patch('/notifications/supply-requests/{id}/respond', [NotificationManagementController::class, 'respondToSupplyRequestNotification']);
+
+    // ......................................Messaging..............................................
+
+    //    Route::get('/messages/contacts', [MessageController::class, 'contacts']);
+    //     Route::get('/messages/thread/{contactName}', [MessageController::class, 'thread']);
+    //     Route::post('/messages', [MessageController::class, 'store']);
+    //     Route::post('/messages/mark-read', [MessageController::class, 'markRead']);
 });
 
 // ....................................................customer Routes.....................................................
@@ -117,9 +133,19 @@ Route::middleware(['auth:sanctum', 'checkUserRole:customer'])->prefix('user/cust
 
 Route::middleware(['auth:sanctum', 'checkUserRole:employee'])->prefix('user/employee')->group(function () {
 
-    Route::get('/menuitem', [OrderManagementController::class, 'fetchMenuItems']); // Done
-    Route::post('/orders/create', [OrderManagementController::class, 'createOrder']); // Done
-    Route::match(['get', 'put'], '/orders/{order}/edit', [OrderManagementController::class, 'editOrder']); // Done
+    Route::get('/menuitem', [OrderManagementController::class, 'fetchMenuItems']);
+    Route::get('/top-sales', [OrderManagementController::class, 'fetchTopSales']);
+    Route::get('/promotions', [OrderManagementController::class, 'fetchPromotions']);
+    Route::post('/orders/create', [OrderManagementController::class, 'createOrder']);
+    Route::match(['get', 'put'], '/orders/{order}/edit', [OrderManagementController::class, 'editOrder']);
+
+    Route::get('/customers/{order}/contact', [OrderManagementController::class, 'getContactInfo']);
+    Route::post('{orderId}/suspend', [OrderManagementController::class, 'suspend']);
+    Route::post('{orderId}/resume', [OrderManagementController::class, 'resume']);
+
+    Route::get('/get-status', [OrderManagementController::class, 'getOrderControlStatus']);
+    Route::post('/pause', [OrderManagementController::class, 'pauseOrders']);
+    Route::post('/resume', [OrderManagementController::class, 'resumeOrders']);
 
     Route::get('/myOrders', [OrderManagementController::class, 'getCustomerOrders']); // Done
     Route::get('/myOrders/invoice/{id}', [OrderManagementController::class, 'viewOrderBill']); // Done
@@ -135,4 +161,34 @@ Route::middleware(['auth:sanctum', 'checkUserRole:employee'])->prefix('user/empl
     // ** employee notification **//
     Route::get('/notifications', [NotificationManagementController::class, 'getAllCustomerNotifications']);
     Route::patch('/notifications/{id}/seen', [NotificationManagementController::class, 'markAsSeen']);
+
+    // ......................................Messaging..............................................
+
+    //    Route::get('/messages/contacts', [MessageController::class, 'contacts']);
+    //     Route::get('/messages/thread/{contactName}', [MessageController::class, 'thread']);
+    //     Route::post('/messages', [MessageController::class, 'store']);
+    //     Route::post('/messages/mark-read', [MessageController::class, 'markRead']);
+
+});
+
+// ......................................................Delivery Routes ......................................................
+
+Route::middleware(['auth:sanctum', 'checkUserRole:delivery_worker'])->prefix('user/delivery-worker')->group(function () {
+
+    Route::get('/delivery-orders', [DeliveryController::class, 'index']);
+    Route::patch('/delivery-orders/{id}', [DeliveryController::class, 'update']);
+    Route::post('/orders/{id}/confirm-receipt', [DeliveryController::class, 'confirmReceipt']);
+    Route::get('/delivery-orders/check-new', [DeliveryController::class, 'checkNewOrders']);
+
+    // ** Delivery notification **//
+    Route::get('/notifications', [NotificationManagementController::class, 'getAllCustomerNotifications']);
+    Route::patch('/notifications/{id}/seen', [NotificationManagementController::class, 'markAsSeen']);
+
+    // ......................................Messaging..............................................
+
+    //    Route::get('/messages/contacts', [MessageController::class, 'contacts']);
+    //     Route::get('/messages/thread/{contactName}', [MessageController::class, 'thread']);
+    //     Route::post('/messages', [MessageController::class, 'store']);
+    //     Route::post('/messages/mark-read', [MessageController::class, 'markRead']);
+
 });

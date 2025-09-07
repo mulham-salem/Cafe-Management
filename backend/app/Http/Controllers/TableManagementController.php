@@ -14,7 +14,9 @@ class TableManagementController extends Controller
      */
     public function index(): JsonResponse
     {
-        $tables = Table::with('employee')->get();
+        $tables = Table::with('employee')
+            ->select('id', 'number', 'status', 'capacity', 'x', 'y')
+            ->get();
 
         return response()->json(['tables' => $tables]);
     }
@@ -25,7 +27,7 @@ class TableManagementController extends Controller
     public function store(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'number' => 'required|integer|unique:tables,number',
+            'number' => 'required|string|unique:tables,number',
             'capacity' => 'required|integer|min:1',
             'status' => 'required|in:available,reserved,cleaning',
         ]);
@@ -48,20 +50,6 @@ class TableManagementController extends Controller
     }
 
     /**
-     * Display the specified table with its associated employee.
-     */
-    public function show(string $id): JsonResponse
-    {
-        $table = Table::with('employee')->find($id);
-
-        if (! $table) {
-            return response()->json(['message' => 'Table not found'], 404);
-        }
-
-        return response()->json(['table' => $table]);
-    }
-
-    /**
      * Update the specified table's status in storage.
      */
     public function update(Request $request, string $id): JsonResponse
@@ -72,18 +60,35 @@ class TableManagementController extends Controller
             return response()->json(['message' => 'Table not found'], 404);
         }
 
+        // السماح بتعديل status, x, y
         $validated = $request->validate([
-            'status' => 'required|in:available,reserved,cleaning',
-            'confirm' => 'nullable|boolean',
+            'status' => 'nullable|in:available,reserved,cleaning',
+            'x'      => 'nullable|numeric|min:0',
+            'y'      => 'nullable|numeric|min:0',
+            'confirm'=> 'nullable|boolean',
         ]);
 
+        // إذا كان الطلب تعديل إحداثيات بس بدون status
+        if (!isset($validated['status'])) {
+            $table->fill([
+                'x' => $validated['x'] ?? $table->x,
+                'y' => $validated['y'] ?? $table->y,
+            ])->save();
+
+            return response()->json([
+                'message' => 'Table position updated successfully',
+                'table'   => $table,
+            ]);
+        }
+
+        // إذا فيه تعديل status
         $newStatus = $validated['status'];
         $currentStatus = $table->status;
 
         $allowedTransitions = [
             'available' => ['reserved'],
-            'reserved' => ['cleaning'],
-            'cleaning' => ['available'],
+            'reserved'  => ['cleaning'],
+            'cleaning'  => ['available'],
         ];
 
         if (! in_array($newStatus, $allowedTransitions[$currentStatus] ?? [])) {
@@ -94,14 +99,19 @@ class TableManagementController extends Controller
 
         if ($currentStatus === 'reserved' && $newStatus === 'cleaning' && ! $request->boolean('confirm')) {
             return response()->json([
-                'message' => 'This table is currently reserved.', // 'Are you sure you want to update status?',
+                'message' => 'This table is currently reserved.',
             ], 409);
         }
 
         $table->status = $newStatus;
+        $table->x = $validated['x'] ?? $table->x;
+        $table->y = $validated['y'] ?? $table->y;
         $table->save();
 
-        return response()->json(['message' => 'Table status updated successfully', 'table' => $table]);
+        return response()->json([
+            'message' => 'Table status updated successfully',
+            'table'   => $table,
+        ]);
     }
 
     /**
@@ -135,4 +145,19 @@ class TableManagementController extends Controller
 
         return response()->json(['message' => 'Table deleted successfully']);
     }
+
+    /**
+     * Display the specified table with its associated employee.
+     */
+    public function show(string $id): JsonResponse
+    {
+        $table = Table::with('employee')->find($id);
+
+        if (! $table) {
+            return response()->json(['message' => 'Table not found'], 404);
+        }
+
+        return response()->json(['table' => $table]);
+    }
+
 }

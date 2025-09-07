@@ -18,6 +18,8 @@ use Laravel\Sanctum\HasApiTokens;
  * @property $role
  * @property $id
  * @property \Illuminate\Database\Eloquent\Collection|\App\Models\Permission[] $permissions
+ *
+ * @mixin IdeHelperUser
  */
 class User extends Authenticatable
 {

@@ -29,7 +29,16 @@ class DeliveryOrder extends Model
     }
 
     protected $fillable = [
-        'phone_number',
+        'delivery_worker_id',
+        'order_id',
+        'status',
+        'delivery_fee',
         'address',
+        'city',
+        'phone',
+        'pickup_time',
+        'estimated_time',
+        'rating_score',
+        'rating_comment',
     ];
 }

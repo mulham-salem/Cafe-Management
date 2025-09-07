@@ -258,14 +258,17 @@ const MenuAndOrderEmp = () => {
   const [orderItems, setOrderItems] = useState([]);
   const [note, setNote] = useState("");
   const [showOverlay, setShowOverlay] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loadingMenu, setLoadingMenu] = useState(true);
+  const [loadingPromo, setLoadingPromo] = useState(true);
+  const [loadingBestSelling, setLoadingBestSelling] = useState(true);
   const [availableSlots, setAvailableSlots] = useState([]);
   const [fulfillmentMethod, setFulfillmentMethod] = useState("dineIn");
-  const [whenType, setWhenType] = useState("asap");
+  const [whenType, setWhenType] = useState("ASAP");
   const [scheduledTime, setScheduledTime] = useState("");
 
   const token =
-    sessionStorage.getItem("employeeToken") || localStorage.getItem("employeeToken");
+    sessionStorage.getItem("employeeToken") ||
+    localStorage.getItem("employeeToken");
 
   axios.defaults.withCredentials = true;
   axios.defaults.baseURL = "http://localhost:8000/api";
@@ -276,12 +279,10 @@ const MenuAndOrderEmp = () => {
   useEffect(() => {
     const fetchMenu = async () => {
       try {
-        // const response = await axios.get('/user/employee/menuitem');
-        // if (response.data.data) {
-        //   setMenu(response.data.data.map(item => ({
-        if (mockMenu) {
+        const response = await axios.get("/user/employee/menuitem");
+        if (response.data.data) {
           setMenu(
-            mockMenu.map((item) => ({
+            response.data.data.map((item) => ({
               ...item,
               id: item.id,
               imageUrl: item.image,
@@ -290,7 +291,7 @@ const MenuAndOrderEmp = () => {
             }))
           );
           setFilteredMenu(
-            mockMenu.map((item) => ({
+            response.data.data.map((item) => ({
               ...item,
               id: item.id,
               imageUrl: item.image,
@@ -298,18 +299,10 @@ const MenuAndOrderEmp = () => {
               available: item.available,
             }))
           );
-
-          // setFilteredMenu(response.data.data.map(item => ({
-          //   ...item,
-          //   id: item.id,
-          //   imageUrl: item.image,
-          //   category: item.category,
-          //   available: item.available
-          // })));
         } else {
           toast.info(response.data.message);
-          setMenu([]);
-          setFilteredMenu([]);
+          setMenu(mockMenu);
+          setFilteredMenu(mockMenu);
         }
       } catch (error) {
         toast.error("Failed to load menu items.");
@@ -317,7 +310,7 @@ const MenuAndOrderEmp = () => {
         setMenu([]);
         setFilteredMenu([]);
       } finally {
-        setLoading(false);
+        setLoadingMenu(false);
       }
     };
     fetchMenu();
@@ -344,7 +337,7 @@ const MenuAndOrderEmp = () => {
     );
   }, [filteredMenu, searchQuery]);
 
-  const addToOrder = (item) => {
+  const addToOrder = (item, quantity = 1, showToast = true) => {
     if (!item.available) {
       toast.error(`${item.name} is not available!`);
       return;
@@ -357,18 +350,22 @@ const MenuAndOrderEmp = () => {
 
       if (existingItemIndex > -1) {
         const updatedItems = [...prevItems];
+        const newQuantity = updatedItems[existingItemIndex].quantity + quantity; // استخدم quantity من الدالة
         updatedItems[existingItemIndex] = {
           ...updatedItems[existingItemIndex],
-          quantity: updatedItems[existingItemIndex].quantity + 1,
-          price:
-            (updatedItems[existingItemIndex].quantity + 1) *
-            updatedItems[existingItemIndex].unitPrice,
+          quantity: newQuantity,
+          price: newQuantity * updatedItems[existingItemIndex].unitPrice, // السعر = الكمية * السعر المفرد
         };
         return updatedItems;
       } else {
         return [
           ...prevItems,
-          { ...item, quantity: 1, unitPrice: item.price, price: item.price },
+          {
+            ...item,
+            quantity,
+            unitPrice: item.price,
+            price: item.price * quantity,
+          },
         ];
       }
     });
@@ -397,7 +394,10 @@ const MenuAndOrderEmp = () => {
       flying.remove();
     }, 800);
 
-    toast.success(`${item.name} added to order`);
+    // Show toast only if flag is true
+    if (showToast) {
+      toast.success(`${item.name} added to order`);
+    }
   };
 
   const handleCreateOrder = async () => {
@@ -411,7 +411,9 @@ const MenuAndOrderEmp = () => {
       return;
     }
 
-    if (whenType === "schedule" && !scheduledTime) {
+    console.log("test: ", scheduledTime);
+
+    if (whenType === "Schedule" && !scheduledTime) {
       toast.error("Please select a scheduled time.");
       return;
     }
@@ -423,7 +425,7 @@ const MenuAndOrderEmp = () => {
     }));
 
     try {
-      let toastMessage;
+      let toastMessage, systemStatus;
       if (editMode && orderToEdit) {
         const response = await axios.put(
           `/user/employee/orders/${orderToEdit.id}/edit`,
@@ -432,21 +434,24 @@ const MenuAndOrderEmp = () => {
             note: note.trim(),
             fulfillmentMethod,
             whenType,
-            scheduledTime: whenType === "schedule" ? scheduledTime : null,
+            scheduledTime: whenType === "Schedule" ? scheduledTime : null,
           }
         );
         toastMessage = response.data.message;
+        systemStatus = response.data.statusMessage;
       } else {
         const response = await axios.post("/user/employee/orders/create", {
           items: itemsForBackend,
           note: note.trim(),
           fulfillmentMethod,
           whenType,
-          scheduledTime: whenType === "schedule" ? scheduledTime : null,
+          scheduledTime: whenType === "Schedule" ? scheduledTime : null,
         });
         toastMessage = response.data.message;
+        systemStatus = response.data.statusMessage;
       }
 
+      if (systemStatus) toast.warn(systemStatus);
       toast.success(toastMessage);
       setOrderItems([]);
       setNote("");
@@ -479,20 +484,23 @@ const MenuAndOrderEmp = () => {
             `/user/employee/orders/${orderToEdit.id}/edit`
           );
           const fetchedOrder = response.data;
-
+          let systemStatus = response.data.statusMessage;
+          if (systemStatus) {
+            toast.warn(systemStatus);
+            return;
+          }
           const formattedItems = fetchedOrder.items.map((item) => ({
             id: item.menuItem_id,
             name: item.name,
-            price: item.price,
-            unitPrice: item.price / item.quantity,
+            price: Number(item.price),
+            unitPrice: Number(item.price / item.quantity),
             quantity: item.quantity,
             imageUrl: item.image,
             available: true,
           }));
-
           setOrderItems(formattedItems || []);
           setNote(fetchedOrder.note || "");
-          setFulfillmentMethod(fetchedOrder.receiptMethod || "DineIn"); 
+          setFulfillmentMethod(fetchedOrder.receiptMethod || "dineIn");
           setScheduledTime(fetchedOrder.receiptTime || "ASAP");
           setShowOverlay(true);
         } catch (error) {
@@ -550,15 +558,14 @@ const MenuAndOrderEmp = () => {
   // fetch promotions
   async function fetchOffers() {
     try {
-      const res = await axios.get("/api/promotions", { withCredentials: true });
-      setOffers(res.data);
-      toast.success("Promotions loaded successfully!");
+      const res = await axios.get("/user/employee/promotions");
+      setOffers(res.data.data || []);
     } catch (error) {
       console.error(error);
       setOffers(mockPromo);
       //toast.error("Failed to fetch promotions. Showing demo data.");
     } finally {
-      setLoading(false);
+      setLoadingPromo(false);
     }
   }
 
@@ -578,10 +585,10 @@ const MenuAndOrderEmp = () => {
       let itemsAddedCount = 0;
 
       // حلقة تكرارية على جميع المنتجات في العرض
-      offer.products.forEach((productName) => {
+      offer.products.forEach((product) => {
         // البحث عن العنصر المقابل في قائمة المنيو
         const correspondingMenuItem = menu.find(
-          (item) => item.name === productName
+          (item) => item.name === product.name
         );
 
         if (correspondingMenuItem) {
@@ -614,11 +621,11 @@ const MenuAndOrderEmp = () => {
           }, 800);
 
           // إضافة العنصر إلى السلة
-          addToOrder(correspondingMenuItem);
-          itemsAddedCount++;
+          addToOrder(correspondingMenuItem, product.quantity, false);
+          itemsAddedCount += product.quantity;
         } else {
           toast.error(
-            `Could not find the product '${productName}' in the menu.`
+            `Could not find the product '${product.name}' in the menu.`
           );
         }
       });
@@ -633,20 +640,20 @@ const MenuAndOrderEmp = () => {
     }
   };
 
-  const [bestSellers, setBestSellers] = useState(mockMenu);
+  const [bestSellers, setBestSellers] = useState([]);
 
   useEffect(() => {
     // كود لجلب البيانات الأكثر مبيعًا من API
     const fetchBestSellers = async () => {
       try {
-        // const response = await fetch("/api/bestsellers");
-        // const data = await response.json();
-        // setBestSellers(data);
+        const response = await axios.get("/user/employee/top-sales");
+        setBestSellers(response.data.data || []);
       } catch (error) {
         console.error("Error fetching best sellers:", error);
         //toast.error("Error fetching best sellers data");
+        setBestSellers(mockMenu);
       } finally {
-        setLoading(false);
+        setLoadingBestSelling(false);
       }
     };
 
@@ -763,19 +770,24 @@ const MenuAndOrderEmp = () => {
             className={styles.formContainer}
             onClick={(e) => e.stopPropagation()} // منع الإغلاق عند النقر داخل الفورم
           >
-            <div class={styles.formHeader}>
+            <div className={styles.formHeader}>
               <h2>Your Order</h2>
             </div>
             {/* Order Items */}
             {orderItems.map((item, index) => (
-              <div key={index} className={`${styles.orderItemPreview} ${index === orderItems.length - 1 ? styles.lastItem: ''}`}>
+              <div
+                key={index}
+                className={`${styles.orderItemPreview} ${
+                  index === orderItems.length - 1 ? styles.lastItem : ""
+                }`}
+              >
                 <div className={styles.itemInfo}>
                   <span className={styles.itemName}>{item.name}</span>
                   <span className={styles.itemQuantity}>× {item.quantity}</span>
                 </div>
                 <div className={styles.itemPriceActions}>
                   <strong className={styles.itemPrice}>
-                    ${(parseFloat(item.price) * item.quantity).toFixed(2)}
+                    ${item.price.toFixed(2)}
                   </strong>
                   {editMode && (
                     <div className={styles.editQty}>
@@ -799,11 +811,7 @@ const MenuAndOrderEmp = () => {
                 <span className={styles.totalAmount}>
                   $
                   {orderItems
-                    .reduce(
-                      (total, item) =>
-                        total + parseFloat(item.price) * item.quantity,
-                      0
-                    )
+                    .reduce((total, item) => total + item.price, 0)
                     .toFixed(2)}
                 </span>
               </div>
@@ -819,8 +827,8 @@ const MenuAndOrderEmp = () => {
                   <input
                     type="radio"
                     name="fulfillmentMethod"
-                    value="DineIn"
-                    checked={fulfillmentMethod === "DineIn"}
+                    value="dineIn"
+                    checked={fulfillmentMethod === "dineIn"}
                     onChange={(e) => setFulfillmentMethod(e.target.value)}
                   />
                   DineIn
@@ -829,8 +837,8 @@ const MenuAndOrderEmp = () => {
                   <input
                     type="radio"
                     name="fulfillmentMethod"
-                    value="Takeaway"
-                    checked={fulfillmentMethod === "Takeaway"}
+                    value="takeaway"
+                    checked={fulfillmentMethod === "takeaway"}
                     onChange={(e) => setFulfillmentMethod(e.target.value)}
                   />
                   Takeaway
@@ -877,6 +885,7 @@ const MenuAndOrderEmp = () => {
                   onChange={(e) => setScheduledTime(e.target.value)}
                   className={styles.timeSelect}
                 >
+                  <option>Select Time</option>
                   {availableSlots.length > 0 ? (
                     availableSlots.map((slot, index) => (
                       <option key={index} value={slot.time24}>
@@ -911,11 +920,7 @@ const MenuAndOrderEmp = () => {
               <button className={styles.confirmBtn} onClick={handleCreateOrder}>
                 {editMode ? "Update Order" : "Confirm Order"} • $
                 {orderItems
-                  .reduce(
-                    (total, item) =>
-                      total + parseFloat(item.price) * item.quantity,
-                    0
-                  )
+                  .reduce((total, item) => total + item.price, 0)
                   .toFixed(2)}
               </button>
               <button
@@ -966,7 +971,7 @@ const MenuAndOrderEmp = () => {
           </div>
         )}
         <div className={styles.menuContent}>
-          {loading ? (
+          {loadingMenu ? (
             <div className={styles.loadingSpinner}></div>
           ) : filteredMenuItem.length === 0 ? (
             <div className={styles.emptyState}>
@@ -1030,7 +1035,7 @@ const MenuAndOrderEmp = () => {
           </span>
           Active Promotions
         </h2>
-        {loading ? (
+        {loadingPromo ? (
           <div className={styles.loadingSpinner}></div>
         ) : offers.length === 0 ? (
           <div className={styles.emptyState}>
@@ -1039,14 +1044,16 @@ const MenuAndOrderEmp = () => {
           </div>
         ) : (
           <div className={styles.promoCardsGrid}>
-            {offers.map((offer) => (
+            {offers?.map((offer) => (
               <div
                 key={offer.id}
                 className={styles.promoCard}
                 id={`promo-card-${offer.id}`}
               >
                 <div className={styles.cardHeader}>
-                  <div className={styles.discountBadge}>{offer.discount}</div>
+                  <div className={styles.discountBadge}>
+                    {Number(offer.discount_percentage).toFixed(0)}%
+                  </div>
                   <div className={styles.ribbon}>
                     <FontAwesomeIcon
                       icon={faCrown}
@@ -1064,8 +1071,8 @@ const MenuAndOrderEmp = () => {
                       className={styles.calendarIcon}
                     />
                     <span>
-                      {formatDate(offer.startDate)} -{" "}
-                      {formatDate(offer.endDate)}
+                      {formatDate(offer.start_date)} -{" "}
+                      {formatDate(offer.end_date)}
                     </span>
                   </div>
                   <p className={styles.description}>{offer.description}</p>
@@ -1078,13 +1085,16 @@ const MenuAndOrderEmp = () => {
                       />
                       Included Products
                     </h4>
-                    <ul className={styles.productsList}>
+                    <SimpleBar
+                      style={{ maxHeight: 160 }}
+                      className={styles.productsList}
+                    >
                       {offer.products.map((product, index) => (
                         <li key={index} className={styles.productItem}>
-                          {product}
+                          {product.name} × {product.quantity}
                         </li>
                       ))}
-                    </ul>
+                    </SimpleBar>
                   </div>
                 </div>
                 <div className={styles.promoCardFooter}>
@@ -1126,7 +1136,7 @@ const MenuAndOrderEmp = () => {
           Best-Selling Items
         </h2>
 
-        {loading ? (
+        {loadingBestSelling ? (
           <div className={styles.loadingSpinner}></div>
         ) : bestSellers.length === 0 ? (
           <div className={styles.emptyState}>
@@ -1134,7 +1144,7 @@ const MenuAndOrderEmp = () => {
           </div>
         ) : (
           <div className={styles.menuGrid}>
-            {bestSellers.map((item, index) => (
+            {bestSellers?.map((item, index) => (
               <div
                 className={`${styles.menuCard} ${styles.bestsellerCard}`}
                 key={item.id}

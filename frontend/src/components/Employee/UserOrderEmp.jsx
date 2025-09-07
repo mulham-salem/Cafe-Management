@@ -17,6 +17,7 @@ import {
   faBan,
   faInfoCircle,
   faArrowRotateBack,
+  faPlay,
 } from "@fortawesome/free-solid-svg-icons";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -25,6 +26,7 @@ import { EmpSearchContext } from "./EmployeeHome";
 import axios from "axios";
 import SimpleBar from "simplebar-react";
 import "simplebar-react/dist/simplebar.min.css";
+import { motion, AnimatePresence } from "framer-motion";
 
 const mockOrders = [
   {
@@ -210,7 +212,8 @@ const mockOrders = [
 
 const UserOrderEmp = () => {
   const token =
-    sessionStorage.getItem("employeeToken") || localStorage.getItem("employeeToken");
+    sessionStorage.getItem("employeeToken") ||
+    localStorage.getItem("employeeToken");
 
   axios.defaults.withCredentials = true;
   axios.defaults.baseURL = "http://localhost:8000/api";
@@ -231,27 +234,26 @@ const UserOrderEmp = () => {
 
   const fetchOrders = async () => {
     try {
-      // const response = await axios.get('/user/employee/myOrders');
-      // const fetchedOrders = response.data.data.map(order => ({
-      //   id: order.order_id,
-      //   status: order.status,
-      //   createdAt: new Date(order.created_at).toLocaleString(),
-      //   canShowBill: order.can_show_bill,
-      //   itemsCount: order.item_count,
-      //   receiptMethod: order.receiptMethod,
-      //   receiptTime: order.receiptTime,
-      //   note: order.note,
-      //   items: order.items.map((item) => ({
-      //   name: item.name,
-      //   price: item.price,
-      //   quantity: item.quantity,
-      //  }))
-      // }));
-      // setOrders(fetchedOrders);
-      setOrders(mockOrders);
+      const response = await axios.get("/user/employee/myOrders");
+      const fetchedOrders = response.data.data.map((order) => ({
+        id: order.order_id,
+        status: order.status,
+        createdAt: new Date(order.created_at).toLocaleString(),
+        canShowBill: order.can_show_bill,
+        itemsCount: order.item_count,
+        receiptMethod: order.pickup_method,
+        receiptTime: order.pickup_time,
+        note: order.note,
+        items: order.items.map((item) => ({
+          name: item.item_name,
+          price: item.price,
+          quantity: item.quantity,
+        })),
+      }));
+      setOrders(fetchedOrders);
     } catch (error) {
       if (error.response && error.response.status === 404) {
-        setOrders([]);
+        setOrders(mockOrders);
       } else {
         toast.error("Failed to load orders. Please try again.");
         console.error("Error fetching orders:", error);
@@ -401,12 +403,7 @@ const UserOrderEmp = () => {
       const searchSingleOrder = async () => {
         try {
           const response = await axios.get(
-            `http://localhost:8000/api/user/employee/orders/search?order_id=${searchQuery}`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
+            `/user/employee/orders/search?order_id=${searchQuery}`
           );
           const fetchedOrder = response.data.data;
           setFilteredOrders([
@@ -473,13 +470,12 @@ const UserOrderEmp = () => {
     setActiveMenu(null);
     try {
       const res = await axios.post(
-        `/api/orders/${orderId}/suspend`, // adjust API path as in your backend
-        {},
-        { withCredentials: true }
+        `/user/employee/${orderId}/suspend` // adjust API path as in your backend
       );
 
       if (res.status === 200) {
         toast.success("Order has been suspended successfully!");
+        fetchOrders();
         return res.data;
       } else {
         toast.warning("Order could not be suspended. Try again later.");
@@ -496,13 +492,12 @@ const UserOrderEmp = () => {
     setActiveMenu(null);
     try {
       const res = await axios.post(
-        `/api/orders/${orderId}/resume`, // adjust API path as in your backend
-        {},
-        { withCredentials: true }
+        `/user/employee/${orderId}/resume` // adjust API path as in your backend
       );
 
       if (res.status === 200) {
         toast.success("Order has been resumed successfully!");
+        fetchOrders();
         return res.data;
       } else {
         toast.warning("Order could not be resumed. Try again later.");
@@ -528,13 +523,20 @@ const UserOrderEmp = () => {
   const handleContactCustomer = async (orderId) => {
     setActiveMenu(null);
     try {
-      // const res = await axios.get(`/api/customers/${orderId}/contact`);
-      // setContactInfo(res.data);
-      setContactInfo(mockCustomer);
+      const res = await axios.get(
+        `/user/employee/customers/${orderId}/contact`
+      );
+      setContactInfo(res.data);
       setOpenContact(true);
+      if (res.data.message) {
+        toast.warn(res.data.message);
+        setOpenContact(close);
+        return;
+      }
     } catch (err) {
       console.error("Error fetching contact info:", err);
       toast.error("Error fetching contact info");
+      setContactInfo(mockCustomer);
     }
   };
 
@@ -544,15 +546,34 @@ const UserOrderEmp = () => {
   const [showScheduler, setShowScheduler] = useState(false);
   const [selectedDate, setSelectedDate] = useState("");
 
+  useEffect(() => {
+    // دالة لجلب الحالة من الباك
+    const fetchOrderControlStatus = async () => {
+      try {
+        const res = await axios.get("/user/employee/get-status");
+        if (res.data.status === "open") {
+          setSystemPaused(false);
+          return;
+        }
+        setSystemPaused(true);
+        setResumeTime(res.data.resume_at);
+      } catch (err) {
+        console.error("Failed to fetch order control status:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOrderControlStatus();
+  }, []); // empty deps → تعمل مرة عند تحميل الصفحة
+
   async function pauseOrders(duration = null) {
     try {
-      // const res = await axios.post(
-      //   "/api/orders/pause",
-      //   { duration }, // send null or minutes
-      //   { withCredentials: true }
-      // );
-      // return res.data;
-      return true;
+      const res = await axios.post(
+        "/user/employee/pause",
+        { duration } // send null or minutes
+      );
+      return res.data;
     } catch (err) {
       throw err.response?.data?.message || "Error while pausing orders";
     }
@@ -564,9 +585,23 @@ const UserOrderEmp = () => {
       const data = await pauseOrders();
       setSystemPaused(true);
       setResumeTime(null);
-      toast.success("✅ Orders paused successfully");
+      toast.success("Orders paused successfully");
+      return true;
     } catch {
-      toast.error("❌ Failed to pause orders");
+      toast.error("Failed to pause orders");
+    }
+  };
+
+  const handleResume = async () => {
+    try {
+      setOpen(false);
+      // API call to resume orders
+      await axios.post("/user/employee/resume");
+      setSystemPaused(false);
+      setResumeTime(null);
+      toast.success("Orders resumed successfully");
+    } catch {
+      toast.error("Failed to resume orders");
     }
   };
 
@@ -616,13 +651,25 @@ const UserOrderEmp = () => {
         My Orders
       </h1>
 
-      {systemPaused && (
-        <div className={styles.alertBanner}>
-          <FontAwesomeIcon icon={faBan} className={styles.banIcon} size="lg" />{" "}
-          Orders are paused
-          {resumeTime && ` until ${resumeTime.toLocaleString()}`}
-        </div>
-      )}
+      <AnimatePresence>
+        {systemPaused && (
+          <motion.div
+            className={styles.alertBanner}
+            initial={{ y: -50, opacity: 0 }} // يبدأ من فوق وبشفافية صفر
+            animate={{ y: 0, opacity: 1 }} // ينزل لمكانه ويصبح ظاهر
+            exit={{ y: -50, opacity: 0 }} // لما يختفي، يرجع يصعد وبشفافية صفر
+            transition={{ type: "spring", stiffness: 120, damping: 15 }} // حركة سلسة وناعمة
+          >
+            <FontAwesomeIcon
+              icon={faBan}
+              className={styles.banIcon}
+              size="lg"
+            />{" "}
+            Orders are paused
+            {resumeTime && ` until ${resumeTime.toLocaleString()}`}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {loading ? (
         <div className={styles.loadingOverlay}>
@@ -739,7 +786,7 @@ const UserOrderEmp = () => {
                                 {item.name}
                               </span>
                               <span className={styles.itemMeta}>
-                                {item.quantity} × ${item.price.toFixed(2)}
+                                {item.quantity} × ${item.price}
                                 <span className={styles.itemTotal}>
                                   ${(item.quantity * item.price).toFixed(2)}
                                 </span>
@@ -880,9 +927,19 @@ const UserOrderEmp = () => {
             <h3 className={styles.modalTitle}>Quick actions</h3>
 
             <div className={styles.optionsGrid}>
-              <button onClick={handlePause} className={styles.optionBtn}>
-                <FontAwesomeIcon icon={faPause} fixedWidth />
-                <span className={styles.optionLabel}>Pause Receive Orders</span>
+              <button
+                onClick={systemPaused ? handleResume : handlePause}
+                className={styles.optionBtn}
+              >
+                <FontAwesomeIcon
+                  icon={systemPaused ? faPlay : faPause}
+                  fixedWidth
+                />
+                <span className={styles.optionLabel}>
+                  {systemPaused
+                    ? "Resume Receive Orders"
+                    : "Pause Receive Orders"}
+                </span>
               </button>
 
               <button onClick={handleSchedule} className={styles.optionBtn}>

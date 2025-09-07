@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @method static inRandomOrder()
+ *
+ * @mixin IdeHelperSupplier
  */
 class Supplier extends Model
 {
@@ -22,6 +24,11 @@ class Supplier extends Model
     public function supplyOffers(): HasMany
     {
         return $this->hasMany(SupplyOffer::class, 'supplier_id');
+    }
+
+    public function supplyRequests(): HasMany
+    {
+        return $this->hasMany(SupplyRequest::class, 'supplier_id');
     }
 
     public function purchaseBills(): HasMany

@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @method static inRandomOrder()
+ *
+ * @mixin IdeHelperMenuItem
  */
 class MenuItem extends Model
 {
@@ -49,5 +51,5 @@ class MenuItem extends Model
         return $this->hasMany(PromotionMenuItem::class, 'menu_item_id');
     }
 
-    protected $fillable = ['name', 'description', 'price', 'category_id', 'manager_id', 'image_url', 'available'];
+    protected $fillable = ['name', 'description', 'price', 'category_id', 'manager_id', 'image_url', 'available', 'isFavorite'];
 }

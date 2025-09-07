@@ -21,16 +21,17 @@ return new class extends Migration
                 ->constrained('employees')
                 ->cascadeOnDelete();
 
-            $table->dateTime('createdAt');
-            $table->dateTime('confirmedAt');
-            $table->enum('status', ['pending', 'confirmed', 'preparing', 'ready', 'delivered'])->default('pending');
+            $table->dateTime('createdAt')->nullable();
+            $table->dateTime('confirmedAt')->nullable();
+
+            $table->enum('status', ['pending', 'confirmed', 'preparing', 'onHold', 'ready', 'delivered'])->default('pending');
             $table->string('note', 100)->nullable();
 
             $table->timestamps(); // created_at, updated_at
 
             $table->boolean('onHold')->default(false);
             $table->enum('pickup_method', ['dineIn', 'takeaway', 'delivery'])->default('dineIn');
-            $table->dateTime('pickup_time')->nullable();
+            $table->time('pickup_time')->nullable();
             $table->decimal('rating_score', 2, 1)->nullable();
             $table->string('rating_comment', 200)->nullable();
             $table->decimal('used_loyalty_points', 8, 2)->nullable();

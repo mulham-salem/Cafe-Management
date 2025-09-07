@@ -9,6 +9,8 @@ use Laravel\Sanctum\HasApiTokens;
 
 /**
  * @method static where(string $string, mixed $username)
+ *
+ * @mixin IdeHelperManager
  */
 class Manager extends Authenticatable
 {

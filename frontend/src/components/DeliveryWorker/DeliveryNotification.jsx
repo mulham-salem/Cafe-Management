@@ -14,14 +14,14 @@ const DeliveryNotification = () => {
   const [loading, setLoading] = useState(true); 
   const [error, setError] = useState(null);
 
-  const token = sessionStorage.getItem('authToken') || localStorage.getItem('authToken'); 
+  const token = sessionStorage.getItem('delivery_workerToken') || localStorage.getItem('delivery_workerToken'); 
 
   useEffect(() => {
      document.title = "Cafe Delights - Delivery Notifications";
      
      const fetchNotifications = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/user/employee/notifications', {
+        const response = await axios.get('http://localhost:8000/api/user/delivery-worker/notifications', {
           headers: {
             Authorization: `Bearer ${token}`,
             Accept: 'application/json',
@@ -43,7 +43,7 @@ const DeliveryNotification = () => {
 
   const markAsSeen = async (id) => {
     try {
-      await axios.patch(`http://localhost:8000/api/user/employee/notifications/${id}/seen`, {}, {
+      await axios.patch(`http://localhost:8000/api/user/delivery-worker/notifications/${id}/seen`, {}, {
         headers: {
           Authorization: `Bearer ${token}`,
           Accept: 'application/json',
