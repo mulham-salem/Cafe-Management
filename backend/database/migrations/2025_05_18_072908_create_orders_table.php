@@ -34,7 +34,6 @@ return new class extends Migration
             $table->time('pickup_time')->nullable();
             $table->decimal('rating_score', 2, 1)->nullable();
             $table->string('rating_comment', 200)->nullable();
-            $table->decimal('used_loyalty_points', 8, 2)->nullable();
             $table->boolean('repreparation_request')->default(false);
             $table->string('repreparation_reason', 200)->nullable();
         });

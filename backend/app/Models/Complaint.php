@@ -32,11 +32,9 @@ class Complaint extends Model
 
     protected $fillable = [
         'customer_id',
-        'order_id',
-        'reservation_id',
-        'employee_id',
         'status',
         'notes',
+        'type',
         'description',
     ];
 }

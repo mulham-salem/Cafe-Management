@@ -30,7 +30,7 @@ class DatabaseSeeder extends Seeder
             SalesReportsSeeder::class,
             InternalMessagesSeeder::class,
             LiveLocationsSeeder::class,
-            LoyalityAccountsSeeder::class,
+            LoyaltyAccountsSeeder::class,
             OrderControlSeeder::class,
             ReservationsTableSeeder::class,
             PromotionsTableSeeder::class,

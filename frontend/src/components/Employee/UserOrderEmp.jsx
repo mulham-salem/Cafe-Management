@@ -869,7 +869,7 @@ const UserOrderEmp = () => {
             <ul className={styles.invoiceItems}>
               {selectedInvoice.items.map((item, index) => (
                 <li key={index}>
-                  {item.name} × {item.quantity} = ${item.price * item.quantity}
+                  {item.name} × {item.quantity} = ${(item.price * item.quantity).toFixed(2)}
                 </li>
               ))}
             </ul>
@@ -879,7 +879,7 @@ const UserOrderEmp = () => {
               {selectedInvoice.items.reduce(
                 (sum, item) => sum + item.price * item.quantity,
                 0
-              )}
+              ).toFixed(2)}
             </p>
           </div>
         </div>

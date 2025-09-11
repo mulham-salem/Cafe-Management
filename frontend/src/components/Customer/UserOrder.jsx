@@ -249,7 +249,8 @@ const mockOrders = [
 
 const UserOrder = () => {
   const token =
-    sessionStorage.getItem("customerToken") || localStorage.getItem("customerToken");
+    sessionStorage.getItem("customerToken") ||
+    localStorage.getItem("customerToken");
 
   axios.defaults.withCredentials = true;
   axios.defaults.baseURL = "http://localhost:8000/api";
@@ -276,38 +277,37 @@ const UserOrder = () => {
 
   const fetchOrders = async () => {
     try {
-      // const response = await axios.get('/user/customer/myOrders');
+      const response = await axios.get("/user/customer/myOrders");
 
-      // const fetchedOrders = response.data.data.map(order => ({
-      //   id: order.order_id,
-      //   status: order.status,
-      //   createdAt: new Date(order.created_at).toLocaleString(),
-      //   canShowBill: order.can_show_bill,
-      //   receiptMethod: order.receiptMethod,
-      //   receiptTime: order.receiptTime,
-      //   note: order.note,
-      //   itemsCount: order.item_count,
-      //   items: order.items.map((item) => ({
-      //   name: item.name,
-      //   price: item.price,
-      //   quantity: item.quantity,
-      //  })),
-      // deliveryDetails: order.delivery_details
-      //   ? {
-      //       name: order.delivery_details.name,
-      //       address: order.delivery_details.address,
-      //       city: order.delivery_details.city,
-      //       phone: order.delivery_details.phone,
-      //       deliveryFee: order.delivery_details.delivery_fee,
-      //       ETA: order.delivery_details.eta,
-      //     }
-      //   : null,
-      // }));
-      // setOrders(fetchedOrders);
-      setOrders(mockOrders);
+      const fetchedOrders = response.data.data.map((order) => ({
+        id: order.order_id,
+        status: order.status,
+        createdAt: new Date(order.created_at).toLocaleString(),
+        canShowBill: order.can_show_bill,
+        receiptMethod: order.pickup_method,
+        receiptTime: order.pickup_time,
+        note: order.note,
+        itemsCount: order.item_count,
+        items: order.items.map((item) => ({
+          name: item.item_name,
+          price: item.price,
+          quantity: item.quantity,
+        })),
+        name: order.customer_name,
+        deliveryDetails: order.delivery
+          ? {
+              address: order.delivery.address,
+              city: order.delivery.city,
+              phone: order.delivery.phone,
+              deliveryFee: order.delivery.delivery_fee,
+              ETA: order.delivery.estimated_time,
+            }
+          : null,
+      }));
+      setOrders(fetchedOrders);
     } catch (error) {
       if (error.response && error.response.status === 404) {
-        setOrders([]);
+        setOrders(mockOrders);
       } else {
         toast.error("Failed to load orders. Please try again.");
         console.error("Error fetching orders:", error);
@@ -321,13 +321,13 @@ const UserOrder = () => {
     fetchOrders();
   }, []);
 
-  const [filteredOrders, setFilteredOrders] = useState(mockOrders);
   const { searchQuery, setSearchPlaceholder } = useContext(CusSearchContext);
   setSearchPlaceholder("Search by ID...");
 
   const filteredUserOrder = useMemo(() => {
     return orders.filter(
-      (item) => searchQuery === "" || item.id.includes(searchQuery)
+      (item) =>
+        searchQuery === "" || item.id.toLocaleString().includes(searchQuery)
     );
   }, [orders, searchQuery]);
 
@@ -411,7 +411,7 @@ const UserOrder = () => {
   const mockInvoice = {
     id: "006",
     receiptMethod: "Delivery",
-    customerName: "John Smith",
+    username: "John Smith",
     items: [
       { name: "Pepperoni Pizza", quantity: 1, price: 13.99 },
       { name: "Coca Cola", quantity: 2, price: 2.99 },
@@ -428,34 +428,37 @@ const UserOrder = () => {
 
   const handleShowInvoice = async (order) => {
     try {
-      // const response = await axios.get(
-      //   `/user/customer/myOrders/invoice/${order.id}`
-      // );
-      // const invoiceData = response.data;
+      const response = await axios.get(
+        `/user/customer/myOrders/invoice/${order.id}`
+      );
+      const invoiceData = response.data;
 
-      // const mappedInvoice = {
-      //   id: order.id,
-      //   customerName: invoiceData.username,
-      //   receiptMethod: invoiceData.receiptMethod,
-      //   items: invoiceData.items.map((item) => ({
-      //     name: item.menu_item,
-      //     quantity: item.quantity,
-      //     price: item.price / item.quantity,
-      //   })),
-      //  deliveryDetails: invoiceData.deliveryDetails.deliveryFee || null,
-      //   totalPrice: invoiceData.total_price,
-      ///  loyaltyBalance: invoiceData.loyalty.balance,
-      //   loyaltyPointValue: invoiceData.loyalty.pointVAlue,
-      // };
+      const mappedInvoice = {
+        id: order.id,
+        username: invoiceData.username,
+        pickupMethod: invoiceData.pickupMethod,
+        items: invoiceData.items.map((item) => ({
+          name: item.menu_item,
+          quantity: item.quantity,
+          price: item.price / item.quantity,
+        })),
+        subtotal: invoiceData.subtotal,
+        grossTotal: invoiceData.gross_total,
+        deliveryDetails: invoiceData.deliveryDetails.deliveryFee || null,
+        totalPrice: invoiceData.total_price,
+        loyaltyBalance: invoiceData.loyalty.balance,
+        loyaltyTier: invoiceData.loyalty.tier,
+        loyaltyPointValue: invoiceData.loyalty.pointValue,
+      };
 
-      // setSelectedInvoice(mappedInvoice);
-      setSelectedInvoice(mockInvoice);
+      setSelectedInvoice(mappedInvoice);
       setShowInvoiceOverlay(true);
     } catch (error) {
       const errorMessage =
         error.response?.data?.message || "Failed to fetch invoice.";
       toast.error(errorMessage);
       console.error("Error fetching invoice:", error);
+      setSelectedInvoice(mockInvoice);
     }
   };
 
@@ -476,7 +479,7 @@ const UserOrder = () => {
 
   const handlePaid = async (orderId) => {
     try {
-      // await axios.post(`/api/orders/${orderId}/mark-paid`);
+      await axios.post(`/user/customer/orders/${orderId}/mark-paid`);
 
       // Find the paid order in mockOrders
       const paidOrder = orders.find((o) => o.id === orderId);
@@ -488,25 +491,28 @@ const UserOrder = () => {
         }, 6000);
       }
     } catch (error) {
+      console.error(error.response.data);
       toast.error("Payment completed, but failed to trigger rating modal.");
     }
   };
 
   const handleCashChosen = async (orderId) => {
     try {
-      // await axios.post(`/api/orders/${orderId}/mark-paid`);
+      await axios.post(`/user/customer/orders/${orderId}/mark-paid`);
+      toast.success("Cash selected. Please prepare the exact amount.");
 
-      // Find the paid order in mockOrders
       const paidOrder = orders.find((o) => o.id === orderId);
-
       if (paidOrder) {
         setCurrentOrderForRating(paidOrder);
         setTimeout(() => {
           setShowRatingModal(true); // show rating modal
         }, 6000);
       }
-    } catch {
-      /* noop */
+    } catch (err) {
+      const msg =
+        err?.response?.data?.message ||
+        "Failed to set cash payment. Please try again.";
+      toast.error(msg);
     }
   };
 
@@ -534,13 +540,12 @@ const UserOrder = () => {
     setActiveMenu(null);
     try {
       const res = await axios.post(
-        `/api/orders/${orderId}/suspend`, // adjust API path as in your backend
-        {},
-        { withCredentials: true }
+        `/user/customer/${orderId}/suspend` // adjust API path as in your backend
       );
 
       if (res.status === 200) {
         toast.success("Order has been suspended successfully!");
+        fetchOrders();
         return res.data;
       } else {
         toast.warning("Order could not be suspended. Try again later.");
@@ -557,13 +562,12 @@ const UserOrder = () => {
     setActiveMenu(null);
     try {
       const res = await axios.post(
-        `/api/orders/${orderId}/resume`, // adjust API path as in your backend
-        {},
-        { withCredentials: true }
+        `/user/customer/${orderId}/resume` // adjust API path as in your backend
       );
 
       if (res.status === 200) {
         toast.success("Order has been resumed successfully!");
+        fetchOrders();
         return res.data;
       } else {
         toast.warning("Order could not be resumed. Try again later.");
@@ -585,13 +589,16 @@ const UserOrder = () => {
     setLoading(true);
     try {
       // Example API endpoint - adjust to your backend route
-      await axios.post("/api/orders/reprepare", {
+      await axios.post("/user/customer/orders/re-prepare", {
         orderId,
         reason,
       });
       toast.success("Your re-preparation request was sent successfully!");
       setReason("");
       setOpen(false);
+      setTimeout(() => {
+        fetchOrders();
+      }, 1000);
     } catch (error) {
       console.error("Re-preparation request failed:", error);
       toast.error("Failed to send request. Please try again.");
@@ -603,14 +610,13 @@ const UserOrder = () => {
   const handleReorder = async (orderId) => {
     setActiveMenu(null);
     try {
-      const res = await axios.post(
-        `/api/orders/${orderId}/reorder`, // adjust API path as in your backend
-        {},
-        { withCredentials: true }
-      );
+      const res = await axios.post(`/user/customer/orders/${orderId}/reorder`);
 
       if (res.status === 200) {
-        toast.success("Order has been sent to kitchen successfully");
+        toast.success("Order has been reordered successfully");
+        setTimeout(() => {
+          fetchOrders();
+        }, 1000);
         return res.data;
       } else {
         toast.warning("Order could not be request now. Try again later.");
@@ -659,12 +665,11 @@ const UserOrder = () => {
   const handleConfirmReceipt = async (orderId) => {
     try {
       const response = await axios.post(
-        `/api/orders/${orderId}/confirm-receipt`
+        `/user/customer/orders/${orderId}/confirm-receipt`
       );
       if (response.status === 200) {
         toast.success("Order marked as delivered!");
-        // تحديث الحالة محليًا إذا كنت تستخدم state
-        // setOrders(prev => prev.map(o => o.id === orderId ? {...o, status: 'delivered'} : o));
+        fetchOrders();
       } else {
         toast.error("Something went wrong.");
       }
@@ -792,7 +797,7 @@ const UserOrder = () => {
                 </p>
                 <p className={styles.receiptInfo}>
                   <strong>Receipt Method:</strong> {order.receiptMethod}
-                  {order.receiptMethod === "Delivery" &&
+                  {order.receiptMethod === "delivery" &&
                     order.deliveryDetails && (
                       <div className={styles.receiptTooltipContainer}>
                         <span className={styles.tooltipIcon}>
@@ -802,8 +807,7 @@ const UserOrder = () => {
                           <h4>Delivery Details</h4>
                           <ul className={styles.receiptList}>
                             <li>
-                              <strong>Name:</strong>{" "}
-                              {order.deliveryDetails.name}
+                              <strong>Name:</strong> {order.name}
                             </li>
                             <li>
                               <strong>Address:</strong>{" "}
@@ -826,7 +830,7 @@ const UserOrder = () => {
                                   icon={faDollarSign}
                                   className={styles.badgeIcon}
                                 />
-                                {order.deliveryDetails.deliveryFee.toFixed(2)}
+                                {order.deliveryDetails.deliveryFee}
                               </span>
                             </li>
                             <li>
@@ -867,7 +871,7 @@ const UserOrder = () => {
                           <li key={index} className={styles.itemDetail}>
                             <span className={styles.itemName}>{item.name}</span>
                             <span className={styles.itemMeta}>
-                              {item.quantity} × ${item.price.toFixed(2)}
+                              {item.quantity} × ${item.price}
                               <span className={styles.itemTotal}>
                                 ${(item.quantity * item.price).toFixed(2)}
                               </span>
@@ -1020,12 +1024,13 @@ const UserOrder = () => {
         order={currentOrderForRating}
       />
 
-      {showLocationModal && 
-      <DeliveryLocation
-        isOpen={showLocationModal}
-        onClose={() => setShowLocationModal(false)}
-        isEditable={false}
-      />}
+      {showLocationModal && (
+        <DeliveryLocation
+          isOpen={showLocationModal}
+          onClose={() => setShowLocationModal(false)}
+          isEditable={false}
+        />
+      )}
     </div>
   );
 };

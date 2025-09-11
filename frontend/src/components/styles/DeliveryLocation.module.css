@@ -63,6 +63,7 @@
 
 .controls select {
   padding: 10px 15px;
+  margin: auto;
   border: none;
   border-radius: 6px;
   background-color: #4a5568;

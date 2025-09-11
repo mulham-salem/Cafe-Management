@@ -232,22 +232,23 @@
 }
 
 .itemDetail {
-  width: 80%;
+  width: 100%;
   margin: auto;
   display: flex;
+  word-break: break-word;
+  text-wrap: balance;
   font-size: 0.8rem;
   justify-content: space-between;
   align-items: center;
   padding: 8px 0;
   border-bottom: 1px solid #f0f0f0;
-  transition: background-color 0.2s ease;
+  transition: all 0.3s ease;
 }
 
 .itemDetail:hover {
   background-color: #fafaff;
   border-radius: 16px;
-  padding-left: 8px;
-  padding-right: 8px;
+  transform: translateX(1px);
 }
 
 .itemDetail:last-child {
@@ -318,6 +319,7 @@
     opacity: 0;
     transform: translateY(-10px) scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -432,7 +434,7 @@ button {
 }
 
 .trackBtn {
-   padding: 0.5rem 1rem;
+  padding: 0.5rem 1rem;
   background-color: #e0f7fa;
   color: #006064;
 }
@@ -442,7 +444,7 @@ button {
 }
 
 .receiptBtn {
-   padding: 0.5rem 1rem;
+  padding: 0.5rem 1rem;
   background-color: #fff3e0;
   color: #ef6c00;
 }

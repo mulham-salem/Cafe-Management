@@ -295,7 +295,7 @@
 }
 
 .menuCard:hover {
-  transform: translateY(-8px);
+  transform: translateY(-8px) !important;
 }
 
 .menuCard img {

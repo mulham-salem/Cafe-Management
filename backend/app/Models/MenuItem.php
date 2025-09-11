@@ -51,5 +51,5 @@ class MenuItem extends Model
         return $this->hasMany(PromotionMenuItem::class, 'menu_item_id');
     }
 
-    protected $fillable = ['name', 'description', 'price', 'category_id', 'manager_id', 'image_url', 'available', 'isFavorite'];
+    protected $fillable = ['name', 'description', 'price', 'category_id', 'manager_id', 'image_url', 'available'];
 }

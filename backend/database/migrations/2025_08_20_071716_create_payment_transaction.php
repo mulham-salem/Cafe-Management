@@ -18,7 +18,7 @@ return new class extends Migration
                 ->constrained('bills')
                 ->cascadeOnDelete();
 
-            $table->enum('method', ['VisaCard', 'PayPal', 'CreditCard', 'GooglePay', 'SamsungPay', 'Cash']);
+            $table->enum('method', ['visacard/mastercard', 'applepay']);
             $table->enum('status', ['pending', 'completed', 'failed', 'refunded'])->default('pending');
             $table->string('transaction_code', 100);
             $table->dateTime('processed_at');

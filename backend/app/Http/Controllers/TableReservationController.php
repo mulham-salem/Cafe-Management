@@ -11,9 +11,17 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
+use App\Services\LoyaltyService;
 
 class TableReservationController extends Controller
 {
+    protected LoyaltyService $loyalty;
+
+    public function __construct(LoyaltyService $loyalty)
+    {
+        $this->loyalty = $loyalty;
+    }
+
     /**
      * Display a listing of available tables.
      * This method corresponds to the filtering and display of available tables in the React component.
@@ -99,6 +107,10 @@ class TableReservationController extends Controller
         $table->status = 'reserved';
         $table->save();
 
+        // إضافة نقاط ثابتة مثلاً 10 نقاط
+        $points = 10;
+        $loyaltyAccount = $this->loyalty->addPoints($reservation->customer_id, $points);
+
         $tableNumber = $table->number;
 
         $notificationMessage = "Your reservation #{$reservation->id} has been confirmed.\n";
@@ -115,7 +127,12 @@ class TableReservationController extends Controller
             'seen' => false,
         ]);
 
-        return response()->json($reservation, Response::HTTP_CREATED);
+        return response()->json([
+            'message' => 'Table reserved successfully!',
+            'reservation' => $reservation,
+            'loyalty_account' => $loyaltyAccount,
+            'loyalty_points' => $points,
+        ], 201);
     }
 
     /**

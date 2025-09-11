@@ -259,7 +259,9 @@
 }
 
 .itemDetail {
-  width: 80%;
+  width: 100%;
+  word-break: break-word;
+  text-wrap: balance;
   margin: auto;
   display: flex;
   font-size: 0.8rem;
@@ -267,14 +269,13 @@
   align-items: center;
   padding: 8px 0;
   border-bottom: 1px solid #f0f0f0;
-  transition: background-color 0.2s ease;
+  transition: all 0.3s ease;
 }
 
 .itemDetail:hover {
   background-color: #fafaff;
   border-radius: 16px;
-  padding-left: 8px;
-  padding-right: 8px;
+  transform: translateX(1px);
 }
 
 .itemDetail:last-child {

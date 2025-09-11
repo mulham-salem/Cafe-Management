@@ -28,7 +28,6 @@ class OrderFactory extends Factory
             'pickup_time' => $this->faker->optional()->dateTimeBetween('now', '+1 week'),
             'rating_score' => $this->faker->optional()->randomFloat(1, 1, 5),
             'rating_comment' => $this->faker->optional()->sentence(),
-            'used_loyalty_points' => $this->faker->optional()->randomFloat(2, 0, 50),
             'repreparation_request' => $this->faker->boolean(10),
             'repreparation_reason' => $this->faker->optional()->sentence(),
         ];

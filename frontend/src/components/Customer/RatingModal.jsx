@@ -13,7 +13,17 @@ const RatingModal = ({ open, onClose, order }) => {
   const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const isDelivery = order?.receiptMethod === "Delivery";
+  const isDelivery = order?.receiptMethod === "delivery";
+
+  const token =
+    sessionStorage.getItem("customerToken") ||
+    localStorage.getItem("customerToken");
+
+  axios.defaults.withCredentials = true;
+  axios.defaults.baseURL = "http://localhost:8000/api";
+  axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+  axios.defaults.headers.post["Content-Type"] = "application/json";
+  axios.defaults.headers.put["Content-Type"] = "application/json";
 
   const handleSubmit = async () => {
     if (orderRating === 0) {
@@ -35,8 +45,7 @@ const RatingModal = ({ open, onClose, order }) => {
       };
 
       // API call
-      //await axios.post("/api/orders/rate", payload);
-
+      await axios.post("/user/customer/orders/rate", payload);
       toast.success("Your rating has been submitted!");
       onClose();
     } catch (error) {
@@ -83,7 +92,13 @@ const RatingModal = ({ open, onClose, order }) => {
               initial={{ x: "100%" }}
               animate={{ x: "0%" }}
               exit={{ x: "100%" }}
-              transition={{ type: "spring", stiffness: 300, damping: 30, duration: 0.6, ease: "ease" }}
+              transition={{
+                type: "spring",
+                stiffness: 300,
+                damping: 30,
+                duration: 0.6,
+                ease: "ease",
+              }}
             >
               <button className={styles.closeBtn} onClick={onClose}>
                 <FaTimes size={22} />

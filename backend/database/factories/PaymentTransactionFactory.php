@@ -16,7 +16,7 @@ class PaymentTransactionFactory extends Factory
 
         return [
             'bill_id' => $bills->isNotEmpty() ? $bills->random()->id : null,
-            'method' => $this->faker->randomElement(['VisaCard', 'PayPal', 'CreditCard', 'GooglePay', 'SamsungPay', 'Cash']),
+            'method' => $this->faker->randomElement(['visacard/mastercard', 'applepay']),
             'status' => $this->faker->randomElement(['pending', 'completed', 'failed', 'refunded']),
             'transaction_code' => strtoupper($this->faker->bothify('TXN####??')),
             'processed_at' => $this->faker->dateTimeBetween('-1 month', 'now'),

@@ -144,11 +144,23 @@
   justify-content:center;
   border-radius: 10px;
   background: rgba(255,255,255,0.01);
-  color: #fff;
+  color: white;
   z-index: 30;
   pointer-events: none; /* لا تمنع النقر أو السحب */
   box-shadow: 0 6px 16px rgba(0,0,0,0.3);
   backdrop-filter: blur(4px);
+}
+
+.available .statusBadge {
+  background: linear-gradient(145deg, #4caf50, #3d8b40);
+}
+
+.cleaning .statusBadge {
+  background: linear-gradient(145deg, #2196f3, #1976d2);
+}
+
+.reserved .statusBadge {
+  background: linear-gradient(145deg, #f44336, #d32f2f);
 }
 
 /* الطاولة الدائرية — مظهر متقدم */

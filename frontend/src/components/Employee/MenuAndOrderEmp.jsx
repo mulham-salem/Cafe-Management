@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext, useMemo, useRef } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import styles from "../styles/MenuAndOrderEmp.module.css";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -265,6 +265,7 @@ const MenuAndOrderEmp = () => {
   const [fulfillmentMethod, setFulfillmentMethod] = useState("dineIn");
   const [whenType, setWhenType] = useState("ASAP");
   const [scheduledTime, setScheduledTime] = useState("");
+  const navigate = useNavigate();
 
   const token =
     sessionStorage.getItem("employeeToken") ||
@@ -411,8 +412,6 @@ const MenuAndOrderEmp = () => {
       return;
     }
 
-    console.log("test: ", scheduledTime);
-
     if (whenType === "Schedule" && !scheduledTime) {
       toast.error("Please select a scheduled time.");
       return;
@@ -439,6 +438,9 @@ const MenuAndOrderEmp = () => {
         );
         toastMessage = response.data.message;
         systemStatus = response.data.statusMessage;
+        setTimeout(() => {
+          navigate("/login/employee-home/user-order");
+        }, 800);
       } else {
         const response = await axios.post("/user/employee/orders/create", {
           items: itemsForBackend,
@@ -885,7 +887,7 @@ const MenuAndOrderEmp = () => {
                   onChange={(e) => setScheduledTime(e.target.value)}
                   className={styles.timeSelect}
                 >
-                  <option>Select Time</option>
+                  <option value="">Select Time</option>
                   {availableSlots.length > 0 ? (
                     availableSlots.map((slot, index) => (
                       <option key={index} value={slot.time24}>

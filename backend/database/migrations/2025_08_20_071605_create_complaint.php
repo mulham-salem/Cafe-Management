@@ -18,25 +18,10 @@ return new class extends Migration
                 ->constrained('customers')
                 ->cascadeOnDelete();
 
-            $table->foreignId('order_id')
-                ->nullable()
-                ->constrained('orders')
-                ->nullOnDelete();
-
-            $table->foreignId('reservation_id')
-                ->nullable()
-                ->constrained('reservations')
-                ->nullOnDelete();
-
-            $table->foreignId('employee_id')
-                ->nullable()
-                ->constrained('employees')
-                ->nullOnDelete();
-
-            $table->enum('status', ['New', 'In Progress', 'Resolved', 'Closed', 'Rejected'])->default('New');
+            $table->enum('status', ['new', 'inProgress', 'resolved', 'closed', 'rejected'])->default('new');
+            $table->enum('type', ['order', 'reservation', 'service'])->default('order');
             $table->string('notes', 100)->nullable();
             $table->text('description');
-
             $table->timestamps();
         });
     }

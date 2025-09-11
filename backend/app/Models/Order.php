@@ -59,7 +59,6 @@ class Order extends Model
         'pickup_time',
         'rating_score',
         'rating_comment',
-        'used_loyalty_points',
         'repreparation_request',
         'repreparation_reason',
     ];

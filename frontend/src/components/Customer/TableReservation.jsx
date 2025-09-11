@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import styles from "../styles/TableReservation.module.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -109,7 +109,8 @@ const TableReservation = () => {
   const [editingReservationId, setEditingReservationId] = useState(null);
 
   const token =
-    sessionStorage.getItem("customerToken") || localStorage.getItem("customerToken");
+    sessionStorage.getItem("customerToken") ||
+    localStorage.getItem("customerToken");
 
   axios.defaults.withCredentials = true;
   axios.defaults.baseURL = "http://localhost:8000/api";
@@ -150,13 +151,17 @@ const TableReservation = () => {
 
   const fetchAvailableTables = async (guests) => {
     try {
-      // const response = await axios.get(`/user/customer/table-reservation/available`, {
-      //   params: { guest_count: guests }
-      // });
-      // setTables(response.data);
-      setTables(mockTables);
+      const response = await axios.get(
+        `/user/customer/table-reservation/available`,
+        {
+          params: { guest_count: guests },
+        }
+      );
+      setTables(response.data);
     } catch (error) {
-      // toast.error('Failed to load available tables.');
+      console.error(error);
+      toast.error("Failed to load available tables. mockData Displayed");
+      setTables(mockTables);
     } finally {
       setLoadingTables(false);
     }
@@ -167,7 +172,7 @@ const TableReservation = () => {
       const response = await axios.get("/user/customer/table-reservation");
       setReservations(response.data);
     } catch (error) {
-      // toast.error('Failed to load your reservations.');
+      toast.error("Failed to load your reservations.");
     } finally {
       setLoadingReser(false);
     }
@@ -186,6 +191,7 @@ const TableReservation = () => {
 
     try {
       const reservationDateTime = `${reservationDate}T${reservationTime}:00`;
+      let pointsBalance, totalBalance;
 
       const newReservation = {
         table_id: selectedTableId,
@@ -224,6 +230,15 @@ const TableReservation = () => {
           hideProgressBar: true,
         }
       );
+
+      pointsBalance = response.data.loyalty_points;
+      totalBalance = response.data.loyalty_account.points_balance;
+
+      setTimeout(() => {
+        toast.info(
+          `🎉 You have earned ${pointsBalance} loyalty points! Your total is now ${totalBalance} points`
+        );
+      }, 5500);
       fetchReservations();
       fetchAvailableTables(guestCount);
       resetFormFields();
@@ -520,7 +535,7 @@ const TableReservation = () => {
                           icon={faChair}
                           className={styles.icon}
                         />
-                        <p>Table #{table.id}</p>
+                        <p>No: {table.number}</p>
                         <p>Capacity: {table.capacity}</p>
                         <p>Status: {table.status}</p>
                       </motion.div>
@@ -564,7 +579,7 @@ const TableReservation = () => {
                       <strong>Guests:</strong> {res.numberOfGuests}
                     </p>
                     <p>
-                      <strong>Table:</strong> #{res.table_id}
+                      <strong>Table:</strong> {res.table.number}
                     </p>
                     <p>
                       <strong>Status:</strong> {res.status}
@@ -592,7 +607,7 @@ const TableReservation = () => {
 
         {activeTab === "map" && (
           <div className={styles.visualMap}>
-            <VisualTableMap readonly={true}/>
+            <VisualTableMap readonly={true} />
           </div>
         )}
       </div>

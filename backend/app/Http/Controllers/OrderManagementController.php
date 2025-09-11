@@ -3,14 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\Bill;
+use App\Models\Complaint;
 use App\Models\Customer;
 use App\Models\DeliveryOrder;
+use App\Models\Employee;
 use App\Models\MenuItem;
 use App\Models\Notification;
 use App\Models\Order;
 use App\Models\OrderControl;
 use App\Models\OrderItem;
-use App\Models\Promotion;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -18,129 +19,21 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use App\Services\LoyaltyService;
 
 class OrderManagementController extends Controller
 {
-    public function __construct()
+    protected LoyaltyService $loyalty;
+    public function __construct(LoyaltyService $loyalty)
     {
         $this->autoResume();
-    }
-
-    /**
-     * Fetches menu items, optionally filtered by category.
-     */
-    public function fetchMenuItems(Request $request): JsonResponse // 1
-    {
-        $category = $request->query('category', 'all');
-
-        $query = MenuItem::with('category');
-
-        if ($category === 'drinks') {
-            $query->where('category_id', 1);
-        } elseif ($category === 'snacks') {
-            $query->where('category_id', 2);
-        }
-
-        $menuItems = $query->get();
-
-        if ($menuItems->isEmpty()) {
-            return response()->json([
-                'message' => "There aren't any item available now ",
-            ], 200);
-        }
-
-        return response()->json([
-            'data' => $menuItems->map(function ($item) {
-                return [
-                    'id' => $item->id,
-                    'image' => $item->image_url,
-                    'name' => $item->name,
-                    'description' => $item->description,
-                    'price' => $item->price,
-                    'category' => $item->category->name,
-                    'available' => $item->available,
-                    'isFavorite' => $item->isFavorite,
-                ];
-            }),
-        ], 200);
-    }
-
-    public function fetchTopSales(Request $request): JsonResponse
-    {
-        $topSales = DB::table('bills')
-            ->join('orders', 'bills.order_id', '=', 'orders.id')
-            ->join('order_items', 'orders.id', '=', 'order_items.order_id')
-            ->join('menu_items', 'order_items.menuItem_id', '=', 'menu_items.id')
-            ->select(
-                'menu_items.id',
-                'menu_items.name',
-                'menu_items.description',
-                'menu_items.price',
-                'menu_items.image_url as imageUrl',
-                'menu_items.available',
-                DB::raw('SUM(order_items.quantity) as total_quantity')
-            )
-            ->groupBy(
-                'menu_items.id',
-                'menu_items.name',
-                'menu_items.description',
-                'menu_items.price',
-                'menu_items.image_url',
-                'menu_items.available'
-            )
-            ->orderByDesc('total_quantity')
-            ->limit(10)
-            ->get();
-
-        if ($topSales->isEmpty()) {
-            return response()->json([
-                'message' => "There aren't any top selling items available now",
-            ], 200);
-        }
-
-        return response()->json([
-            'data' => $topSales,
-        ], 200);
-    }
-
-    public function fetchPromotions(): JsonResponse
-    {
-        $promotions = Promotion::with('promotionMenuItems.menuItem')->get();
-
-        if ($promotions->isEmpty()) {
-            return response()->json([
-                'message' => "There aren't any promotions available now",
-            ], 200);
-        }
-
-        // تمثيل البيانات بالشكل المطلوب للفرونت
-        $data = $promotions->map(function ($promotion) {
-            return [
-                'id' => $promotion->id,
-                'title' => $promotion->title,
-                'discount_percentage' => $promotion->discount_percentage,
-                'start_date' => $promotion->start_date,
-                'end_date' => $promotion->end_date,
-                'description' => $promotion->description,
-                'products' => $promotion->promotionMenuItems->map(function ($pmi) {
-                    return [
-                        'name' => $pmi->menuItem->name,
-                        'quantity' => $pmi->quantity
-                    ];
-                }),
-
-            ];
-        });
-
-        return response()->json([
-            'data' => $data,
-        ], 200);
+        $this->loyalty = $loyalty;
     }
 
     /**
      * Creates a new order.
      */
-    public function createOrder(Request $request): JsonResponse // 2
+    public function createOrder(Request $request): JsonResponse // 1
     {
         // --- تحقق من حالة النظام أولاً ---
         $employee = auth('user')->user()->employee ?? null;
@@ -160,16 +53,16 @@ class OrderManagementController extends Controller
             'items' => 'required|array|min:1',
             'items.*.menuItem_id' => 'required|exists:menu_items,id',
             'items.*.quantity' => 'required|integer|min:1',
-            'note' => 'nullable|string',
-            'fulfillmentMethod' => 'required|in:dineIn,takeaway,delivery',
+            'note' => 'nullable|string|max:100',
+            'pickupMethod' => 'required|in:dineIn,takeaway,delivery',
             'scheduledTime' => [
                 'nullable',
                 'regex:/^(?:[01]\d|2[0-3]):[0-5]\d$/', // HH:mm
             ],
             // في حال كانت delivery
-            'address' => 'required_if:pickup_method,delivery|string|max:100',
-            'city' => 'required_if:pickup_method,delivery|string|max:100',
-            'phone' => 'required_if:pickup_method,delivery|string|max:100',
+            'deliveryInfo.address' => 'required_if:pickupMethod,delivery|string|max:100',
+            'deliveryInfo.city' => 'required_if:pickupMethod,delivery|string|max:100',
+            'deliveryInfo.phone' => 'required_if:pickupMethod,delivery|string|max:100',
         ]);
 
         $user = auth('user')->user();
@@ -184,32 +77,56 @@ class OrderManagementController extends Controller
                 'createdAt' => now(),
                 'confirmedAt' => null,
                 'note' => $request->input('note'),
-                'pickup_method' => $request->input('fulfillmentMethod'),
+                'pickup_method' => $request->input('pickupMethod'),
                 'pickup_time' => $request->input('scheduledTime'),
             ]);
 
+            // تحضير المتغيرات
+            $loyaltyAccount = null;
+            $totalPoints = 0.0;
+
+            // optimization: جلب كل menu items المطلوبة دفعة وحدة
+            $menuItemIds = collect($request->items)->pluck('menuItem_id')->unique()->filter()->values()->all();
+            $menuItems = MenuItem::whereIn('id', $menuItemIds)->get()->keyBy('id');
+
+
             foreach ($request->items as $item) {
-                $menuItem = MenuItem::find($item['menuItem_id']);
+
+                $menuItem = $menuItems->get($item['menuItem_id']) ?? null;
+
                 if (! $menuItem || ! $menuItem->available) {
                     throw ValidationException::withMessages([
                         'items' => ['Item "' . ($menuItem?->name ?? 'Unknown') . '" is not available.'],
                     ]);
                 }
 
-                $totalPriceForItem = $menuItem->price * $item['quantity'];
+                $quantity = (int) ($item['quantity'] ?? 1);
+                $totalPriceForItem = (float) $menuItem->price * $quantity;
 
                 OrderItem::create([
                     'order_id' => $order->id,
                     'menuItem_id' => $menuItem->id,
                     'item_name' => $menuItem->name,
-                    'quantity' => $item['quantity'],
-                    'price' => $totalPriceForItem,
+                    'quantity' => $quantity,
+                    'price' => $totalPriceForItem, // إن أردت تخزين السعر للوحدة: أضف unit_price و total_price
                 ]);
+
+                // جمع النقاط — لا ننفذ الإضافة هنا، فقط نجمع
+                if (! $employee) {
+                    $totalPoints += $totalPriceForItem * 0.5; // عدّل معدل التحويل للنقاط كما تريد
+                }
+            }
+
+            // بعد الانتهاء من اللوب، نضيف النقاط مرة واحدة (إذا في نقاط)
+            if (! $employee && $totalPoints > 0) {
+                // تقريب إلى منزلتين عشريتين لو لازم
+                $totalPoints = round($totalPoints, 2);
+                $loyaltyAccount = $this->loyalty->addPoints($order->customer_id, $totalPoints);
             }
 
             // في حال delivery: إنشاء سجل في جدول delivery_orders
-            if ($request->pickup_method === 'delivery') {
-                $deliveryFee = rand(3, 10); // قيمة عشوائية بين 3 و 10
+            if ($request->pickupMethod === 'delivery') {
+                $deliveryFee = rand(1, 6); // قيمة عشوائية بين 3 و 10
                 $etaMinutes = rand(20, 60); // وقت توصيل عشوائي بالدقايق
 
                 DeliveryOrder::create([
@@ -217,9 +134,9 @@ class OrderManagementController extends Controller
                     'order_id' => $order->id,
                     'status' => 'unassigned',
                     'delivery_fee' => $deliveryFee,
-                    'address' => $request->address,
-                    'city' => $request->city,
-                    'phone' => $request->phone,
+                    'address' => $request->input('deliveryInfo.address'),
+                    'city' =>  $request->input('deliveryInfo.city'),
+                    'phone' =>  $request->input('deliveryInfo.phone'),
                     'pickup_time' => $order->pickup_time,
                     'estimated_time' => now()->addMinutes($etaMinutes),
                 ]);
@@ -229,6 +146,8 @@ class OrderManagementController extends Controller
 
             return response()->json([
                 'message' => 'Order #' . $order->id . ' created successfully',
+                'loyalty_account' => $loyaltyAccount,
+                'loyalty_points' => $totalPoints,
             ], 201);
 
         } catch (Exception $e) {
@@ -241,10 +160,11 @@ class OrderManagementController extends Controller
     /**
      * Retrieves orders for the authenticated customer or employee.
      */
-    public function getCustomerOrders(): JsonResponse // 3
+    public function getCustomerOrders(): JsonResponse // 2
     {
         $user = auth('user')->user();
-        $query = Order::with(['orderItems.menuItem', 'bill']);
+
+        $query = Order::with(['orderItems.menuItem', 'bill', 'deliveryOrder', 'customer']);
 
         if ($user->role === 'customer') {
             $query->where('customer_id', $user->id);
@@ -258,21 +178,45 @@ class OrderManagementController extends Controller
 
         return response()->json([
             'data' => $orders->map(function ($order) {
+                // 🔥 delivery details
+                $deliveryData = null;
+                if ($order->pickup_method === 'delivery' && $order->deliveryOrder) {
+                    $deliveryData = [
+                        'address'        => $order->deliveryOrder->address ?? '',
+                        'city'           => $order->deliveryOrder->city ?? '',
+                        'phone'          => $order->deliveryOrder->phone ?? '',
+                        'delivery_fee'   => number_format($order->deliveryOrder->delivery_fee, 2),
+                        'estimated_time' => $order->deliveryOrder->estimated_time
+                            ? Carbon::parse($order->deliveryOrder->estimated_time)->format('h:i A')
+                            : null,
+                    ];
+                }
+
                 return [
-                    'order_id' => $order->id,
-                    'status' => $order->status,
-                    'created_at' => $order->createdAt,
+                    'order_id'      => $order->id,
+                    'status'        => $order->status,
+                    'created_at'    => $order->createdAt,
                     'can_show_bill' => $order->status === 'delivered' && $order->bill !== null,
-                    'note' => $order->note ?? '-',
+                    'note'          => $order->note ?? '-',
                     'pickup_method' => $order->pickup_method ?? 'dineIn',
-                    'pickup_time' => $order->pickup_time ? Carbon::parse($order->pickup_time)->format('h:i A') : 'ASAP',
+                    'pickup_time'   => $order->pickup_time
+                        ? Carbon::parse($order->pickup_time)->format('h:i A')
+                        : 'ASAP',
+
+                    // 🔥 Customer full name
+                    'customer_name' => $order->customer->user->full_name ?? 'Unknown',
+
+                    // 🔥 Delivery data
+                    'delivery'      => $deliveryData,
+
                     'items' => $order->orderItems->map(function ($item) {
                         return [
                             'item_name' => $item->menuItem->name,
-                            'price' => number_format($item->price/$item->quantity, 2),
-                            'quantity' => $item->quantity,
+                            'price'     => number_format($item->price / $item->quantity, 2),
+                            'quantity'  => $item->quantity,
                         ];
                     }),
+
                     'item_count' => $order->orderItems->count(),
                 ];
             }),
@@ -280,60 +224,11 @@ class OrderManagementController extends Controller
     }
 
     /**
-     * Views the bill for a specific order.
-     *
-     * @param  int  $orderId
-     */
-    public function viewOrderBill($orderId): JsonResponse // 4
-    {
-        $user = auth('user')->user();
-
-        $orderQuery = Order::with(['orderItems.menuItem', 'bill', 'customer.user', 'employee.user'])
-            ->where('id', $orderId);
-
-        if ($user->role === 'customer') {
-            $customerId = optional($user->customer)->id;
-            $orderQuery->where('customer_id', $customerId);
-        }
-
-        $order = $orderQuery->first();
-
-        if (! $order) {
-            return response()->json(['message' => "Order isn't existed or unavailable"], 404);
-        }
-
-        if ($order->status !== 'delivered') {
-            return response()->json(['message' => "Order isn't delivered yet ,can't show invoice now "], 403);
-        }
-
-        if ($order->employee_id) {
-            $username = optional($order->employee)->user->full_name ?? 'Unknown Employee';
-        } elseif ($order->customer_id) {
-            $username = optional($order->customer)->user->full_name ?? 'Unknown Customer';
-        } else {
-            $username = 'Unknown';
-        }
-
-        return response()->json([
-            'message' => "Bill for order #{$order->id}",
-            'username' => $username,
-            'items' => $order->orderItems->map(function ($item) {
-                return [
-                    'menu_item' => $item->menuItem->name,
-                    'quantity' => $item->quantity,
-                    'price' => $item->price,
-                ];
-            }),
-            'total_price' => $order->bill->total_amount,
-        ]);
-    }
-
-    /**
      * Edits an existing order. Supports GET (to show edit interface) and PUT (to update order).
      *
      * @param  int  $orderId
      */
-    public function editOrder(Request $request, $orderId): JsonResponse // 5
+    public function editOrder(Request $request, $orderId) // 3
     {
         // --- تحقق من حالة النظام أولاً ---
         $employee = auth('user')->user()->employee ?? null;
@@ -371,67 +266,130 @@ class OrderManagementController extends Controller
             $items = $order->orderItems->map(function ($item) {
                 return [
                     'menuItem_id' => $item->menuItem_id,
-                    'name' => $item->menuItem->name,
-                    'quantity' => $item->quantity,
-                    'price' => $item->price,
-                    'formatted' => $item->menuItem->name.' * '.$item->quantity.' ('.number_format($item->price, 2).')',
-                    'note' => $item->order->note,
+                    'name'        => $item->menuItem->name,
+                    'quantity'    => $item->quantity,
+                    'price'       => $item->price,
+                    'formatted'   => $item->menuItem->name.' * '.$item->quantity.' ('.number_format($item->price, 2).')',
                 ];
             });
 
+            // 🔥 جلب معلومات التوصيل من جدول DeliveryOrder
+            $deliveryInfo = null;
+            if ($order->pickup_method === 'delivery' && $order->DeliveryOrder) {
+                $deliveryInfo = [
+                    'address' => $order->DeliveryOrder->address ?? '',
+                    'city'    => $order->DeliveryOrder->city ?? '',
+                    'phone'   => $order->DeliveryOrder->phone ?? '',
+                    'deliveryFee' => $order->DeliveryOrder->delivery_fee ?? 0,
+                    'etaText' => $order->DeliveryOrder->estimated_time ?? 'N/A',
+                ];
+            }
+
             return response()->json([
-                'order_id' => $order->id,
-                'note' => $order->note,
-                'items' => $items,
+                'order_id'      => $order->id,
+                'note'          => $order->note,
+                'pickupMethod' => $order->pickup_method,
+                'pickupTime'   => $order->pickup_time,
+                'deliveryInfo' => $deliveryInfo,
+                'items'         => $items,
             ]);
         }
 
         if ($request->isMethod('put')) {
+
             $validated = $request->validate([
                 'items' => 'required|array|min:1',
                 'items.*.menuItem_id' => 'required|exists:menu_items,id',
                 'items.*.quantity' => 'required|integer|min:0',
                 'note' => 'nullable|string',
+                'pickupMethod' => 'required|in:dineIn,takeaway,delivery',
+                'scheduledTime' => [
+                    'nullable',
+                    'regex:/^(?:[01]\d|2[0-3]):[0-5]\d$/', // HH:mm
+                ],
+                // في حال كانت delivery
+                'deliveryInfo.address' => 'required_if:pickupMethod,delivery|string|max:100',
+                'deliveryInfo.city' => 'required_if:pickupMethod,delivery|string|max:100',
+                'deliveryInfo.phone' => 'required_if:pickupMethod,delivery|string|max:100',
             ]);
 
             DB::beginTransaction();
 
             try {
+                // IDs العناصر الجديدة اللي جايين من الواجهة
+                $newItemIds = collect($validated['items'])->pluck('menuItem_id');
+
+                // حذف العناصر القديمة اللي مو موجودة بالـ request
+                OrderItem::where('order_id', $order->id)
+                    ->whereNotIn('menuItem_id', $newItemIds)
+                    ->delete();
+
                 foreach ($validated['items'] as $item) {
                     $menuItem = MenuItem::find($item['menuItem_id']);
 
-                    if (! $menuItem->available) {
+                    if (!$menuItem->available) {
                         throw ValidationException::withMessages([
                             'menuItem_id' => "item {$menuItem->name} unavailable now",
                         ]);
                     }
+
                     $totalPriceForItem = $menuItem->price * $item['quantity'];
+
                     if ($item['quantity'] < 1) {
                         OrderItem::where('order_id', $order->id)
                             ->where('menuItem_id', $item['menuItem_id'])
                             ->delete();
                     } else {
-
                         OrderItem::updateOrCreate(
                             [
                                 'order_id' => $order->id,
                                 'menuItem_id' => $item['menuItem_id'],
                             ],
                             [
+                                'item_name' => $menuItem->name,
                                 'quantity' => $item['quantity'],
                                 'price' => $totalPriceForItem,
                             ]
                         );
                     }
                 }
-
+                // تحديث معلومات الطلب الأساسية
+                $order->pickup_method = $validated['pickupMethod'];
+                $order->pickup_time = $validated['scheduledTime'];
                 $order->note = $validated['note'] ?? null;
                 $order->save();
+
+                // في حال delivery: إنشاء سجل في جدول delivery_orders
+                $pickupMethod = $request->input('pickupMethod');
+
+                if ($pickupMethod === 'delivery') {
+                    $deliveryInfo = $request->input('deliveryInfo', []);
+
+                    $deliveryData = [
+                        'delivery_worker_id' => null,
+                        'status'             => 'unassigned',
+                        'delivery_fee'       => rand(3, 10),
+                        'address'            => $deliveryInfo['address'] ?? null,
+                        'city'               => $deliveryInfo['city'] ?? null,
+                        'phone'              => $deliveryInfo['phone'] ?? null,
+                        'pickup_time'        => $order->pickup_time,
+                        'estimated_time'     => now()->addMinutes(rand(20, 60)),
+                    ];
+
+                    // إما تحديث أو إنشاء
+                    DeliveryOrder::updateOrCreate(
+                        ['order_id' => $order->id], // شرط البحث
+                        $deliveryData              // القيم للتحديث/الإنشاء
+                    );
+                } else {
+                    // لو غير ديلفري نحذف أي سجل قديم
+                    DeliveryOrder::where('order_id', $order->id)->delete();
+                }
 
                 DB::commit();
 
                 return response()->json([
-                    'message' => 'Order '.$order->id.' updating successfully',
+                    'message' => 'Order '.$order->id.' updated successfully',
                 ]);
             } catch (Exception $e) {
                 DB::rollBack();
@@ -453,7 +411,7 @@ class OrderManagementController extends Controller
      *
      * @param  int  $id
      */
-    public function cancelOrder($id): JsonResponse // 6
+    public function cancelOrder($id): JsonResponse // 4
     {
         $user = auth('user')->user();
         $order = Order::with(['employee.user', 'customer.user'])->findOrFail($id);
@@ -486,10 +444,10 @@ class OrderManagementController extends Controller
      *
      * @param  int  $id
      */
-    public function confirmOrder($id): JsonResponse // 7
+    public function confirmOrder($id): JsonResponse // 5
     {
         $user = auth('user')->user();
-        $order = Order::with('orderItems.menuItem')->findOrFail($id);
+        $order = Order::with('orderItems.menuItem', 'deliveryOrder')->findOrFail($id);
 
         if ($order->confirmedAt !== null) {
             return response()->json([
@@ -518,11 +476,21 @@ class OrderManagementController extends Controller
 
             $notificationMessage = "Order #{$order->id} has been confirmed. Details:\n";
             $totalAmount = 0;
-
             foreach ($order->orderItems as $item) {
                 $totalAmount += $item->quantity * $item->menuItem->price;
                 $notificationMessage .= "- {$item->menuItem->name} (Qty: {$item->quantity}, Price: $".number_format($item->price, 2).")\n";
             }
+
+            $delivery_fee = $order->deliveryOrder->delivery_fee ?? 0;
+            if ($order->deliveryOrder) {
+                $totalAmount += $delivery_fee;
+            }
+
+            Bill::create([
+                'order_id' => $order->id,
+                'total_amount' => $totalAmount,
+                'date_issued' => now(),
+            ]);
 
             $notificationMessage .= 'Total Amount: $'.number_format($totalAmount, 2);
             $notificationMessage .= "\nNote: ".($order->note ?? 'N/A');
@@ -538,13 +506,6 @@ class OrderManagementController extends Controller
                 'seen' => false,
             ]);
 
-            Bill::create([
-                'order_id' => $order->id,
-                'total_amount' => $totalAmount,
-                'date_issued' => now(),
-                'payment_method' => 'cash',
-            ]);
-
             DB::commit();
 
             return response()->json([
@@ -558,6 +519,158 @@ class OrderManagementController extends Controller
             ], 500);
         }
     }
+
+    public function storeComplaint(Request $request) // 6
+    {
+        $user = auth('user')->user()->id;
+        $request->validate([
+            'type' => 'required|in:order,reservation,service',
+            'details' => 'required|string|max:1000',
+        ]);
+
+        try {
+            $complaint = Complaint::create([
+                'customer_id' => $user,
+                'type' => $request->type,
+                'description' => $request->details, // mapping details → description
+                'note' => null,
+            ]);
+
+            return response()->json([
+                'message' => 'Complaint submitted successfully!',
+                'data' => $complaint,
+            ], 201);
+
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Failed to submit complaint',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function requestRePreparation(Request $request) // 7
+    {
+        $user = auth('user')->user();
+
+        // Validate request
+        $validated = $request->validate([
+            'orderId' => 'required|exists:orders,id',
+            'reason'  => 'required|string|max:255',
+        ]);
+
+        // Fetch the order
+        $order = Order::where('id', $validated['orderId'])
+            ->where('customer_id', $user->id) // Make sure the order belongs to this customer
+            ->firstOrFail();
+
+        // Check if the order is delivered
+        if ($order->status !== 'delivered') {
+            return response()->json([
+                'message' => 'You can only request re-preparation for delivered orders.',
+            ], 400);
+        }
+
+        // Update order fields
+        $order->update([
+            'status'                => 'preparing',
+            'repreparation_request' => 1,
+            'repreparation_reason'  => $validated['reason'],
+        ]);
+
+        //🔥 Update related delivery order
+        if ($order->pickup_method === 'delivery') {
+            DeliveryOrder::where('order_id', $order->id)->update(['status' => 'unassigned']);
+        }
+
+        // 🔥 إشعار لكل الموظفين
+        $employees = Employee::with('user')->get(); // جلب كل الموظفين مع الـ user_id
+
+        foreach ($employees as $employee) {
+            if ($employee->user) {
+                Notification::create([
+                    'user_id'   => $employee->user->id, // id من جدول users
+                    'sent_by'   => 'System',
+                    'purpose'   => 'Order Re-Preparation',
+                    'message'   => "The customer requested re-preparation for order #{$order->id}.",
+                    'createdAt' => now(),
+                ]);
+            }
+        }
+
+        return response()->json([
+            'message' => 'Re-preparation request submitted successfully.',
+            'order_id' => $order->id,
+        ], 200);
+    }
+
+    public function reorderOrder($orderId) // 8
+    {
+        try {
+            // جلب الطلب مع علاقة الـ deliveryOrder
+            $order = Order::with('deliveryOrder', 'bill')->findOrFail($orderId);
+
+            // تحديث حالة الطلب إلى pending
+            $order->status = 'pending';
+            $order->confirmedAt = null;
+            $order->createdAt = now();
+            $order->bill->delete();
+            $order->save();
+
+            // إذا طريقة الاستلام delivery، حدث حالة deliveryOrder
+            if ($order->pickup_method === 'delivery' && $order->deliveryOrder) {
+                $order->deliveryOrder->status = 'unassigned';
+                $order->deliveryOrder->save();
+            }
+
+            return response()->json([
+                'message' => 'Order has been reordered successfully',
+                'order' => $order,
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Failed to request the order.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function rateOrder(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'orderId' => 'required|integer|exists:orders,id',
+            'orderRating' => 'required|numeric|min:0|max:5',
+            'deliveryRating' => 'nullable|numeric|min:0|max:5',
+            'notes' => 'nullable|string|max:1000',
+        ]);
+
+        // إحضار الطلب
+        $order = Order::findOrFail($data['orderId']);
+
+        // تحديث تقييم الطلب نفسه
+        $order->rating_score = $data['orderRating'];
+        $order->rating_comment = $data['notes'];
+        $order->save();
+
+        // إذا كان الطلب توصيل، تحديث جدول التوصيل
+        if ($order->pickup_method === 'delivery') {
+            if ($data['deliveryRating'] !== null) {
+                $delivery = DeliveryOrder::where('order_id', $order->id)->first();
+
+                if ($delivery) {
+                    $delivery->rating_score = $data['deliveryRating'];
+                    $delivery->rating_comment = $data['notes'];
+                    $delivery->save();
+                }
+            }
+        }
+
+        return response()->json([
+            'message' => 'Rating submitted successfully',
+            'order' => $order,
+        ]);
+    }// 9
 
     // ----------------------------------------------------Employee Only---------------------------------------------------//
 
@@ -621,7 +734,7 @@ class OrderManagementController extends Controller
         return response()->json([
             'error' => 'Invalid status transition.',
         ], 403);
-    } // 8
+    } // 10
 
     /**
      * Searches for an order by its ID and optionally by status.
@@ -653,7 +766,7 @@ class OrderManagementController extends Controller
                 'created_at' => $order->createdAt,
                 'status' => $order->status,
                 'note' => $order->note ?? '-',
-//                'item_count' => $order->orderItems->count(),
+                'item_count' => $order->orderItems->count(),
                 'pickup_method' => $order->pickup_method ?? 'dineIn',
                 'pickup_time' => $order->pickup_time ?? 'ASAP',
                 'items' => $order->orderItems->map(function ($item) {
@@ -664,7 +777,7 @@ class OrderManagementController extends Controller
                 }),
             ],
         ]);
-    } // 9
+    } // 11
 
     /**
      * Retrieves orders intended for the kitchen display (confirmed, preparing, ready, delivered).
@@ -684,6 +797,9 @@ class OrderManagementController extends Controller
                     'note' => $order->note ?? '-',
                     'pickup_method' => $order->pickup_method ?? 'dineIn',
                     'pickup_time' => $order->pickup_time ?? 'ASAP',
+                    'rePreparation_reason' => $order->repreparation_request == 1
+                        ? $order->repreparation_reason
+                        : null,
                     'orderItems' => $order->orderItems->map(function ($item) {
                         return [
                             'item_name' => $item->menuItem->name,
@@ -693,7 +809,7 @@ class OrderManagementController extends Controller
                 ];
             }),
         ]);
-    } // 10
+    } // 12
 
     /**
      * Retrieves a short list of orders for the authenticated customer (ID and status only).
@@ -711,7 +827,7 @@ class OrderManagementController extends Controller
             ->get(['id', 'status']);
 
         return response()->json(['orders' => $orders], 200);
-    } // 11
+    } // 13
 
     /**
      * Get customer contact info by order ID.
@@ -735,7 +851,7 @@ class OrderManagementController extends Controller
             'phone' => $customer->phone_number,
             'email' => $customer->user->email,
         ]);
-    }//12
+    }// 14
 
     /**
      * Suspend (Put On Hold) the order
@@ -764,7 +880,7 @@ class OrderManagementController extends Controller
             'message' => 'Order has been suspended successfully!',
             'order'   => $order
         ], 200);
-    }//13
+    }// 15
 
     /**
      * Resume the order
@@ -793,7 +909,7 @@ class OrderManagementController extends Controller
             'message' => 'Order has been resumed successfully!',
             'order'   => $order
         ], 200);
-    }//14
+    }// 16
 
     /**
      * Get current order control status for the logged-in employee
@@ -809,7 +925,7 @@ class OrderManagementController extends Controller
             'status' => $orderControl?->status,       // 'closed' أو 'open' أو null إذا ما موجود
             'resume_at' => $orderControl?->resume_at // الوقت لو محدد
         ], 200);
-    }
+    }// 17
 
     /**
      * Pause receiving orders.
@@ -837,7 +953,7 @@ class OrderManagementController extends Controller
             'status' => $orderControl->status,
             'resume_at' => $orderControl->resume_at,
         ], 200);
-    }//15
+    }// 18
 
     /**
      * Resume receiving orders.
@@ -862,7 +978,7 @@ class OrderManagementController extends Controller
             'status'  => $orderControl->status,
             'resume_at' => null,
         ], 200);
-    }//16
+    }// 19
 
     /**
      * Auto resume receiving orders after time is up.
@@ -882,7 +998,7 @@ class OrderManagementController extends Controller
             $control->resume_at = null;
             $control->save();
 
-            $formattedTime = \Carbon\Carbon::parse($resumeAt)->format('Y-m-d H:i');
+            $formattedTime = Carbon::parse($resumeAt)->format('Y-m-d H:i');
             Notification::create([
                 'user_id' => $control->employee_id,
                 'sent_by' => 'System',
@@ -892,5 +1008,5 @@ class OrderManagementController extends Controller
                 'seen' => false,
             ]);
         }
-    }//17
+    }// 20
 }

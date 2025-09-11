@@ -194,8 +194,8 @@ class UserAuthController extends Controller
         if ($user->role === 'customer') {
             $baseData['phone_number'] = $user->customer->phone_number;
             $baseData['address'] = $user->customer->address;
-            $baseData['points_balance'] = $user->customer->loyalityAccount->points_balance;
-            $baseData['tier'] = $user->customer->loyalityAccount->tier;
+            $baseData['points_balance'] = $user->customer->loyaltyAccount->points_balance;
+            $baseData['tier'] = $user->customer->loyaltyAccount->tier;
         }
         if ($user->role === 'delivery_worker') {
             $baseData['transport'] = $user->DeliveryWorker->transport;

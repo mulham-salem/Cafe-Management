@@ -6,9 +6,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class LoyalityAccount extends Model
+class LoyaltyAccount extends Model
 {
-    protected $table = 'loyality_account';
+    protected $table = 'loyalty_account';
 
     use HasFactory;
 

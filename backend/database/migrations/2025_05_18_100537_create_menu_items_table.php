@@ -17,7 +17,6 @@ return new class extends Migration
             $table->double('price');
             $table->string('image_url', 2083)->nullable();
             $table->boolean('available')->default(true);
-            $table->boolean('isFavorite')->default('false');
             $table->timestamps();
 
         });

@@ -27,5 +27,6 @@ class Bill extends Model
         'payment_method',
         'date_issued',
         'used_loyalty_points',
+        'is_paid',
     ];
 }

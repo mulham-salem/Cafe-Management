@@ -21,9 +21,10 @@ class BillFactory extends Factory
         return [
             'order_id' => Order::factory(),
             'total_amount' => $this->faker->randomFloat(2, 10, 500),
-            'payment_method' => $this->faker->randomElement(['Cash', 'Card', 'Online']),
+            'payment_method' => $this->faker->randomElement(['cash', 'card/online']),
             'date_issued' => $this->faker->dateTimeThisYear(),
             'used_loyalty_points' => $this->faker->randomFloat(2, 0, 100),
+            'is_paid' => $this->faker->randomElement([0, 1]),
         ];
     }
 }

@@ -146,8 +146,18 @@ export default function DeliveryHome() {
   };
 
   async function checkNewDeliveryOrders() {
+    const token =
+      sessionStorage.getItem("delivery_workerToken") ||
+      localStorage.getItem("delivery_workerToken");
     try {
-      const { data } = await axios.get("http://localhost:8000/api/user/delivery-worker/delivery-orders/check-new");
+      const { data } = await axios.get(
+        "http://localhost:8000/api/user/delivery-worker/delivery-orders/check-new",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       return data; // { hasNewOrders: true/false, message?: string }
     } catch (error) {
       console.error(error);
@@ -155,12 +165,19 @@ export default function DeliveryHome() {
     }
   }
 
-  // مثال في useEffect
   useEffect(() => {
     async function fetchNotifications() {
       const res = await checkNewDeliveryOrders();
       if (res.hasNewOrders) {
-        toast(res.message); 
+        toast.custom((t) => (
+          <span
+            className={`${styles.toastNewNotify} ${
+              t.visible ? styles.enter : styles.leave
+            }`}
+          >
+            {res.message}
+          </span>
+        ));
       }
     }
 

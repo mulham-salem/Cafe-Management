@@ -29,7 +29,7 @@ return new class extends Migration
             $table->string('address', 100);
             $table->string('city', 50);
             $table->string('phone', 20);
-            $table->time('pickup_time');
+            $table->time('pickup_time')->nullable();
             $table->dateTime('estimated_time');
             $table->decimal('rating_score', 2, 1)->nullable();
             $table->string('rating_comment', 200)->nullable();

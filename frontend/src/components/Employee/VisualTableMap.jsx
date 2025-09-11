@@ -85,8 +85,8 @@ export default function VisualTableMap({ readonly = false }) {
   const mapRef = useRef(null);
   const mapBounds = mapRef.current?.getBoundingClientRect();
 
+  const role = sessionStorage.getItem("currentRole");
   function getCurrentToken() {
-    const role = sessionStorage.getItem("currentRole");
     if (!role) return null;
     return (
       sessionStorage.getItem(`${role}Token`) ||
@@ -112,7 +112,12 @@ export default function VisualTableMap({ readonly = false }) {
 
     const fetchTables = async () => {
       try {
-        const res = await axiosInstance.get("/user/employee/table");
+        let res;
+        if (role === "employee") {
+          res = await axiosInstance.get("/user/employee/table");
+        } else {
+          res = await axiosInstance.get("/user/customer/table");
+        }
         setTables(res.data.tables);
       } catch (err) {
         console.error(err);

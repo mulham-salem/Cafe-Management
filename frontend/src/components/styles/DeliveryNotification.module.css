@@ -1,5 +1,5 @@
 .pageWrapper {
-  padding: 30px; 
+  padding: 30px;
   font-family: "Segoe UI", sans-serif;
   overflow: hidden auto;
   min-height: 90vh;
@@ -27,7 +27,7 @@
 
 .bellIcon {
   margin-top: 4px;
-  font-size: clamp(20px, 4.5vw, 28px); 
+  font-size: clamp(20px, 4.5vw, 28px);
 }
 
 .loadingOverlay {
@@ -68,15 +68,16 @@
 .list {
   display: flex;
   flex-direction: column;
-  gap: clamp(15px, 3vw, 20px); 
-  margin: 0 auto;
+  gap: clamp(15px, 3vw, 20px);
+  margin: 1.5rem auto;
+  width: 95%;
 }
 
 .card {
   display: flex;
-  gap: clamp(12px, 3vw, 18px); 
+  gap: clamp(12px, 3vw, 18px);
   background-color: #fff;
-  border-radius: clamp(8px, 2vw, 12px); 
+  border-radius: clamp(8px, 2vw, 12px);
   padding: clamp(12px, 3vw, 18px) clamp(16px, 4vw, 22px);
   cursor: pointer;
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
@@ -103,7 +104,7 @@
 
 .icon {
   color: #6c63ff;
-  font-size: clamp(20px, 4.5vw, 22px); 
+  font-size: clamp(20px, 4.5vw, 22px);
   margin-top: clamp(2px, 1vw, 4px);
 }
 
@@ -128,22 +129,22 @@
   font-size: clamp(15px, 3.5vw, 17px);
   font-weight: 500;
   color: #333;
-  margin-bottom: clamp(4px, 1vw, 6px); 
+  margin-bottom: clamp(4px, 1vw, 6px);
   white-space: pre-wrap;
   line-height: clamp(24px, 4vw, 30px);
 }
 
 .title {
-  font-size: clamp(0.9em, 2.5vw, 1em); 
-  font-weight: bold; 
-  color: rgb(15 7 2); 
+  font-size: clamp(0.9em, 2.5vw, 1em);
+  font-weight: bold;
+  color: rgb(15 7 2);
   margin-bottom: clamp(10px, 3vw, 15px);
-  text-align: center; 
+  text-align: center;
   text-transform: uppercase;
 }
 
 .time {
-  font-size: clamp(11px, 2.5vw, 13px); 
+  font-size: clamp(11px, 2.5vw, 13px);
   color: #777;
   font-style: italic;
 }
@@ -159,7 +160,7 @@
   font-family: Titillium-Web, sans-serif;
   font-size: clamp(0.8rem, 2vw, 0.9rem);
   color: #666;
-  margin-top: clamp(2px, 1vw, 4px); 
+  margin-top: clamp(2px, 1vw, 4px);
   text-align: right;
 }
 
@@ -196,7 +197,7 @@
   }
 }
 
-@media screen and (min-width:2560px) and (max-height: 1440px) {
+@media screen and (min-width: 2560px) and (max-height: 1440px) {
   .pageWrapper {
     padding: 50px;
     min-height: 88vh;
@@ -291,7 +292,7 @@
   }
 
   .card {
-    flex-direction: row; 
+    flex-direction: row;
     align-items: flex-start;
     text-align: left;
     padding: 18px;
@@ -336,24 +337,24 @@
 
   .list {
     gap: 10px;
-    padding: 0 15px; 
+    padding: 0 15px;
   }
 
   .card {
-    flex-direction: column; 
-    align-items: center; 
+    flex-direction: column;
+    align-items: center;
     text-align: center;
     padding: 15px;
-    gap: 8px; 
+    gap: 8px;
   }
 
   .icon {
-    font-size: 24px; 
-    margin-top: 0; 
+    font-size: 24px;
+    margin-top: 0;
   }
 
   .content {
-    margin-top: 0; 
+    margin-top: 0;
   }
 
   .message {
@@ -368,7 +369,7 @@
   .sender {
     font-size: 0.75rem;
     margin-top: 2px;
-    text-align: center; 
+    text-align: center;
   }
 }
 

@@ -3,12 +3,12 @@
 namespace Database\Factories;
 
 use App\Models\Customer;
-use App\Models\LoyalityAccount;
+use App\Models\LoyaltyAccount;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class LoyalityAccountFactory extends Factory
+class LoyaltyAccountFactory extends Factory
 {
-    protected $model = LoyalityAccount::class;
+    protected $model = LoyaltyAccount::class;
 
     public function definition()
     {

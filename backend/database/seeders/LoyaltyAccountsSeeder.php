@@ -2,16 +2,16 @@
 
 namespace Database\Seeders;
 
-use App\Models\LoyalityAccount;
+use App\Models\LoyaltyAccount;
 use Illuminate\Database\Seeder;
 
-class LoyalityAccountsSeeder extends Seeder
+class LoyaltyAccountsSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        LoyalityAccount::factory()->count(20)->create();
+        LoyaltyAccount::factory()->count(20)->create();
     }
 }

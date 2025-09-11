@@ -7,7 +7,7 @@ use App\Models\SupplyRequest;
 
 class supplyHistoryController extends Controller
 {
-    public function managerHistory()
+    public function getManagerSupplyHistory()
     {
         // ====== جلب عروض التوريد ======
         $offers = SupplyOffer::with('supplyOfferItems')->get()->map(function ($offer) {
@@ -58,7 +58,7 @@ class supplyHistoryController extends Controller
         return response()->json($history);
     }
 
-    public function supplierHistory()
+    public function getSupplierSupplyHistory()
     {
         $supplierId = auth('user')->id();
 

@@ -30,6 +30,7 @@
     "react-rating": "^2.0.5",
     "react-router-dom": "^7.6.0",
     "react-toastify": "^11.0.5",
+    "react-tooltip": "^5.29.1",
     "recharts": "^3.1.2",
     "simplebar-react": "^3.3.2",
     "use-sound": "^5.0.0",

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "../styles/InvoiceOverlay.module.css"; // نفس ملف الستايل تبعك أو انسخه جديد
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -15,7 +15,7 @@ import { toast } from "react-toastify";
  * Props:
  * - invoice: {
  *     id, customerName, items:[{name, quantity, price}],
- *     receiptMethod, deliveryDetails?:{deliveryFee},
+ *     pickupMethod, deliveryDetails?:{deliveryFee},
  *     totalPrice (number), loyalty?:{balance:number, pointValue:number}
  *   }
  * - onClose: () => void
@@ -30,37 +30,53 @@ export default function InvoiceOverlay({
 }) {
   const [usingPoints, setUsingPoints] = useState(0);
   const [applying, setApplying] = useState(false);
-  const loyaltyBalance = invoice?.loyalty?.balance ?? 0; // points count
-  const pointValue = invoice?.loyalty?.pointValue ?? 0.01; // 1 pt = $0.01 by default
-
-  const subtotal = useMemo(() => {
-    try {
-      return Number(
-        invoice.items
-          .reduce((acc, it) => acc + it.price * it.quantity, 0)
-          .toFixed(2)
-      );
-    } catch {
-      return Number(invoice.totalPrice || 0);
-    }
-  }, [invoice]);
-
-  const deliveryFee = Number(invoice?.deliveryDetails?.deliveryFee || 0);
-  const grossTotal = useMemo(() =>{
-    const fee = invoice.receiptMethod === "delivery" ? deliveryFee : 0;
-    return Number((subtotal + fee).toFixed(2));
-  },[subtotal, deliveryFee, invoice.receiptMethod]);  
-
-  const maxPointsByAmount = Math.floor(grossTotal / pointValue); // max points that could be used by amount
-  const maxUsablePoints = Math.max(
-    0,
-    Math.min(loyaltyBalance, maxPointsByAmount)
+  const [netTotal, setNetTotal] = useState(Number(invoice?.totalPrice ?? 0));
+  const [loyaltyBalance, setLoyaltyBalance] = useState(
+    invoice?.loyaltyBalance ?? 0
   );
+  const [loyaltyTier, setLoyaltyTier] = useState(
+    invoice?.loyaltyTier ?? "Bronze"
+  );
+  const [pointValue, setPointValue] = useState(
+    invoice?.loyaltyPointValue ?? 0.01
+  );
+  const [discount, setDiscount] = useState(0);
 
-  const discount = Number((usingPoints * pointValue).toFixed(2));
-  const netTotal = Number(Math.max(0, grossTotal - discount).toFixed(2));
+  const subtotal = Number(invoice?.subtotal ?? 0);
+  const deliveryFee = Number(invoice?.deliveryDetails ?? 0);
+  const grossTotal = Number(invoice?.grossTotal ?? 0);
 
-  const handleUseMax = () => setUsingPoints(maxUsablePoints);
+  const fakeBalance = Math.max(0, loyaltyBalance - usingPoints);
+
+  const token =
+    sessionStorage.getItem("customerToken") ||
+    localStorage.getItem("customerToken");
+
+  axios.defaults.withCredentials = true;
+  axios.defaults.baseURL = "http://localhost:8000/api";
+  axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+  axios.defaults.headers.post["Content-Type"] = "application/json";
+  axios.defaults.headers.put["Content-Type"] = "application/json";
+
+  const fetchPreview = async () => {
+    try {
+      const res = await axios.post("/user/customer/loyalty/preview-points", {
+        orderId: invoice.id,
+        points: usingPoints,
+      });
+      setDiscount(Number(res.data.bill.discount));
+      setNetTotal(Number(res.data.bill.total_amount));
+    } catch (err) {
+      console.error("Preview error", err);
+    }
+  };
+
+  // 🔥 مراقبة التغيير
+  useEffect(() => {
+    if (usingPoints > 0) {
+      fetchPreview(usingPoints);
+    }
+  }, [usingPoints]);
 
   const handleApplyPoints = async () => {
     if (!usingPoints || usingPoints < 0) {
@@ -71,19 +87,23 @@ export default function InvoiceOverlay({
       toast.warning("You don't have enough points.");
       return;
     }
-    if (usingPoints > maxUsablePoints) {
-      toast.warning("Selected points exceed the invoice amount.");
-      return;
-    }
 
     try {
       setApplying(true);
       // Example API: lock/apply points to this order before payment
-      await axios.post(`/api/loyalty/apply`, {
+      const res = await axios.post(`/user/customer/loyalty/apply`, {
         orderId: invoice.id,
         points: usingPoints,
       });
-      toast.success("Loyalty points applied.");
+      toast.success(res.data.message || "Loyalty points applied.");
+      const { bill, loyalty } = res.data;
+
+      setDiscount(Number(bill?.discount ?? discount));
+      setNetTotal(Number(bill?.total_price ?? netTotal));
+
+      setLoyaltyBalance(loyalty?.balance ?? loyaltyBalance);
+      setLoyaltyTier(loyalty?.tier ?? loyaltyTier);
+      setPointValue(loyalty?.point_value ?? pointValue);
     } catch (err) {
       const msg =
         err?.response?.data?.message ||
@@ -94,19 +114,15 @@ export default function InvoiceOverlay({
     }
   };
 
-  const handleCash = async () => {
-    try {
-      // Optional: tell backend user chose Cash
-     // await axios.post(`/api/orders/${invoice.id}/choose-cash`);
-      toast.success("Cash selected. Please prepare the exact amount.");
-      onClose();
-      onCashChosen?.(invoice.id);
-    } catch (err) {
-      const msg =
-        err?.response?.data?.message ||
-        "Failed to set cash payment. Please try again.";
-      toast.error(msg);
-    }
+  const maxPointsByAmount = Math.floor(grossTotal / pointValue);
+
+  const maxUsablePoints = Math.min(loyaltyBalance, maxPointsByAmount);
+
+  const handleUseMax = () => setUsingPoints(loyaltyBalance);
+
+  const handleCash = () => {
+    onClose();
+    onCashChosen?.(invoice.id);
   };
 
   const handleElectronic = () => {
@@ -133,7 +149,7 @@ export default function InvoiceOverlay({
         <h2>Invoice for Order #{invoice.id}</h2>
 
         <p>
-          <strong>Customer:</strong> {invoice.customerName || "N/A"}
+          <strong>Customer:</strong> {invoice.username || "N/A"}
         </p>
 
         <ul className={styles.invoiceItems}>
@@ -147,7 +163,7 @@ export default function InvoiceOverlay({
           ))}
         </ul>
 
-        {invoice.receiptMethod === "Delivery" && (
+        {invoice.pickupMethod === "delivery" && (
           <p className={styles.deliveryFee}>
             <span>Delivery Fee:</span> ${deliveryFee.toFixed(2)}
           </p>
@@ -161,13 +177,21 @@ export default function InvoiceOverlay({
           </div>
           <div className={styles.loyaltyRow}>
             <span>Balance:</span>
-            <strong>{loyaltyBalance.toLocaleString()} pts</strong>
+            <strong>
+              {applying
+                ? loyaltyBalance.toLocaleString()
+                : fakeBalance.toLocaleString()}{" "}
+              pts
+            </strong>
           </div>
           <div className={styles.loyaltyRow}>
             <span>Point value:</span>
             <strong>${pointValue.toFixed(2)} / pt</strong>
           </div>
-
+          <div className={styles.loyaltyRow}>
+            <span>Tier:</span>
+            <strong>{loyaltyTier.toUpperCase()}</strong>
+          </div>
           <div className={styles.loyaltyInputRow}>
             <label htmlFor="pointsInput">Use points</label>
             <input
@@ -217,7 +241,7 @@ export default function InvoiceOverlay({
             <span>Subtotal:</span>
             <span>${subtotal.toFixed(2)}</span>
           </div>
-          {invoice.receiptMethod === "Delivery" && (
+          {invoice.pickupMethod === "delivery" && (
             <div>
               <span>Delivery:</span>
               <span>${deliveryFee.toFixed(2)}</span>

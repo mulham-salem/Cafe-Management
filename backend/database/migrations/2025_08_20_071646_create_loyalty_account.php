@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('loyality_account', function (Blueprint $table) {
+        Schema::create('loyalty_account', function (Blueprint $table) {
             $table->id(); // bigint unsigned auto increment
 
             $table->foreignId('customer_id')
@@ -20,7 +20,7 @@ return new class extends Migration
                 ->unique(); // علاقة One-to-One
 
             $table->decimal('points_balance', 8, 2);
-            $table->enum('tier', ['Bronze', 'Silver', 'Gold', 'Platinum'])->default('Bronze');
+            $table->enum('tier', ['bronze','silver','gold','platinum'])->default('bronze');
             $table->dateTime('last_update');
             $table->timestamps();
 

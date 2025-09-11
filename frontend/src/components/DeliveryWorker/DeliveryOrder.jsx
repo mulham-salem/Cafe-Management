@@ -180,13 +180,11 @@ function OrderCard({ order, onUpdate, onShowDetails }) {
       const response = await axiosInstance.post(
         `/user/delivery-worker/orders/${orderId}/confirm-receipt`
       );
-      onUpdate(orderId, { status: action.next });
       if (response.status === 200) {
         toast.success("Order marked as delivered!");
-        // تحديث الحالة محليًا إذا كنت تستخدم state
-        // setOrders(prev => prev.map(o => o.id === orderId ? {...o, status: 'delivered'} : o));
+        onUpdate(orderId, { status: action.next });
       } else {
-        toast.error("Something went wrong.");
+        toast.error(response.data.message);
       }
     } catch (error) {
       console.error(error);
@@ -413,11 +411,25 @@ export default function DeliveryOrder() {
                 </p>
                 <p>
                   <strong>Pickup Time:</strong>{" "}
-                  {new Date(detailOrder.pickup_time).toLocaleString()}
+                  {detailOrder.pickup_time
+                    ? new Date(detailOrder.pickup_time).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })
+                    : "ASAP"}
                 </p>
+
                 <p>
                   <strong>Estimated Time:</strong>{" "}
-                  {new Date(detailOrder.estimated_time).toLocaleString()}
+                  {detailOrder.estimated_time
+                    ? `${Math.max(
+                        Math.round(
+                          (new Date(detailOrder.estimated_time) - new Date()) /
+                            60000
+                        ),
+                        0
+                      )} mins`
+                    : "N/A"}
                 </p>
                 <p>
                   <strong>Items:</strong>

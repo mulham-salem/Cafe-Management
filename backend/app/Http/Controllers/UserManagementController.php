@@ -138,6 +138,7 @@ class UserManagementController extends Controller
                     'points_balance' => 0.00,
                     'tier' => 'Bronze',
                     'last_update' => now(),
+                    'created_at' => now(),
                 ]);
                 break;
 

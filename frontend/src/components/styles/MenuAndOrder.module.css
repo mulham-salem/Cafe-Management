@@ -438,7 +438,7 @@
 }
 
 .menuCard:hover {
-  transform: translateY(-8px);
+  transform: translateY(-8px) !important;
 }
 
 .menuCard img {
@@ -516,8 +516,8 @@
 }
 
 .loadingSpinner {
-  width: 50px;
-  height: 50px;
+  width: 40px;
+  height: 40px;
   border: 5px solid rgba(107, 55, 31, 0.2);
   border-radius: 50%;
   border-top-color: var(--primary);
@@ -664,13 +664,15 @@
 
 .itemName {
   font-weight: 550;
+  white-space: nowrap;
 }
 
 .itemDetails {
   display: inline-flex;
   align-items: center;
-  gap: 4px; /* مسافة صغيرة بين الكمية والسعر */
-  white-space: nowrap; /* يخليهم بسطر واحد */
+  gap: 5px;
+  white-space: nowrap;
+  margin: 0 0 0 5px;
 }
 
 .itemQuantity {
@@ -717,7 +719,7 @@
 .fieldRow {
   display: flex;
   flex-direction: column;
-  margin-bottom: 0.8rem;
+  margin-bottom: 1rem;
 }
 
 .fieldRow label {
@@ -735,6 +737,7 @@
   color: #fff;
   outline: none;
   transition: border 0.2s;
+  margin: 0;
 }
 
 .fieldRow input:focus,
@@ -900,9 +903,6 @@ textarea {
 .editQty {
   display: flex;
   gap: clamp(5px, 2vw, 8px);
-  position: relative;
-  right: 3px;
-  bottom: clamp(15px, 4vw, 25px);
   align-items: center;
   width: 100%;
   justify-content: flex-end;
@@ -910,7 +910,7 @@ textarea {
 
 .editQty button {
   padding: clamp(4px, 0.5vw, 8px) clamp(8px, 1vw, 16px);
-  background-color: #3e1c04;
+  background-color: #d4a574;
   color: white;
   border: none;
   border-radius: 20px;
@@ -922,7 +922,7 @@ textarea {
 }
 
 .editQty button:hover {
-  background-color: #2e1403;
+  background-color: #393838;
   transform: scale(1.1);
 }
 
@@ -1190,12 +1190,12 @@ textarea {
 
 /* تعديلات الألوان للزر في بطاقات الأكثر مبيعًا */
 .bestsellerCard button {
-  background: linear-gradient(135deg, #ff984e 0%, #3e2114 100%);
+  background-color: #cc9e0a;
   border: 1px solid #d4af37;
 }
 
 .bestsellerCard button:hover {
-  background: linear-gradient(135deg, #51210a 0%, #9e5f46 100%);
+  background: #ab8509;
 }
 
 .bestsellerCard::before {

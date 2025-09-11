@@ -349,15 +349,14 @@
   color: white;
 }
 
-
 .toastCard {
   max-width: 90%;
   width: clamp(260px, 18vw, 360px);
-  background:  #f6efd9;
+  background: #f6efd9;
   padding: clamp(8px, 0.5vw, 10px) clamp(8px, 2vw, 12px);
   border-radius: 18px;
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-  font-family: 'Georgia', serif;
+  font-family: "Georgia", serif;
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -392,6 +391,7 @@
     opacity: 0;
     transform: translate(40px, -40px) scale(1);
   }
+
   to {
     opacity: 1;
     transform: translate(0, 0) scale(1);
@@ -403,6 +403,7 @@
     opacity: 1;
     transform: translate(0, 0) scale(1);
   }
+
   to {
     opacity: 0;
     transform: translate(40px, -40px) scale(0);
@@ -420,4 +421,15 @@
   animation-duration: 300ms;
   animation-timing-function: ease-in;
   animation-fill-mode: forwards;
+}
+
+.toastNewNotify {
+  padding: 10px 18px;
+  border-radius: 12px;
+  border: 1px solid rgb(250, 241, 220);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  background-color: #faf7eb;
+  white-space: nowrap;
 }

@@ -8,9 +8,12 @@ import {
   faTruck,
   faClock,
   faStickyNote,
+  faTriangleExclamation,
 } from "@fortawesome/free-solid-svg-icons";
 import { EmpSearchContext } from "./EmployeeHome";
 import axios from "axios";
+import { Tooltip as ReactTooltip } from "react-tooltip";
+import "react-tooltip/dist/react-tooltip.css";
 
 const mockData = [
   {
@@ -163,22 +166,28 @@ const KitchenOrders = () => {
 
   const fetchOrders = useCallback(async () => {
     try {
-      const response = await axios.get('http://localhost:8000/api/user/employee/kitchen/orders', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setOrders(response.data.data.map(order => ({
-        id: order.order_id,
-        status: order.status,
-        receiptTime: order.pickup_time,
-        receiptMethod: order.pickup_method,
-        note: order.note,
-        items: order.orderItems.map(item => ({
-          name: item.item_name,
-          quantity: item.quantity,
+      const response = await axios.get(
+        "http://localhost:8000/api/user/employee/kitchen/orders",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setOrders(
+        response.data.data.map((order) => ({
+          id: order.order_id,
+          status: order.status,
+          receiptTime: order.pickup_time,
+          receiptMethod: order.pickup_method,
+          note: order.note,
+          rePreparationReason: order.rePreparation_reason,
+          items: order.orderItems.map((item) => ({
+            name: item.item_name,
+            quantity: item.quantity,
+          })),
         }))
-      })));
+      );
     } catch (error) {
       console.error("Error fetching kitchen orders:", error);
       toast.error("Failed to load orders. Please try again.");
@@ -293,6 +302,7 @@ const KitchenOrders = () => {
               status: fetchedOrder.status,
               receiptTime: fetchedOrder.pickup_time,
               receiptMethod: fetchedOrder.pickup_method,
+              rePreparationReason: fetchedOrder.rePreparation_reason,
               note: fetchedOrder.note,
               items:
                 orders.find((o) => o.id === fetchedOrder.order_id)?.items || [],
@@ -473,16 +483,43 @@ const KitchenOrders = () => {
                   </span>
                 </div>
 
-                {order.note && (
-                  <div className={styles.detailRow}>
-                    <FontAwesomeIcon
-                      icon={faStickyNote}
-                      className={styles.detailIcon}
-                    />
-                    <span className={styles.detailLabel}>Note:</span>
-                    <span className={styles.noteValue}>{order.note}</span>
-                  </div>
-                )}
+                <div className={styles.detailRow}>
+                  <FontAwesomeIcon
+                    icon={faStickyNote}
+                    className={styles.detailIcon}
+                  />
+                  <span className={styles.detailLabel}>Note:</span>
+                  <span className={styles.noteValue}>
+                    {order.note}
+
+                    {order.rePreparationReason && (
+                      <>
+                        <span
+                          className={styles.reprepWrapper}
+                          data-tooltip-id={`reprep-${order.id}`}
+                          data-tooltip-place="top"
+                        >
+                          <FontAwesomeIcon
+                            icon={faTriangleExclamation}
+                            className={styles.reprepIcon}
+                          />
+                        </span>
+
+                        <ReactTooltip
+                          id={`reprep-${order.id}`}
+                          className={styles.tooltip}
+                        >
+                          <div className={styles.tooltipTitle}>
+                            Re-Preparation Reason
+                          </div>
+                          <div className={styles.tooltipText}>
+                            {order.rePreparationReason}
+                          </div>
+                        </ReactTooltip>
+                      </>
+                    )}
+                  </span>
+                </div>
               </div>
 
               <div className={styles.statusRow}>

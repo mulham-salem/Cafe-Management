@@ -113,7 +113,8 @@ const CustomerHome = () => {
 
   const handleLogout = async () => {
     const token =
-      sessionStorage.getItem("customerToken") || localStorage.getItem("customerToken");
+      sessionStorage.getItem("customerToken") ||
+      localStorage.getItem("customerToken");
 
     try {
       const response = await axios.post(
@@ -141,7 +142,8 @@ const CustomerHome = () => {
 
   const profile = async () => {
     const token =
-      sessionStorage.getItem("customerToken") || localStorage.getItem("customerToken");
+      sessionStorage.getItem("customerToken") ||
+      localStorage.getItem("customerToken");
 
     try {
       const response = await axios.get(

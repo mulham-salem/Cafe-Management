@@ -36,7 +36,7 @@ class MessageController extends Controller
 
             return [
                 'id' => $contact->id,
-                'full_name' => $contact->first_name . ' ' . $contact->last_name,
+                'full_name' => $contact->first_name.' '.$contact->last_name,
                 'role' => $contact->role,
                 'unread' => $unreadCount,
             ];
@@ -53,12 +53,12 @@ class MessageController extends Controller
         $user = auth('manager')->check() ? auth('manager')->user() : auth()->user();
 
         $messages = InternalMessage::where(function ($q) use ($user, $contactId) {
-                $q->where('sender_id', $user->id)
-                  ->where('receiver_id', $contactId);
-            })
+            $q->where('sender_id', $user->id)
+                ->where('receiver_id', $contactId);
+        })
             ->orWhere(function ($q) use ($user, $contactId) {
                 $q->where('sender_id', $contactId)
-                  ->where('receiver_id', $user->id);
+                    ->where('receiver_id', $user->id);
             })
             ->orderBy('sent_at', 'asc')
             ->get();
@@ -84,8 +84,8 @@ class MessageController extends Controller
         $message = InternalMessage::create([
             'sender_id' => $user->id,
             'receiver_id' => $receiver->id,
-            'sender_name' => $user->first_name . ' ' . $user->last_name,
-            'receiver_name' => $receiver->first_name . ' ' . $receiver->last_name,
+            'sender_name' => $user->first_name.' '.$user->last_name,
+            'receiver_name' => $receiver->first_name.' '.$receiver->last_name,
             'body' => $validated['body'],
             'subject' => $validated['subject'] ?? null,
             'sent_at' => now(),
@@ -118,7 +118,7 @@ class MessageController extends Controller
             ]);
 
         return response()->json([
-            'message' => "Messages from contact {$validated['contact_id']} marked as read."
+            'message' => "Messages from contact {$validated['contact_id']} marked as read.",
         ]);
     }
 
@@ -128,6 +128,7 @@ class MessageController extends Controller
     public function currentUser()
     {
         $user = auth('manager')->check() ? auth('manager')->user() : auth()->user();
+
         return response()->json($user);
     }
 }

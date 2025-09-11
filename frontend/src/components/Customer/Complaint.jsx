@@ -10,6 +10,10 @@ export default function ComplaintModal({ open, onClose }) {
   const [details, setDetails] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const token =
+    sessionStorage.getItem("customerToken") ||
+    localStorage.getItem("customerToken");
+
   // API method
   async function submitComplaint() {
     if (!details.trim()) {
@@ -18,7 +22,15 @@ export default function ComplaintModal({ open, onClose }) {
     }
     setLoading(true);
     try {
-      await axios.post("/api/complaints", { type, details });
+      await axios.post(
+        "http://localhost:8000/api/user/customer/complaints",
+        { type, details },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       toast.success("Complaint submitted successfully");
       setDetails("");
       setType("order");

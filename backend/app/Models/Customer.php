@@ -42,9 +42,9 @@ class Customer extends Model
         return $this->hasMany(FavoriteItem::class, 'customer_id');
     }
 
-    public function loyalityAccount(): HasOne
+    public function loyaltyAccount(): HasOne
     {
-        return $this->hasOne(LoyalityAccount::class, 'customer_id');
+        return $this->hasOne(LoyaltyAccount::class, 'customer_id');
     }
 
     protected $fillable = [

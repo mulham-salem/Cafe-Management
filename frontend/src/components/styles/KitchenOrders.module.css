@@ -43,7 +43,7 @@
   left: 50%;
   transform: translate(-50%, -50%);
   font-style: italic;
-  font-weight: 400;
+  font-weight: 350;
 }
 
 .ordersGrid {
@@ -192,6 +192,56 @@
   white-space: nowrap;
 }
 
+/* Wrapper للأيقونة */
+.reprepWrapper {
+  display: inline-block;
+  margin-left: 25px;
+  cursor: pointer;
+}
+
+/* أيقونة التحذير متحركة */
+.reprepIcon {
+  color: rgb(255, 217, 0); /* أصفر/تحذير */
+  font-size: 16px;
+  animation: floatInfinity 1.2s ease-in-out infinite;
+  vertical-align: middle;
+}
+
+/* حركة Infinity بسيطة */
+@keyframes floatInfinity {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+/* Tooltip */
+.tooltip {
+  max-width: 220px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  opacity: 1 !important;
+  color: #fff;
+  font-size: 13px;
+  text-align: left;
+  line-height: 1.4;
+}
+
+.tooltipTitle {
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: #ffb46a;
+}
+
+.tooltipText {
+  word-wrap: break-word;
+  text-wrap: balance;
+}
+
 .statusRow {
   display: flex;
   align-items: center;
@@ -270,7 +320,6 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-weight: bold;
   font-family: "Courier New", Courier, monospace;
 }
 

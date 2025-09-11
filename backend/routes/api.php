@@ -1,13 +1,16 @@
 <?php
 
 use App\Http\Controllers\BillManagementController;
+use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\DeliveryController;
 use App\Http\Controllers\InventoryManagementController;
 use App\Http\Controllers\ManagerAuthController;
 use App\Http\Controllers\MenuManagementController;
+use App\Http\Controllers\MenuSectionController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NotificationManagementController;
 use App\Http\Controllers\OrderManagementController;
+use App\Http\Controllers\OrderPaymentController;
 use App\Http\Controllers\PromotionManagementController;
 use App\Http\Controllers\ReportDashboardController;
 use App\Http\Controllers\SupplierController;
@@ -69,9 +72,9 @@ Route::prefix('admin')->group(function () {
         Route::get('/suppliers', [SupplyManagementController::class, 'getSuppliers']);
         Route::post('/supply-offers/{id}/accept', [SupplyManagementController::class, 'acceptOffer']);
         Route::post('/supply-offers/{id}/reject', [SupplyManagementController::class, 'rejectOffer']);
-        Route::get('/purchase-bills', [BillManagementController::class, 'index']);
-        Route::post('/supply-purchase-bill', [SupplyManagementController::class, 'storePurchaseBill']);
-        Route::get('/supply-history', [supplyHistoryController::class, 'managerHistory']);
+        Route::get('/purchase-bills', [BillManagementController::class, 'fetchPurchaseBill']);
+        Route::post('/supply-purchase-bill', [BillManagementController::class, 'storePurchaseBill']);
+        Route::get('/supply-history', [supplyHistoryController::class, 'getManagerSupplyHistory']);
 
     });
 
@@ -91,7 +94,7 @@ Route::middleware(['auth:sanctum', 'checkUserRole:supplier'])->prefix('user/supp
 
     Route::post('/offers', [SupplierController::class, 'store']);
     Route::get('/view-offers', [SupplierController::class, 'viewMyOffers']);
-    Route::get('/supply-history', [supplyHistoryController::class, 'supplierHistory']);
+    Route::get('/supply-history', [supplyHistoryController::class, 'getSupplierSupplyHistory']);
 
     // ** supplier notification **//
     Route::get('/notifications', [NotificationManagementController::class, 'getAllSupplierNotifications']);
@@ -112,19 +115,39 @@ Route::middleware(['auth:sanctum', 'checkUserRole:customer'])->prefix('user/cust
 
     Route::get('/table-reservation/available', [TableReservationController::class, 'indexAvailableTables']);
     Route::apiResource('/table-reservation', TableReservationController::class);
+    Route::apiResource('/table', TableManagementController::class);
 
-    Route::get('/menuitem', [OrderManagementController::class, 'fetchMenuItems']);
+    Route::get('/menuitem', [MenuSectionController::class, 'fetchMenuItems']);
+    Route::get('/top-sales', [MenuSectionController::class, 'fetchTopSales']);
+    Route::get('/promotions', [MenuSectionController::class, 'fetchPromotions']);
+    Route::get('/promotions/latest', [MenuSectionController::class, 'latestPromotion']);
+
     Route::post('/orders/create', [OrderManagementController::class, 'createOrder']);
     Route::match(['get', 'put'], '/orders/{order}/edit', [OrderManagementController::class, 'editOrder']);
-
     Route::get('/myOrders', [OrderManagementController::class, 'getCustomerOrders']);
-    Route::get('/myOrders/invoice/{id}', [OrderManagementController::class, 'viewOrderBill']);
-
     Route::delete('/orders/cancel/{id}', [OrderManagementController::class, 'cancelOrder']);
     Route::post('/orders/confirm/{id}', [OrderManagementController::class, 'confirmOrder']);
     Route::get('/orders/short', [OrderManagementController::class, 'getCustomerOrdersShort']);
+    Route::post('{orderId}/suspend', [OrderManagementController::class, 'suspend']);
+    Route::post('{orderId}/resume', [OrderManagementController::class, 'resume']);
+    Route::post('/orders/re-prepare', [OrderManagementController::class, 'requestRePreparation']);
+    Route::post('/orders/{order}/reorder', [OrderManagementController::class, 'reorderOrder']);
+    Route::post('/orders/rate', [OrderManagementController::class, 'rateOrder']);
 
-    // ** customer notification **//
+    Route::post('/orders/{order}/confirm-receipt', [DeliveryController::class, 'confirmReceipt']);
+
+    Route::get('/myOrders/invoice/{id}', [OrderPaymentController::class, 'viewOrderBill']);
+    Route::post('/loyalty/apply', [OrderPaymentController::class, 'applyPoints']);
+    Route::post('/loyalty/preview-points', [OrderPaymentController::class, 'previewPoints']);
+    Route::post('/orders/{orderId}/mark-paid', [OrderPaymentController::class, 'markPaid']);
+    Route::post('/payments/charge', [OrderPaymentController::class, 'charge']);
+
+    Route::post('/complaints', [OrderManagementController::class, 'storeComplaint']);
+
+    Route::post('/favorites', [FavoriteController::class, 'store']);
+    Route::delete('/favorites/{menu_item_id}', [FavoriteController::class, 'destroy']);
+    Route::get('/favorites', [FavoriteController::class, 'favorites']);
+
     Route::get('/notifications', [NotificationManagementController::class, 'getAllCustomerNotifications']);
     Route::patch('/notifications/{id}/seen', [NotificationManagementController::class, 'markAsSeen']);
 });
@@ -133,13 +156,17 @@ Route::middleware(['auth:sanctum', 'checkUserRole:customer'])->prefix('user/cust
 
 Route::middleware(['auth:sanctum', 'checkUserRole:employee'])->prefix('user/employee')->group(function () {
 
-    Route::get('/menuitem', [OrderManagementController::class, 'fetchMenuItems']);
-    Route::get('/top-sales', [OrderManagementController::class, 'fetchTopSales']);
-    Route::get('/promotions', [OrderManagementController::class, 'fetchPromotions']);
+    Route::apiResource('/table', TableManagementController::class);
+
+    Route::get('/menuitem', [MenuSectionController::class, 'fetchMenuItems']);
+    Route::get('/top-sales', [MenuSectionController::class, 'fetchTopSales']);
+    Route::get('/promotions', [MenuSectionController::class, 'fetchPromotions']);
+
     Route::post('/orders/create', [OrderManagementController::class, 'createOrder']);
     Route::match(['get', 'put'], '/orders/{order}/edit', [OrderManagementController::class, 'editOrder']);
 
     Route::get('/customers/{order}/contact', [OrderManagementController::class, 'getContactInfo']);
+
     Route::post('{orderId}/suspend', [OrderManagementController::class, 'suspend']);
     Route::post('{orderId}/resume', [OrderManagementController::class, 'resume']);
 
@@ -147,16 +174,15 @@ Route::middleware(['auth:sanctum', 'checkUserRole:employee'])->prefix('user/empl
     Route::post('/pause', [OrderManagementController::class, 'pauseOrders']);
     Route::post('/resume', [OrderManagementController::class, 'resumeOrders']);
 
-    Route::get('/myOrders', [OrderManagementController::class, 'getCustomerOrders']); // Done
-    Route::get('/myOrders/invoice/{id}', [OrderManagementController::class, 'viewOrderBill']); // Done
-
-    Route::get('/kitchen/orders', [OrderManagementController::class, 'getKitchenOrders']);
-    Route::put('/kitchen/orders/{orderId}/status', [OrderManagementController::class, 'updateOrderStatus']);
-
+    Route::get('/myOrders', [OrderManagementController::class, 'getCustomerOrders']);
     Route::get('/orders/search', [OrderManagementController::class, 'searchOrder']);
     Route::delete('/orders/cancel/{id}', [OrderManagementController::class, 'cancelOrder']);
     Route::post('/orders/confirm/{id}', [OrderManagementController::class, 'confirmOrder']);
-    Route::apiResource('/table', TableManagementController::class);
+
+    Route::get('/myOrders/invoice/{id}', [OrderPaymentController::class, 'viewOrderBill']);
+
+    Route::get('/kitchen/orders', [OrderManagementController::class, 'getKitchenOrders']);
+    Route::put('/kitchen/orders/{orderId}/status', [OrderManagementController::class, 'updateOrderStatus']);
 
     // ** employee notification **//
     Route::get('/notifications', [NotificationManagementController::class, 'getAllCustomerNotifications']);
@@ -177,7 +203,7 @@ Route::middleware(['auth:sanctum', 'checkUserRole:delivery_worker'])->prefix('us
 
     Route::get('/delivery-orders', [DeliveryController::class, 'index']);
     Route::patch('/delivery-orders/{id}', [DeliveryController::class, 'update']);
-    Route::post('/orders/{id}/confirm-receipt', [DeliveryController::class, 'confirmReceipt']);
+    Route::post('/orders/{id}/confirm-receipt', [DeliveryController::class, 'confirmDelivered']);
     Route::get('/delivery-orders/check-new', [DeliveryController::class, 'checkNewOrders']);
 
     // ** Delivery notification **//

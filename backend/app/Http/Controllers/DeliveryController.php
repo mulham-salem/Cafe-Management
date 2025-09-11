@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Notification;
+use App\Models\Order;
 use Illuminate\Http\Request;
 use App\Models\DeliveryOrder;
 use Illuminate\Support\Facades\Auth;
@@ -121,6 +122,22 @@ class DeliveryController extends Controller
             $deliveryOrder->status = $request->status;
             $deliveryOrder->save();
 
+            // 🔥 تحديث حالة Order المرتبط
+            $order = $deliveryOrder->order;
+            if ($order) {
+                $orderStatus = match ($request->status) {
+                    'assigned'   => 'assigned',
+                    'inTransit'  => 'inTransit',
+                    'delivered'  => 'delivered',
+                    default      => $order->status, // ما نغير شي إذا unassigned
+                };
+
+                if ($order->status !== $orderStatus) {
+                    $order->status = $orderStatus;
+                    $order->save();
+                }
+            }
+
             return response()->json([
                 'message' => 'Delivery order updated successfully.',
                 'delivery_order' => $deliveryOrder,
@@ -133,49 +150,78 @@ class DeliveryController extends Controller
      * Mark delivery_order as Delivered and update underlying order to delivered.
      * $id is delivery_order id in this implementation.
      */
-    public function confirmReceipt($id)
+    public function confirmDelivered($id)
     {
         return DB::transaction(function () use ($id) {
             $deliveryOrder = DeliveryOrder::with('order')->findOrFail($id);
 
+            // Check if related order is delivered
+            if ($deliveryOrder->order->status !== 'delivered') {
+                return response()->json([
+                    'message' => 'Customer has not confirmed receipt of this order yet.',
+                    'delivery_order' => $deliveryOrder,
+                ], 201); // Bad Request
+            }
+
             $deliveryOrder->status = 'delivered';
             $deliveryOrder->save();
-
-            if ($deliveryOrder->order) {
-                // adapt to your order status values — using 'delivered' here as example
-                $deliveryOrder->order->status = 'delivered';
-                $deliveryOrder->order->save();
-            }
 
             return response()->json([
                 'message' => 'Order confirmed as delivered.',
                 'delivery_order' => $deliveryOrder,
-            ]);
+            ], 200);
         });
     }
+
+    public function confirmReceipt(Request $request, $orderId)
+    {
+        $customer = auth('user')->user(); // المستخدم الحالي
+
+        // جلب الطلب والتحقق من ملكيته
+        $order = Order::where('id', $orderId)
+            ->where('customer_id', $customer->id)
+            ->firstOrFail();
+
+        // تحديث الحالة
+        $order->status = 'delivered';
+        $order->save();
+
+        return response()->json([
+            'message' => 'Order marked as delivered successfully.',
+            'order' => $order
+        ], 200);
+    }
+
     public function checkNewOrders()
     {
         $workerId = Auth::guard('user')->id();
 
-        // ابحث عن أول طلب Unassigned (أسرع من count)
-        $hasUnassigned = DeliveryOrder::where('status', 'unassigned')->exists();
+        // جيب أول طلب Unassigned
+        $unassignedOrder = DeliveryOrder::where('status', 'unassigned')->first();
 
-        if ($hasUnassigned) {
-            // رسالة بالإنكليزي
-            $notificationMessage = "A new unassigned delivery order is available.";
+        if ($unassignedOrder) {
+            $orderId = $unassignedOrder->id;
+            $notificationMessage = "A new unassigned delivery order #{$orderId} is available.";
 
-            Notification::create([
-                'user_id'   => $workerId,
-                'sent_by'   => 'System',
-                'purpose'   => 'New Delivery Order',
-                'message'   => $notificationMessage,
-                'createdAt' => now(),
-                'seen'      => false,
-            ]);
+            // تحقق إذا فيه إشعار بنفس الرسالة للمستخدم
+            $alreadyNotified = Notification::where('user_id', $workerId)
+                ->where('message', $notificationMessage)
+                ->exists();
+
+            if (!$alreadyNotified) {
+                Notification::create([
+                    'user_id'   => $workerId,
+                    'sent_by'   => 'System',
+                    'purpose'   => 'New Delivery Order',
+                    'message'   => $notificationMessage,
+                    'createdAt' => now(),
+                    'seen'      => false,
+                ]);
+            }
 
             return response()->json([
                 'hasNewOrders' => true,
-                'message' => $notificationMessage
+                'message'      => $notificationMessage
             ]);
         }
 

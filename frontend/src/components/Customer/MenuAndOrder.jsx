@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext, useMemo, useRef } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import styles from "../styles/MenuAndOrder.module.css";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -290,7 +290,7 @@ const MenuAndOrder = () => {
   const [open, setOpen] = useState(false);
   const rootRef = useRef(null);
   const [view, setView] = useState("menu");
-  const [fulfillmentMethod, setFulfillmentMethod] = useState("dineIn"); // dineIn | takeaway | delivery
+  const [pickupMethod, setPickupMethod] = useState("dineIn"); // dineIn | takeaway | delivery
   const [whenType, setWhenType] = useState("asap"); // asap | schedule
   const [scheduledTime, setScheduledTime] = useState(""); // الوقت المجدول
   const [deliveryInfo, setDeliveryInfo] = useState({
@@ -300,9 +300,16 @@ const MenuAndOrder = () => {
   });
   const [deliveryFee, setDeliveryFee] = useState(0); // كلفة التوصيل (UC-51)
   const [etaText, setEtaText] = useState("N/A");
+  const [lastSeenPromotionDate, setLastSeenPromotionDate] = useState(
+    localStorage.getItem("lastSeenPromotionDate") || null
+  );
+  const [favorite, setFavorite] = useState([]);
+  const [loadingFavorite, setloadingFavorite] = useState(true);
+  const navigate = useNavigate();
 
   const token =
-    sessionStorage.getItem("customerToken") || localStorage.getItem("customerToken");
+    sessionStorage.getItem("customerToken") ||
+    localStorage.getItem("customerToken");
 
   axios.defaults.withCredentials = true;
   axios.defaults.baseURL = "http://localhost:8000/api";
@@ -368,12 +375,13 @@ const MenuAndOrder = () => {
   setSearchPlaceholder("Search by item name...");
 
   const filteredMenuItem = useMemo(() => {
-    return filteredMenu.filter(
+    const source = view === "favorites" ? favorite : filteredMenu;
+    return source.filter(
       (item) => searchQuery === "" || item.name.includes(searchQuery)
     );
-  }, [filteredMenu, searchQuery]);
+  }, [filteredMenu, searchQuery, favorite, view]);
 
-  const addToOrder = (item) => {
+  const addToOrder = (item, quantity = 1, showToast = true) => {
     if (!item.available) {
       toast.error(`${item.name} is not available!`);
       return;
@@ -386,18 +394,22 @@ const MenuAndOrder = () => {
 
       if (existingItemIndex > -1) {
         const updatedItems = [...prevItems];
+        const newQuantity = updatedItems[existingItemIndex].quantity + quantity; // استخدم quantity من الدالة
         updatedItems[existingItemIndex] = {
           ...updatedItems[existingItemIndex],
-          quantity: updatedItems[existingItemIndex].quantity + 1,
-          price:
-            (updatedItems[existingItemIndex].quantity + 1) *
-            updatedItems[existingItemIndex].unitPrice,
+          quantity: newQuantity,
+          price: newQuantity * updatedItems[existingItemIndex].unitPrice, // السعر = الكمية * السعر المفرد
         };
         return updatedItems;
       } else {
         return [
           ...prevItems,
-          { ...item, quantity: 1, unitPrice: item.price, price: item.price },
+          {
+            ...item,
+            quantity,
+            unitPrice: item.price,
+            price: item.price * quantity,
+          },
         ];
       }
     });
@@ -426,7 +438,9 @@ const MenuAndOrder = () => {
       flying.remove();
     }, 800);
 
-    toast.success(`${item.name} added to order`);
+    if (showToast) {
+      toast.success(`${item.name} added to order`);
+    }
   };
 
   const handleCreateOrder = async () => {
@@ -435,13 +449,13 @@ const MenuAndOrder = () => {
       return;
     }
 
-    if (!fulfillmentMethod) {
+    if (!pickupMethod) {
       toast.error("Please select a receive method.");
       return;
     }
 
     // validation for delivery info
-    if (fulfillmentMethod === "delivery") {
+    if (pickupMethod === "delivery") {
       if (!deliveryInfo.address || !deliveryInfo.city || !deliveryInfo.phone) {
         toast.error("Please provide full delivery information.");
         return;
@@ -459,38 +473,7 @@ const MenuAndOrder = () => {
     }));
 
     try {
-      let toastMessage;
-      if (fulfillmentMethod === "delivery") {
-        try {
-          const estimateRes = await axios.post(
-            "/user/customer/orders/estimate",
-            {
-              items: itemsForBackend,
-              address: deliveryInfo.address,
-              city: deliveryInfo.city,
-              phone: deliveryInfo.phone,
-            }
-          );
-
-          if (estimateRes.data.success) {
-            setDeliveryFee(estimateRes.data.deliveryFee || 0);
-            setEtaText(
-              estimateRes.data.eta
-                ? new Date(estimateRes.data.eta).toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })
-                : "N/A"
-            );
-          } else {
-            toast.error("Delivery is not available for your address.");
-            return;
-          }
-        } catch (e) {
-          toast.error("Could not fetch delivery estimate.");
-          return;
-        }
-      }
+      let toastMessage, systemStatus, pointsBalance, totalBalance;
 
       if (editMode && orderToEdit) {
         const response = await axios.put(
@@ -498,27 +481,37 @@ const MenuAndOrder = () => {
           {
             items: itemsForBackend,
             note: note.trim(),
-            fulfillmentMethod,
-            deliveryInfo:
-              fulfillmentMethod === "delivery" ? deliveryInfo : null,
+            pickupMethod,
+            deliveryInfo: pickupMethod === "delivery" ? deliveryInfo : null,
             whenType,
             scheduledTime: whenType === "schedule" ? scheduledTime : null,
           }
         );
         toastMessage = response.data.message;
+        systemStatus = response.data.statusMessage;
+        setTimeout(() => {
+          navigate("/login/customer-home/user-order");
+        }, 800);
       } else {
         const response = await axios.post("/user/customer/orders/create", {
           items: itemsForBackend,
           note: note.trim(),
-          fulfillmentMethod,
-          deliveryInfo: fulfillmentMethod === "delivery" ? deliveryInfo : null,
+          pickupMethod,
+          deliveryInfo: pickupMethod === "delivery" ? deliveryInfo : null,
           whenType,
-          scheduledTime: whenType === "schedule" ? scheduledTime : null,
+          scheduledTime: whenType === "schedule" ? scheduledTime : null, 
         });
+        pointsBalance = response.data.loyalty_points;
+        totalBalance = response.data.loyalty_account.points_balance;
         toastMessage = response.data.message;
+        systemStatus = response.data.statusMessage;
       }
 
+      if (systemStatus) toast.warn(systemStatus);
       toast.success(toastMessage);
+      setTimeout(() => {
+        toast.info(`🎉 You have earned ${pointsBalance} loyalty points! Your total is now ${totalBalance} points`);
+      }, 5500);
       setOrderItems([]);
       setNote("");
       setShowOverlay(false);
@@ -550,12 +543,16 @@ const MenuAndOrder = () => {
             `/user/customer/orders/${orderToEdit.id}/edit`
           );
           const fetchedOrder = response.data;
-
+          let systemStatus = response.data.statusMessage;
+          if (systemStatus) {
+            toast.warn(systemStatus);
+            return;
+          }
           const formattedItems = fetchedOrder.items.map((item) => ({
             id: item.menuItem_id,
             name: item.name,
-            price: item.price,
-            unitPrice: item.price / item.quantity,
+            price: Number(item.price),
+            unitPrice: Number(item.price / item.quantity),
             quantity: item.quantity,
             imageUrl: item.image,
             available: true,
@@ -563,18 +560,18 @@ const MenuAndOrder = () => {
 
           setOrderItems(formattedItems || []);
           setNote(fetchedOrder.note || "");
-          setFulfillmentMethod(fetchedOrder.receiptMethod || "DineIn");
-          setScheduledTime(fetchedOrder.receiptTime || "ASAP");
+          setPickupMethod(fetchedOrder.pickupMethod || "dineIn");
+          setScheduledTime(fetchedOrder.pickupTime || "ASAP");
 
           // إذا طريقة الاستلام Delivery، نضبط بيانات التوصيل
-          if (fetchedOrder.receiptMethod === "Delivery") {
+          if (fetchedOrder.pickupMethod === "delivery") {
             setDeliveryInfo({
               address: fetchedOrder.deliveryInfo?.address || "",
               city: fetchedOrder.deliveryInfo?.city || "",
               phone: fetchedOrder.deliveryInfo?.phone || "",
             });
-            setDeliveryFee(fetchedOrder.deliveryFee || 0);
-            setEtaText(fetchedOrder.etaText || "N/A");
+            setDeliveryFee(fetchedOrder.deliveryInfo?.deliveryFee || 0);
+            setEtaText(fetchedOrder.deliveryInfo?.etaText || "N/A");
           } else {
             // لو مش Delivery نعيد القيم الافتراضية
             setDeliveryInfo({ address: "", city: "", phone: "" });
@@ -638,9 +635,8 @@ const MenuAndOrder = () => {
   // fetch promotions
   async function fetchOffers() {
     try {
-      const res = await axios.get("/api/promotions", { withCredentials: true });
-      setOffers(res.data);
-      toast.success("Promotions loaded successfully!");
+      const res = await axios.get("/user/customer/promotions");
+      setOffers(res.data.data || []);
     } catch (error) {
       console.error(error);
       setOffers(mockPromo);
@@ -666,10 +662,10 @@ const MenuAndOrder = () => {
       let itemsAddedCount = 0;
 
       // حلقة تكرارية على جميع المنتجات في العرض
-      offer.products.forEach((productName) => {
+      offer.products.forEach((product) => {
         // البحث عن العنصر المقابل في قائمة المنيو
         const correspondingMenuItem = menu.find(
-          (item) => item.name === productName
+          (item) => item.name === product.name
         );
 
         if (correspondingMenuItem) {
@@ -702,11 +698,11 @@ const MenuAndOrder = () => {
           }, 800);
 
           // إضافة العنصر إلى السلة
-          addToOrder(correspondingMenuItem);
-          itemsAddedCount++;
+          addToOrder(correspondingMenuItem, product.quantity, false);
+          itemsAddedCount += product.quantity;
         } else {
           toast.error(
-            `Could not find the product '${productName}' in the menu.`
+            `Could not find the product '${product.name}' in the menu.`
           );
         }
       });
@@ -721,17 +717,17 @@ const MenuAndOrder = () => {
     }
   };
 
-  const [bestSellers, setBestSellers] = useState(mockMenu);
+  const [bestSellers, setBestSellers] = useState([]);
 
   useEffect(() => {
     const fetchBestSellers = async () => {
       try {
-        // const response = await fetch("/api/bestsellers");
-        // const data = await response.json();
-        // setBestSellers(data);
+        const response = await axios.get("/user/customer/top-sales");
+        setBestSellers(response.data.data || []);
       } catch (error) {
         console.error("Error fetching best sellers:", error);
         //toast.error("Error fetching best sellers data");
+        setBestSellers(mockMenu);
       } finally {
         setLoadingBest(false);
       }
@@ -743,9 +739,8 @@ const MenuAndOrder = () => {
   // API call: toggle favorite (optimistic UI)
   async function toggleFavoriteApi(itemId, newState) {
     const payload = { item_id: itemId };
-    if (newState)
-      return axios.post("/api/favorites", payload, { withCredentials: true });
-    else return axios.delete(`/api/favorites/${itemId}`);
+    if (newState) return axios.post("/user/customer/favorites", payload);
+    else return axios.delete(`/user/customer/favorites/${itemId}`);
   }
 
   const handleFavClick = async (e, itemId) => {
@@ -768,7 +763,7 @@ const MenuAndOrder = () => {
     }
 
     try {
-      // await toggleFavoriteApi(item.id, newState);
+      await toggleFavoriteApi(itemId, newState);
       setMenu((prev) =>
         prev.map((it) =>
           it.id === itemId ? { ...it, isFavorite: newState } : it
@@ -779,6 +774,14 @@ const MenuAndOrder = () => {
           it.id === itemId ? { ...it, isFavorite: newState } : it
         )
       );
+      setFavorite((prev) => {
+        if (newState) {
+          const addedItem = menu.find((it) => it.id === itemId);
+          return [...prev, { ...addedItem, isFavorite: true }];
+        } else {
+          return prev.filter((it) => it.id !== itemId);
+        }
+      });
       toast.success(newState ? "Added to favorites" : "Removed from favorites");
     } catch (err) {
       // revert on error
@@ -832,14 +835,14 @@ const MenuAndOrder = () => {
 
   const handleSelect = (type) => {
     setOpen(false);
+    setView(type);
     if (type === "favorites") {
-      setView("favorites");
       // هون استدعاء API تجيب المفضلة
       axios
-        .get("/api/favorites", { withCredentials: true })
+        .get("/user/customer/favorites")
         .then((res) => {
-          setFilteredMenu(res.data); // نفس filteredMenuItem الحالي بس محطوط فيه المفضلة
-          toast.success("Favorites loaded");
+          setFavorite(res.data.data);
+          setloadingFavorite(false);
         })
         .catch((err) => {
           toast.error("Failed to load favorites");
@@ -851,23 +854,21 @@ const MenuAndOrder = () => {
     }
   };
 
-  async function checkNewPromotion() {
-    try {
-      const res = await axios.get("/api/promotions/latest");
-      // assuming your endpoint returns the latest promotion
-
-      if (res.data) {
-        toast.success("🎉 A new promotion is available!");
-      }
-    } catch (err) {
-      //console.error("Error fetching promotion:", err);
-      //toast.error("Failed to fetch promotions.");
-    }
-  }
-
   useEffect(() => {
-    checkNewPromotion();
-  }, []);
+    axios.get("/user/customer/promotions/latest").then((res) => {
+      const promo = res.data;
+
+      if (!promo.id) return; // ما في عرض
+
+      // إذا العرض جديد
+      if (!lastSeenPromotionDate || promo.created_at > lastSeenPromotionDate) {
+        toast.info("🎉 A new promotion is available!");
+        // خزن التاريخ محلياً
+        localStorage.setItem("lastSeenPromotionDate", promo.created_at);
+        setLastSeenPromotionDate(promo.created_at);
+      }
+    });
+  }, [lastSeenPromotionDate]);
 
   function generateAvailableSlots() {
     const slots = [];
@@ -901,10 +902,41 @@ const MenuAndOrder = () => {
 
   const canSubmit =
     orderItems.length > 0 &&
-    fulfillmentMethod &&
-    (fulfillmentMethod !== "delivery" ||
+    pickupMethod &&
+    (pickupMethod !== "delivery" ||
       (deliveryInfo.address && deliveryInfo.city && deliveryInfo.phone)) &&
     (whenType !== "schedule" || scheduledTime);
+
+  function useDebounce(value, delay = 500) {
+    const [debounced, setDebounced] = useState(value);
+
+    useEffect(() => {
+      const handler = setTimeout(() => {
+        setDebounced(value);
+      }, delay);
+
+      return () => clearTimeout(handler); // يلغي التايمر إذا المستخدم لسه عم يكتب
+    }, [value, delay]);
+
+    return debounced; // القيمة تتحدث بس بعد انتهاء التأخير
+  }
+
+  // 🔥 دالة لحساب قيم عشوائية
+  const calculateRandomValues = () => {
+    const fee = (Math.random() * 4 + 2).toFixed(2); // بين 3 و 8 دولار
+    const etaMinutes = Math.floor(Math.random() * 41) + 20; // بين 20 و 60 دقيقة
+    setDeliveryFee(parseFloat(fee));
+    setEtaText(`${etaMinutes} mins`);
+  };
+
+  const debouncedAddress = useDebounce(deliveryInfo.address, 500);
+  const debouncedCity = useDebounce(deliveryInfo.city, 500);
+
+  useEffect(() => {
+    if (debouncedAddress.trim() || debouncedCity.trim()) {
+      calculateRandomValues();
+    }
+  }, [debouncedAddress, debouncedCity]);
 
   return (
     <SimpleBar
@@ -979,7 +1011,11 @@ const MenuAndOrder = () => {
       {showOverlay && (
         <div
           className={styles.overlayForm}
-          onClick={() => setShowOverlay(false)}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setShowOverlay(false);
+            }
+          }}
         >
           <div
             className={styles.formContainer}
@@ -1008,7 +1044,7 @@ const MenuAndOrder = () => {
                       {item.quantity}
                     </strong>
                     <span className={styles.itemPrice}>
-                      (${parseFloat(item.price).toFixed(2)})
+                      ${item.price.toFixed(2)}
                     </span>
                   </span>
                   {editMode && (
@@ -1031,11 +1067,7 @@ const MenuAndOrder = () => {
                   <span className={styles.totalAmount}>
                     $
                     {orderItems
-                      .reduce(
-                        (total, item) =>
-                          total + parseFloat(item.price) * item.quantity,
-                        0
-                      )
+                      .reduce((total, item) => total + item.price, 0)
                       .toFixed(2)}
                   </span>
                 </div>
@@ -1046,8 +1078,8 @@ const MenuAndOrder = () => {
             <div className={styles.fieldRow}>
               <label>Receive Method</label>
               <select
-                value={fulfillmentMethod}
-                onChange={(e) => setFulfillmentMethod(e.target.value)}
+                value={pickupMethod}
+                onChange={(e) => setPickupMethod(e.target.value)}
               >
                 <option value="dineIn">Dine In</option>
                 <option value="takeaway">Takeaway</option>
@@ -1056,7 +1088,7 @@ const MenuAndOrder = () => {
             </div>
 
             {/* Delivery Info */}
-            {fulfillmentMethod === "delivery" && (
+            {pickupMethod === "delivery" && (
               <div className={styles.deliveryFields}>
                 <div className={styles.fieldRow}>
                   <label>Address</label>
@@ -1102,7 +1134,7 @@ const MenuAndOrder = () => {
                 <div className={styles.summaryRow}>
                   <span>
                     <FontAwesomeIcon icon={faTruck} /> Delivery Fee: $
-                    {deliveryFee.toFixed(2)}
+                    {deliveryFee}
                   </span>
                   <span>
                     <FontAwesomeIcon icon={faClock} /> ETA: {etaText}
@@ -1135,7 +1167,7 @@ const MenuAndOrder = () => {
                   onChange={(e) => setScheduledTime(e.target.value)}
                   className={styles.slotSelect}
                 >
-                  <option value="">Select time</option>
+                  <option value="">Select Time</option>
                   {availableSlots.length > 0 ? (
                     availableSlots.map((slot, index) => (
                       <option key={index} value={slot.time24}>
@@ -1313,13 +1345,15 @@ const MenuAndOrder = () => {
           </div>
         )}
         <div className={styles.menuContent}>
-          {loadingMenu ? (
+          {(view === "favorites" ? loadingFavorite : loadingMenu) ? (
             <div className={styles.loadingSpinner}></div>
           ) : filteredMenuItem.length === 0 ? (
             <div className={styles.emptyState}>
               <p>
                 {searchQuery
                   ? `No menu item match "${searchQuery}"`
+                  : view === "favorites"
+                  ? "No favorite items yet."
                   : "No menu items available right now."}
               </p>
             </div>
@@ -1443,14 +1477,16 @@ const MenuAndOrder = () => {
           </div>
         ) : (
           <div className={styles.promoCardsGrid}>
-            {offers.map((offer) => (
+            {offers?.map((offer) => (
               <div
                 key={offer.id}
                 className={styles.promoCard}
                 id={`promo-card-${offer.id}`}
               >
                 <div className={styles.cardHeader}>
-                  <div className={styles.discountBadge}>{offer.discount}</div>
+                  <div className={styles.discountBadge}>
+                    {Number(offer.discount_percentage).toFixed(0)}%
+                  </div>
                   <div className={styles.ribbon}>
                     <FontAwesomeIcon
                       icon={faCrown}
@@ -1468,8 +1504,8 @@ const MenuAndOrder = () => {
                       className={styles.calendarIcon}
                     />
                     <span>
-                      {formatDate(offer.startDate)} -{" "}
-                      {formatDate(offer.endDate)}
+                      {formatDate(offer.start_date)} -{" "}
+                      {formatDate(offer.end_date)}
                     </span>
                   </div>
                   <p className={styles.description}>{offer.description}</p>
@@ -1482,13 +1518,16 @@ const MenuAndOrder = () => {
                       />
                       Included Products
                     </h4>
-                    <ul className={styles.productsList}>
+                    <SimpleBar
+                      style={{ maxHeight: 160 }}
+                      className={styles.productsList}
+                    >
                       {offer.products.map((product, index) => (
                         <li key={index} className={styles.productItem}>
-                          {product}
+                          {product.name} × {product.quantity}
                         </li>
                       ))}
-                    </ul>
+                    </SimpleBar>
                   </div>
                 </div>
                 <div className={styles.promoCardFooter}>
