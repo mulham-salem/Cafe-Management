@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\NewNotificationEvent;
 use App\Http\Requests\StoreSupplyOfferRequest;
 use App\Models\Notification;
 use App\Models\Supplier;
@@ -54,7 +55,7 @@ class SupplierController extends Controller
             }
             $managerIds = [1];
             foreach ($managerIds as $index => $managerId) {
-                Notification::create([
+                $notification = Notification::create([
                     'manager_id' => $managerId,
                     'user_id' => $user->id,
                     'sent_by' => 'supplier',
@@ -63,6 +64,7 @@ class SupplierController extends Controller
                     'createdAt' => now(),
                     'seen' => false,
                 ]);
+                broadcast(new NewNotificationEvent($notification));
             }
 
             return response()->json(['message' => 'Supply offer submitted successfully.'], 201);
@@ -96,7 +98,7 @@ class SupplierController extends Controller
                     'total_price' => $offer->total_price,
                     'status' => $offer->status,
                     'note' => $offer->note,
-                    'rejection_reason' => $offer->rejection_reason ?? null,
+                    'rejection_reason' => $offer->reject_reason ?? null,
                     'items' => $offer->supplyofferitems->map(function ($item) {
                         return [
                             'id' => $item->id,

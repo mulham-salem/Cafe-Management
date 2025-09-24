@@ -269,7 +269,7 @@
 
 .warningRow {
   color: red;
-  font-weight: bold;
+  font-weight: 500;
 }
 
 :global(.headerButtons) {

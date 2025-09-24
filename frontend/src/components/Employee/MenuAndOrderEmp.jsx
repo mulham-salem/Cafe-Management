@@ -431,7 +431,7 @@ const MenuAndOrderEmp = () => {
           {
             items: itemsForBackend,
             note: note.trim(),
-            fulfillmentMethod,
+            pickupMethod: fulfillmentMethod,
             whenType,
             scheduledTime: whenType === "Schedule" ? scheduledTime : null,
           }
@@ -445,7 +445,7 @@ const MenuAndOrderEmp = () => {
         const response = await axios.post("/user/employee/orders/create", {
           items: itemsForBackend,
           note: note.trim(),
-          fulfillmentMethod,
+          pickupMethod: fulfillmentMethod,
           whenType,
           scheduledTime: whenType === "Schedule" ? scheduledTime : null,
         });

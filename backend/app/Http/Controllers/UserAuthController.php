@@ -248,6 +248,7 @@ class UserAuthController extends Controller
             'username' => 'string|max:255|unique:users,username,'.$user->id,
             'email' => 'email|unique:users,email,'.$user->id,
         ];
+
         // Supplier-specific validation
         if ($user->role === 'supplier') {
             $rules['phone_number'] = [
@@ -284,6 +285,8 @@ class UserAuthController extends Controller
         }
 
         $validated = $request->validate($rules);
+        // دمج الاسم الأول والأخير
+        $user->full_name = $validated['first_name'] . ' ' . $validated['last_name'];
 
         // Update User basic info
         $user->update($validated);

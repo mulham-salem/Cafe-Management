@@ -12,7 +12,7 @@ import {
   faSearch,
 } from "@fortawesome/free-solid-svg-icons";
 import styles from "../styles/CustomerHome.module.css";
-import { toast as toastify } from "react-toastify";
+import { toast as toastify, ToastContainer } from "react-toastify";
 import { toast, Toaster } from "react-hot-toast";
 import "react-toastify/dist/ReactToastify.css";
 import "../styles/toastStyles.css";
@@ -20,6 +20,7 @@ import axios from "axios";
 import { motion } from "framer-motion";
 import Complaint from "./Complaint";
 import { createContext } from "react";
+import useUnreadNotifications from "../../hooks/UnreadNotifications";
 export const CusSearchContext = createContext({
   searchQuery: "",
   setSearchQuery: () => {},
@@ -81,6 +82,7 @@ const CustomerHome = () => {
   // search state
   const [searchQuery, setSearchQuery] = useState("");
   const [searchPlaceholder, setSearchPlaceholder] = useState("Search...");
+  const { unreadCount, loadingCount } = useUnreadNotifications();
 
   useEffect(() => {
     if (location.state && location.state.successMessage) {
@@ -164,6 +166,7 @@ const CustomerHome = () => {
   return (
     <div className={styles.container}>
       <Toaster />
+      <ToastContainer theme="dark" />
       <nav className={styles.navbar}>
         <div className={styles.leftSection}>
           <img src={logo} alt="Cafe Delights Logo" className={styles.logo} />
@@ -227,8 +230,11 @@ const CustomerHome = () => {
               </Link>
             </div>
           </div>
-          <Link to="customer-notification" className={styles.bellIcon}>
-            <FontAwesomeIcon icon={faBell} title="Notifications" />
+          <Link to="customer-notification" className={styles.iconWrapper}>
+            <FontAwesomeIcon icon={faBell} className={styles.bellIcon} title="Notifications" />
+            {!loadingCount && unreadCount > 0 && (
+              <span className={styles.badge}>{unreadCount}</span>
+            )}
           </Link>
         </div>
       </nav>

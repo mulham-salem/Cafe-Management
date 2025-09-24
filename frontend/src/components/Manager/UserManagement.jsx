@@ -10,7 +10,7 @@ import {
   faCheck,
   faTimes,
 } from "@fortawesome/free-solid-svg-icons";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import { SearchContext } from "./ManagerDashboard";
@@ -536,7 +536,6 @@ const UserManagement = () => {
 
   return (
     <div className={`userContainer ${showInputs ? styles.open : styles.close}`}>
-      <ToastContainer />
       {loading ? (
         <div className={styles.loadingOverlay}>
           <p className={styles.emptyText}>Loading...</p>

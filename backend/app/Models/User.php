@@ -60,16 +60,6 @@ class User extends Authenticatable
         return $this->hasMany(Permission::class, 'user_id');
     }
 
-    public function userSender(): HasMany
-    {
-        return $this->hasMany(InternalMessage::class, 'sender_id');
-    }
-
-    public function userReceiver(): HasMany
-    {
-        return $this->hasMany(InternalMessage::class, 'receiver_id');
-    }
-
     protected static function booted(): void
     {
         static::created(function ($user) {

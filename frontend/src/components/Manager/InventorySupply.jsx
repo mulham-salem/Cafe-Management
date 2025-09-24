@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext, useMemo } from "react";
 import styles from "../styles/InventorySupply.module.css";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "../styles/toastStyles.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -1070,7 +1070,6 @@ const InventorySupply = () => {
 
   return (
     <div className="pageWrapper">
-      <ToastContainer />
       {activeTab === null && (
         <div className={`backgroundFull ${loaded ? styles.visible : ""}`}>
           <div className={styles.bcgOverlay}>
@@ -1679,8 +1678,9 @@ const InventorySupply = () => {
                         <td>
                           {bill.items.map((item, idx) => (
                             <div key={idx} className={styles.billItemRowData}>
-                              {item.name}: {item.quantity} 
-                              {item.unit} × {prices[idx]/item.quantity}  = ${prices[idx]}
+                              {item.name}: {item.quantity}
+                              {item.unit} × {prices[idx] / item.quantity} = $
+                              {prices[idx]}
                             </div>
                           ))}
                         </td>

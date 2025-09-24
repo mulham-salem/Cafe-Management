@@ -37,5 +37,5 @@ class SupplyRequest extends Model
         return $this->belongsTo(Supplier::class, 'supplier_id');
     }
 
-    protected $fillable = ['manager_id', 'title', 'note', 'request_date', 'status'];
+    protected $fillable = ['manager_id', 'supplier_id', 'title', 'note', 'request_date', 'status'];
 }

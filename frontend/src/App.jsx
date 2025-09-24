@@ -57,9 +57,9 @@ function App() {
           <Route
             path="/change-password"
             element={
-              //<ProtectedRoute>
-              <ChangePassword />
-              //</ProtectedRoute>
+              <ProtectedRoute>
+                <ChangePassword />
+              </ProtectedRoute>
             }
           />
           <Route
@@ -71,13 +71,13 @@ function App() {
           <Route
             path="/login/manager-dashboard"
             element={
-              //<ProtectedRoute>
-              <ActiveTabProvider>
-                <PermissionsProvider>
-                  <ManagerDashboard />
-                </PermissionsProvider>
-              </ActiveTabProvider>
-              //</ProtectedRoute>
+              <ProtectedRoute>
+                <ActiveTabProvider>
+                  <PermissionsProvider>
+                    <ManagerDashboard />
+                  </PermissionsProvider>
+                </ActiveTabProvider>
+              </ProtectedRoute>
             }
           >
             <Route path="user-management" element={<UserManagement />} />
@@ -107,13 +107,13 @@ function App() {
           <Route
             path="/login/supplier-home"
             element={
-              //<ProtectedRoute>
-              <ActiveTabProvider>
-                <PermissionsProvider>
-                  <SupplierHome />
-                </PermissionsProvider>
-              </ActiveTabProvider>
-              //</ProtectedRoute>
+              <ProtectedRoute>
+                <ActiveTabProvider>
+                  <PermissionsProvider>
+                    <SupplierHome />
+                  </PermissionsProvider>
+                </ActiveTabProvider>
+              </ProtectedRoute>
             }
           >
             <Route path="my-account" element={<MyAccount />} />
@@ -143,11 +143,11 @@ function App() {
           <Route
             path="/login/customer-home"
             element={
-              // <ProtectedRoute>
-              <OrderNotificationProvider>
-                <CustomerHome />
-              </OrderNotificationProvider>
-              // </ProtectedRoute>
+              <ProtectedRoute>
+                <OrderNotificationProvider>
+                  <CustomerHome />
+                </OrderNotificationProvider>
+              </ProtectedRoute>
             }
           >
             <Route path="menu-order" element={<MenuAndOrder />} />
@@ -164,13 +164,13 @@ function App() {
           <Route
             path="/login/employee-home"
             element={
-              //<ProtectedRoute>
-              <ActiveTabProvider>
-                <PermissionsProvider>
-                  <EmployeeHome />
-                </PermissionsProvider>
-              </ActiveTabProvider>
-              //</ProtectedRoute>
+              <ProtectedRoute>
+                <ActiveTabProvider>
+                  <PermissionsProvider>
+                    <EmployeeHome />
+                  </PermissionsProvider>
+                </ActiveTabProvider>
+              </ProtectedRoute>
             }
           >
             <Route path="menu-order" element={<MenuAndOrderEmp />} />
@@ -253,9 +253,9 @@ function App() {
           <Route
             path="/login/delivery-home"
             element={
-              // <ProtectedRoute>
-              <DeliveryHome />
-              // </ProtectedRoute>
+              <ProtectedRoute>
+                <DeliveryHome />
+              </ProtectedRoute>
             }
           >
             <Route path="delivery-order" element={<DeliveryOrder />} />

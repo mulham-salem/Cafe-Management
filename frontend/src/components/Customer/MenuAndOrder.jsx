@@ -499,18 +499,23 @@ const MenuAndOrder = () => {
           pickupMethod,
           deliveryInfo: pickupMethod === "delivery" ? deliveryInfo : null,
           whenType,
-          scheduledTime: whenType === "schedule" ? scheduledTime : null, 
+          scheduledTime: whenType === "schedule" ? scheduledTime : null,
         });
-        pointsBalance = response.data.loyalty_points;
-        totalBalance = response.data.loyalty_account.points_balance;
         toastMessage = response.data.message;
         systemStatus = response.data.statusMessage;
+        pointsBalance = response.data?.loyalty_points ?? 0;
+        totalBalance = response.data.loyalty_account?.points_balance ?? 0;
       }
 
-      if (systemStatus) toast.warn(systemStatus);
+      if (systemStatus) {
+        toast.warn(systemStatus);
+        return;
+      }
       toast.success(toastMessage);
       setTimeout(() => {
-        toast.info(`🎉 You have earned ${pointsBalance} loyalty points! Your total is now ${totalBalance} points`);
+        toast.info(
+          `🎉 You have earned ${pointsBalance} loyalty points! Your total is now ${totalBalance} points`
+        );
       }, 5500);
       setOrderItems([]);
       setNote("");

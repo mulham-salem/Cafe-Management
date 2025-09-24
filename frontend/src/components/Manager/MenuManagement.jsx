@@ -3,7 +3,7 @@ import styles from "../styles/MenuManagement.module.css";
 import "../styles/toastStyles.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPen, faTrash, faPlus } from "@fortawesome/free-solid-svg-icons";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import { SearchContext } from "./ManagerDashboard";
@@ -402,7 +402,6 @@ const MenuManagement = () => {
 
   return (
     <div className="menuContainer">
-      <ToastContainer />
       <button
         onClick={() => {
           clearForm();

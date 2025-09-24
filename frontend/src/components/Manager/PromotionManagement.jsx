@@ -11,7 +11,7 @@ import {
   faTimes,
   faGift,
 } from "@fortawesome/free-solid-svg-icons";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "../styles/toastStyles.css";
 import axios from "axios";
@@ -369,7 +369,6 @@ const PromotionManagement = () => {
 
   return (
     <div className="promoWrapper">
-      <ToastContainer />
       <div className="pageHeader">
         <h2 className={styles.pageTitle}>
           <FontAwesomeIcon icon={faGift} /> Promotion List

@@ -2,9 +2,6 @@ import React, { useEffect, useState } from 'react';
 import styles from '../styles/DeliveryNotification.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBell, faCheckCircle, faClock } from '@fortawesome/free-solid-svg-icons';
-import { ToastContainer } from 'react-toastify';
-import "react-toastify/dist/ReactToastify.css";
-import "../styles/toastStyles.css";
 import axios from 'axios';
 
 
@@ -62,7 +59,6 @@ const DeliveryNotification = () => {
 
   return (
     <div className={styles.pageWrapper}>
-       <ToastContainer />
       <h2 className={styles.pageTitle}><FontAwesomeIcon icon={faBell} className={styles.bellIcon}/> Notifications</h2>
 
       {loading ? (

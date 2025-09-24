@@ -17,7 +17,7 @@
 }
 
 @font-face {
-  font-family: "Ubuntu";
+  font-family: Ubuntu;
   src: url("Fonts/Ubuntu/Ubuntu-Regular.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
@@ -35,7 +35,7 @@
   background: var(--bg-veil);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-family: "Ubuntu", "Segoe UI Emoji", "Noto Color Emoji",
+  font-family: Ubuntu, "Segoe UI Emoji", "Noto Color Emoji",
     "Apple Color Emoji", sans-serif;
 }
 
@@ -90,8 +90,7 @@
   font-size: 13px;
   color: var(--muted);
   outline: none;
-  transition: box-shadow var(--transition-fast),
-    transform 0.4s ease;
+  transition: box-shadow var(--transition-fast), transform 0.4s ease;
 }
 
 .searchInput:focus {
@@ -131,6 +130,7 @@
   transition: background var(--transition-fast),
     transform var(--transition-fast), box-shadow var(--transition-fast);
 }
+
 .contactItem:hover {
   background: linear-gradient(
     90deg,
@@ -200,7 +200,7 @@
 
 .preview {
   font-size: 12px;
-  color: rgba(0, 0, 0, 0.44);
+  color: rgba(0, 0, 0, 0.5);
   margin-top: 4px;
   white-space: nowrap;
   overflow: hidden;
@@ -229,6 +229,7 @@
   border-top: 1px dashed rgba(107, 55, 31, 0.04);
   text-align: center;
 }
+
 .leftFooter .small {
   font-size: 12px;
   color: var(--muted);
@@ -241,6 +242,8 @@
   gap: 10px;
   padding: 18px;
   background: var(--panel-bg);
+  font-family: Ubuntu, "Segoe UI Emoji", "Noto Color Emoji",
+    "Apple Color Emoji", sans-serif;
 }
 
 /* Placeholder view */
@@ -250,11 +253,13 @@
   height: 100%;
   color: var(--muted);
 }
+
 .placeholderTitle {
   font-size: 20px;
   font-weight: 800;
   color: var(--accent-dark);
 }
+
 .placeholderNote {
   margin-top: 8px;
   color: rgba(0, 0, 0, 0.45);
@@ -467,8 +472,7 @@
   border: 2px solid rgba(107, 55, 31, 0.06);
   font-size: 15px;
   outline: none;
-  transition: box-shadow var(--transition-fast),
-    transform 0.4s ease;
+  transition: box-shadow var(--transition-fast), transform 0.4s ease;
 }
 
 .textarea:focus {

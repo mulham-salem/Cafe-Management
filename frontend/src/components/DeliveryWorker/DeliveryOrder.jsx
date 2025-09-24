@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "../styles/toastStyles.css";
 import axios from "axios";
@@ -84,29 +84,29 @@ const mockOrders = [
   },
 ];
 
-const token =
-  sessionStorage.getItem("delivery_workerToken") ||
-  localStorage.getItem("delivery_workerToken");
-
-const axiosInstance = axios.create({
-  baseURL: "http://localhost:8000/api",
-  withCredentials: true,
-  headers: {
-    Authorization: `Bearer ${token}`,
-    "Content-Type": "application/json",
-    Accept: "application/json",
-  },
-});
-
-const updateOrderAPI = async (orderId, patch) => {
-  const res = await axiosInstance.patch(
-    `/user/delivery-worker/delivery-orders/${orderId}`,
-    patch
-  );
-  return res.data;
-};
-
 function OrderCard({ order, onUpdate, onShowDetails }) {
+  
+  const token =
+    sessionStorage.getItem("delivery_workerToken") ||
+    localStorage.getItem("delivery_workerToken");
+
+  const axiosInstance = axios.create({
+    baseURL: "http://localhost:8000/api",
+    withCredentials: true,
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+  });
+
+  const updateOrderAPI = async (orderId, patch) => {
+    const res = await axiosInstance.patch(
+      `/user/delivery-worker/delivery-orders/${orderId}`,
+      patch
+    );
+    return res.data;
+  };
   const nextAction = () => {
     switch (order.status) {
       case "unassigned":
@@ -273,6 +273,21 @@ export default function DeliveryOrder() {
   useEffect(() => {
     document.title = "Cafe Delights - Delivery Order";
   }, []);
+
+  const token =
+    sessionStorage.getItem("delivery_workerToken") ||
+    localStorage.getItem("delivery_workerToken");
+
+  const axiosInstance = axios.create({
+    baseURL: "http://localhost:8000/api",
+    withCredentials: true,
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+  });
+
   const [orders, setOrders] = useState([]);
   const [detailOrder, setDetailOrder] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -327,6 +342,7 @@ export default function DeliveryOrder() {
         },
       }}
     >
+      <ToastContainer />
       <header className={styles.header}>
         <div className={styles.headerLeft}>
           <button

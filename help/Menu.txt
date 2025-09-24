@@ -4,7 +4,7 @@ $item1->description = 'Cappuccino';
 $item1->price = 5;
 $item1->category_id = 1;
 $item1->manager_id = 1;
-$item1->image_url = '/Drinks/Cappuccino.jpeg';
+$item1->image_url = 'Drinks/Cappuccino.jpeg';
 $item1->available = 1;
 $item1->save();
 
@@ -14,7 +14,7 @@ $item2->description = 'Hot-Chocolate';
 $item2->price = 5;
 $item2->category_id = 1;
 $item2->manager_id = 1;
-$item2->image_url = '/Drinks/Hot-Chocolate.jpg';
+$item2->image_url = 'Drinks/Hot-Chocolate.jpg';
 $item2->available = 1;
 $item2->save();
 
@@ -24,7 +24,7 @@ $item3->description = 'lemon-mint-lemonade';
 $item3->price = 5;
 $item3->category_id = 1;
 $item3->manager_id = 1;
-$item3->image_url = '/Drinks/lemon-mint-lemonade.jpg';
+$item3->image_url = 'Drinks/lemon-mint-lemonade.jpg';
 $item3->available = 1;
 $item3->save();
 
@@ -34,7 +34,7 @@ $item4->description = 'vanilla-milkshake';
 $item4->price = 5;
 $item4->category_id = 1;
 $item4->manager_id = 1;
-$item4->image_url = '/Drinks/vanilla-milkshake-recipe-5.jpg';
+$item4->image_url = 'Drinks/vanilla-milkshake-recipe-5.jpg';
 $item4->available = 1;
 $item4->save();
 
@@ -44,7 +44,7 @@ $item5->description = 'Strawberry-Milkshake';
 $item5->price = 5;
 $item5->category_id = 1;
 $item5->manager_id = 1;
-$item5->image_url = '/Drinks/Strawberry-Milkshake.jpg;
+$item5->image_url = 'Drinks/Strawberry-Milkshake.jpg';
 $item5->available = 1;
 $item5->save();
 
@@ -54,7 +54,7 @@ $item6->description = 'Donuts';
 $item6->price = 5;
 $item6->category_id = 2;
 $item6->manager_id = 1;
-$item6->image_url = '/Snacks/Chocolate-Frosted-Donuts-High-Res-68.jpg';
+$item6->image_url = 'Snacks/Chocolate-Frosted-Donuts-High-Res-68.jpg';
 $item6->available = 1;
 $item6->save();
 
@@ -64,7 +64,7 @@ $item7->description = 'croissants';
 $item7->price = 5;
 $item7->category_id = 2;
 $item7->manager_id = 1;
-$item7->image_url = '/Snacks/chocolate-croissants.jpg';
+$item7->image_url = 'Snacks/chocolate-croissants.jpg';
 $item7->available = 1;
 $item7->save();
 
@@ -74,7 +74,7 @@ $item8->description = 'Chocolate Waffles';
 $item8->price = 5;
 $item8->category_id = 2;
 $item8->manager_id = 1;
-$item8->image_url = '/Snacks/ChocolateWaffles.jpg';
+$item8->image_url = 'Snacks/ChocolateWaffles.jpg';
 $item8->available = 1;
 $item8->save();
 
@@ -84,7 +84,7 @@ $item9->description = 'Turkey Sandwich_';
 $item9->price = 5;
 $item9->category_id = 2;
 $item9->manager_id = 1;
-$item9->image_url = '/Snacks/TurkeySandwich_.jpg';
+$item9->image_url = 'Snacks/TurkeySandwich_.jpg';
 $item9->available = 1;
 $item9->save();
 
@@ -94,6 +94,6 @@ $item10->description = 'mint-chip-mousse';
 $item10->price = 5;
 $item10->category_id = 2;
 $item10->manager_id = 1;
-$item10->image_url = '/Snacks/mint-chip-mousse-1.jpg';
+$item10->image_url = 'Snacks/mint-chip-mousse-1.jpg';
 $item10->available = 1;
 $item10->save();

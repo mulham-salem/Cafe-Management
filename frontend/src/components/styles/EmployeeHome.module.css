@@ -114,11 +114,11 @@
 .dropdown {
   position: absolute;
   top: 100%;
-  left: 50%;
+  left: 60%;
   border-radius: 8px;
   opacity: 0;
   visibility: hidden;
-  transform: translateX(-50%) translateY(20%);
+  transform: translateX(-60%) translateY(20%);
   transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
@@ -164,12 +164,67 @@
 
 .bellIcon {
   color: white;
-  font-size: clamp(1.2rem, 1.5vw, 1.4rem);
+  font-size: clamp(14px, 2vw, 24px);
   transition: color 0.3s ease;
 }
 
 .bellIcon:hover {
   color: #f4c063;
+}
+
+
+.iconWrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #444; /* لون الأيقونة */
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.iconWrapper span {
+  font-size: 0.6rem;
+}
+
+/* البادج */
+.badge {
+  position: absolute;
+  top: -4px;
+  right: -6px;
+  min-width: 10px;
+  width: 10px;
+  height: 18px;
+  padding: 0 5px;
+  background: linear-gradient(135deg, #ff3b3b, #c70000);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: bold;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  animation: pulse 1.5s infinite;
+}
+
+/* أنيميشن نبض خفيف */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(255, 59, 59, 0.6);
+  }
+
+  70% {
+    transform: scale(1.15);
+    box-shadow: 0 0 0 8px rgba(255, 59, 59, 0);
+  }
+
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(255, 59, 59, 0);
+  }
 }
 
 @font-face {

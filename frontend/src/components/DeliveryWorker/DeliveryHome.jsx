@@ -12,7 +12,10 @@ import logo from "/logo_1.png";
 import styles from "../styles/DeliveryHome.module.css";
 import axios from "axios";
 import { toast, Toaster } from "react-hot-toast";
+import { ToastContainer } from "react-toastify";
 import DeliveryLocation from "./DeliveryLocation";
+import useChattingNotification from "../../hooks/ChattingNotification";
+import useUnreadNotifications from "../../hooks/UnreadNotifications";
 
 // Framer Motion variants
 const pageVariants = {
@@ -68,6 +71,8 @@ export default function DeliveryHome() {
   const [showLocationModal, setShowLocationModal] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const { unreadCount, loadingCount } = useUnreadNotifications();
+  useChattingNotification();
 
   useEffect(() => {
     if (location.state && location.state.successMessage) {
@@ -89,7 +94,7 @@ export default function DeliveryHome() {
               </div>
             </div>
           ),
-          { duration: 4000, position: "top-right" }
+          { duration: 3500, position: "top-right" }
         );
         window.history.replaceState({}, document.title);
       }, 1500);
@@ -168,17 +173,19 @@ export default function DeliveryHome() {
   useEffect(() => {
     async function fetchNotifications() {
       const res = await checkNewDeliveryOrders();
-      if (res.hasNewOrders) {
-        toast.custom((t) => (
-          <span
-            className={`${styles.toastNewNotify} ${
-              t.visible ? styles.enter : styles.leave
-            }`}
-          >
-            {res.message}
-          </span>
-        ));
-      }
+      setTimeout(() => {
+        if (res.hasNewOrders) {
+          toast.custom((t) => (
+            <span
+              className={`${styles.toastNewNotify} ${
+                t.visible ? styles.enter : styles.leave
+              }`}
+            >
+              {res.message}
+            </span>
+          ));
+        }
+      }, 3000);
     }
 
     fetchNotifications();
@@ -193,6 +200,7 @@ export default function DeliveryHome() {
       variants={pageVariants}
     >
       <Toaster />
+      <ToastContainer />
       {/* Navbar */}
       <header className={styles.navbar}>
         {/* يمين: اللوغو + اسم المقهى */}
@@ -255,8 +263,11 @@ export default function DeliveryHome() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: 0.35 }}
           >
-            <Link to="delivery-notification" title="Notifications">
+            <Link to="delivery-notification" title="Notifications" className={styles.iconWrapper}>
               <Bell className={styles.bellIcon} />
+              {!loadingCount && unreadCount > 0 && (
+                <span className={styles.badge}>{unreadCount}</span>
+              )}
             </Link>
           </motion.div>
         </div>

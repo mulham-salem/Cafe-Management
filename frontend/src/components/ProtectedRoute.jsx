@@ -1,12 +1,22 @@
 import { Navigate } from "react-router-dom";
 
-const ProtectedRoute = ( { children } ) => {
-    const token = sessionStorage.getItem('authToken') || localStorage.getItem('authToken');
+const ProtectedRoute = ({ children }) => {
+    
+  function getCurrentToken() {
+    const role = sessionStorage.getItem("currentRole");
+    if (!role) return null;
+    return (
+      sessionStorage.getItem(`${role}Token`) ||
+      localStorage.getItem(`${role}Token`)
+    );
+  }
 
-    if ( ! token ) {
-        return <Navigate to="/login" replace/>
-    }
-    return children;
+  const token = getCurrentToken();
+
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+  return children;
 };
 
 export default ProtectedRoute;

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\NewNotificationEvent;
 use App\Models\InventoryItem;
 use App\Models\Notification;
 use App\Models\PurchaseBill;
@@ -121,7 +122,7 @@ class SupplyManagementController extends Controller
         $supplyOffer->status = 'accepted';
         $supplyOffer->save();
 
-        Notification::create([
+        $notification = Notification::create([
             'manager_id' => $managerId,
             'user_id' => $supplyOffer->supplier_id,
             'sent_by' => 'manager',
@@ -130,7 +131,7 @@ class SupplyManagementController extends Controller
             'createdAt' => now(),
             'seen' => false,
         ]);
-
+        event(new NewNotificationEvent($notification));
         return response()->json(['message' => 'Supply offer accepted and waiting to pay the bill.']);
     }
 
@@ -171,19 +172,19 @@ class SupplyManagementController extends Controller
         }
 
         $supplyOffer->status = 'rejected';
-        $supplyOffer->rejection_reason = $request->reason ?? 'Rejected without reason';
+        $supplyOffer->reject_reason = $request->reason ?? 'Rejected without reason';
         $supplyOffer->save();
 
-        Notification::create([
+        $notification = Notification::create([
             'manager_id' => $managerId,
             'user_id' => $supplyOffer->supplier_id,
             'sent_by' => 'manager',
             'purpose' => 'Supply Offer Response',
-            'message' => "Offer '{$supplyOffer->title}' has been rejected\nReason: {$supplyOffer->rejection_reason}",
+            'message' => "Offer '{$supplyOffer->title}' has been rejected\nReason: {$supplyOffer->reject_reason}",
             'createdAt' => now(),
             'seen' => false,
         ]);
-
+        event(new NewNotificationEvent($notification));
         return response()->json(['message' => 'Supply offer rejected successfully.']);
     }
 
@@ -230,9 +231,10 @@ class SupplyManagementController extends Controller
 
         $supplyRequest = SupplyRequest::create([
             'manager_id' => $managerId,
+            'supplier_id' => $validated['supplier_id'],
             'title' => $validated['title'],
-            'note' => $validated['note'],
             'request_date' => now(),
+            'note' => $validated['note'],
             'status' => 'pending',
         ]);
 
@@ -244,7 +246,7 @@ class SupplyManagementController extends Controller
             ]);
         }
 
-        Notification::create([
+        $notification = Notification::create([
             'manager_id' => $managerId,
             'user_id' => $validated['supplier_id'],
             'supplyRequest_id' => $supplyRequest->id,
@@ -254,6 +256,7 @@ class SupplyManagementController extends Controller
             'createdAt' => now(),
             'seen' => false,
         ]);
+        event(new NewNotificationEvent($notification));
 
         return response()->json([
             'message' => 'Supply request sent successfully.',

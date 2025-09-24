@@ -13,13 +13,13 @@ class ReportDashboardController extends Controller
     public function salesReport(Request $request)
     {
         $request->validate([
-            'type' => 'required|in:daily,weekly,monthly',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
+            'params.type' => 'required|in:daily,weekly,monthly',
+            'params.start_date' => 'required|date',
+            'params.end_date' => 'required|date|after_or_equal:start_date',
         ]);
 
-        $start = Carbon::parse($request->start_date);
-        $end = Carbon::parse($request->end_date);
+        $start = Carbon::parse($request->input('params.start_date'))->startOfDay();
+        $end = Carbon::parse($request->input('params.end_date'))->endOfDay();
 
         $summary = [
             'total_orders' => Order::whereBetween('created_at', [$start, $end])->count(),
@@ -31,23 +31,20 @@ class ReportDashboardController extends Controller
                 ->get(),
             'top_sales' => DB::table('bills')
                 ->join('orders', 'bills.order_id', '=', 'orders.id')
-                ->join('order_items', 'orders.id', '=', 'order_items.order_id')
-                ->join('menu_items', 'order_items.menuItem_id', '=', 'menu_items.id')
                 ->select(
-                    'menu_items.id',
-                    'menu_items.name',
-                    DB::raw('SUM(order_items.quantity) as total_quantity')
+                    DB::raw('DATE(orders.created_at) as date'),
+                    DB::raw('SUM(bills.total_amount) as sales')
                 )
-                ->groupBy('menu_items.id', 'menu_items.name')
-                ->orderByDesc('total_quantity')
-                ->limit(5)
+                ->whereBetween('orders.created_at', [$start, $end])
+                ->groupBy(DB::raw('DATE(orders.created_at)'))
+                ->orderBy('date')
                 ->get(),
 
         ];
 
         // حفظ التقرير في جدول
         DB::table('sales_report')->insert([
-            'type' => $request->type,
+            'type' => $request->input('params.type'),
             'start_date' => $start,
             'end_date' => $end,
             'data' => json_encode($summary),
@@ -68,13 +65,13 @@ class ReportDashboardController extends Controller
     public function financialReport(Request $request)
     {
         $request->validate([
-            'type' => 'required|in:daily,weekly,monthly',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
+            'params.type' => 'required|in:daily,weekly,monthly',
+            'params.start_date' => 'required|date',
+            'params.end_date' => 'required|date|after_or_equal:start_date',
         ]);
 
-        $start = Carbon::parse($request->start_date);
-        $end = Carbon::parse($request->end_date);
+        $start = Carbon::parse($request->input('params.start_date'));
+        $end = Carbon::parse($request->input('params.end_date'));
 
         $total_revenue = DB::table('bills')
             ->whereBetween('created_at', [$start, $end])
@@ -125,7 +122,7 @@ class ReportDashboardController extends Controller
 
         // حفظ التقرير في جدول
         DB::table('finanical_report')->insert([
-            'type' => $request->type,
+            'type' => $request->input('params.type'),
             'start_date' => $start,
             'end_date' => $end,
             'data' => json_encode($summary),

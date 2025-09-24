@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { X, Send, AlertCircle } from "lucide-react";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import styles from "../styles/Complaint.module.css";
@@ -90,8 +90,6 @@ export default function ComplaintModal({ open, onClose }) {
           </button>
         </div>
       </div>
-
-      <ToastContainer />
     </div>
   );
 }

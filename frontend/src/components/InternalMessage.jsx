@@ -6,23 +6,24 @@ import EmojiPicker from "emoji-picker-react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import styles from "./styles/InternalMessage.module.css";
+import echo from "../../echo";
 
 /* -------------------------
    Mock data (fallback)
    ------------------------- */
 const MOCK_CONTACTS = [
-  { id: 1, name: "Samir", role: "Delivery", avatarColor: "#C05621", unread: 2 },
-  { id: 2, name: "Lina", role: "Employee", avatarColor: "#065F46", unread: 1 },
+  { id: 1, name: "Samir", role: "delivery", avatarColor: "#C05621", unread: 2 },
+  { id: 2, name: "Lina", role: "employee", avatarColor: "#065F46", unread: 1 },
   {
     id: 3,
     name: "Omar Supplies",
-    role: "Supplier",
+    role: "supplier",
     avatarColor: "#7C3AED",
     unread: 1,
   },
-  { id: 4, name: "Rana", role: "Employee", avatarColor: "#B91C1C", unread: 1 },
-  { id: 5, name: "Adnan", role: "Manager", avatarColor: "#B91C1C", unread: 5 },
-  { id: 6, name: "Ahmad", role: "Delivery", avatarColor: "#C05621", unread: 1 },
+  { id: 4, name: "Rana", role: "employee", avatarColor: "#B91C1C", unread: 1 },
+  { id: 5, name: "Adnan", role: "manager", avatarColor: "#B91C1C", unread: 5 },
+  { id: 6, name: "Ahmad", role: "delivery", avatarColor: "#C05621", unread: 1 },
 ];
 
 const MOCK_MESSAGES = {
@@ -70,84 +71,12 @@ const MOCK_MESSAGES = {
   ],
 };
 
-/* -------------------------
-   Axios client
-   ------------------------- */
-const apiClient = axios.create({
-  baseURL: "/api", // adjust to your API base URL
-  headers: { "Content-Type": "application/json" },
-  withCredentials: true,
-});
-
-/* -------------------------
-   Simple API helpers:
-   - try real API
-   - if it throws -> toast error + use mock
-   ------------------------- */
-async function fetchContactsApi() {
-  try {
-    const res = await apiClient.get("/messages/contacts");
-    if (!Array.isArray(res.data)) throw new Error("Invalid contacts payload");
-    return res.data;
-  } catch (err) {
-    toast.error("Failed to load contacts — using offline data.");
-    return MOCK_CONTACTS;
-  }
-}
-
-async function fetchMessagesApi(contactName) {
-  try {
-    const res = await apiClient.get(
-      `/messages/thread/${encodeURIComponent(contactName)}`
-    );
-    if (!Array.isArray(res.data)) throw new Error("Invalid messages payload");
-    return res.data;
-  } catch (err) {
-    toast.error(
-      `Failed to load conversation for "${contactName}" — using offline data.`
-    );
-    return MOCK_MESSAGES[contactName] ? [...MOCK_MESSAGES[contactName]] : [];
-  }
-}
-
-async function postMessageApi(payload) {
-  // payload: { subject, body, receiver_name, sender_name }
-  try {
-    const res = await apiClient.post("/messages", payload);
-    // assume server returns saved message object
-    toast.success("Message sent.");
-    return res.data;
-  } catch (err) {
-    // notify user about failure and fallback to local mock save
-    toast.error(
-      `Failed to send message to ${payload.receiver_name}. Message saved offline.`
-    );
-    const saved = {
-      id: `m_${Date.now()}`,
-      subject: payload.subject ?? null,
-      body: payload.body,
-      sender_name: payload.sender_name,
-      receiver_name: payload.receiver_name,
-      sent_at: new Date().toISOString(),
-      read_at: null,
-    };
-    if (!MOCK_MESSAGES[payload.receiver_name])
-      MOCK_MESSAGES[payload.receiver_name] = [];
-    MOCK_MESSAGES[payload.receiver_name].push(saved);
-    return saved;
-  }
-}
-// fetch current user (leave axios import as-is at top of file)
-async function fetchCurrentUser() {
-  try {
-    const res = await axios.get("/api/current-user", { withCredentials: true });
-    return res.data;
-  } catch (err) {
-    console.error("Error fetching current user:", err);
-    toast.error("Error fetching current user:", err);
-    return null;
-  }
-}
+const roleColors = {
+  manager: "#1c5bb9ff",
+  employee: "#065F46",
+  supplier: "#7C3AED",
+  delivery_worker: "#C05621",
+};
 
 /* -------------------------
    Helpers
@@ -167,6 +96,7 @@ export default function InternalMessage() {
   const [active, setActive] = useState(null);
   const [messages, setMessages] = useState([]); // always array
   const [loading, setLoading] = useState(false);
+  const [loadingContact, setLoadingContact] = useState(true);
   const [subject, setSubject] = useState("");
   const [text, setText] = useState("");
   const [showEmoji, setShowEmoji] = useState(false);
@@ -176,23 +106,174 @@ export default function InternalMessage() {
     role: null,
   });
 
+
+  /* -------------------------
+   Axios client
+   ------------------------- */
+  function getCurrentToken() {
+    const role = sessionStorage.getItem("currentRole");
+    if (!role) return null;
+    return (
+      sessionStorage.getItem(`${role}Token`) ||
+      localStorage.getItem(`${role}Token`)
+    );
+  }
+
+  const token = getCurrentToken();
+  const apiClient = axios.create({
+    baseURL: "http://localhost:8000/api",
+    withCredentials: true,
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+  });
+
+  /* -------------------------
+   Simple API helpers:
+   - try real API
+   - if it throws -> toast error + use mock
+   ------------------------- */
+  async function fetchContactsApi() {
+    try {
+      const res = await apiClient.get("/user/messages/contacts");
+      if (!Array.isArray(res.data)) throw new Error("Invalid contacts payload");
+      return res.data;
+    } catch (err) {
+      console.error(err.response.data);
+      toast.error("Failed to load contacts — using offline data.");
+      return MOCK_CONTACTS;
+    }
+  }
+
+  async function fetchMessagesApi(contactId, contactName) {
+    try {
+      const res = await apiClient.get(`/user/messages/thread/${contactId}`);
+      if (!Array.isArray(res.data)) throw new Error("Invalid messages payload");
+      return res.data;
+    } catch (err) {
+      console.error(err.response.data);
+      toast.error(
+        `Failed to load conversation for "${contactName}" — using offline data.`
+      );
+      return MOCK_MESSAGES[contactName] ? [...MOCK_MESSAGES[contactName]] : [];
+    }
+  }
+
+  async function postMessageApi(payload) {
+    // payload: { subject, body, receiver_name, sender_name }
+    try {
+      const res = await apiClient.post("/user/messages", payload);
+      // assume server returns saved message object
+      toast.success("Message sent.");
+      return res.data;
+    } catch (err) {
+      // notify user about failure and fallback to local mock save
+      console.error(err);
+      toast.error(
+        `Failed to send message to ${payload.receiver_name}. Message saved offline.`
+      );
+      const saved = {
+        id: `m_${Date.now()}`,
+        subject: payload.subject ?? null,
+        body: payload.body,
+        sender_name: payload.sender_name,
+        receiver_name: payload.receiver_name,
+        sent_at: new Date().toISOString(),
+        read_at: null,
+      };
+      if (!MOCK_MESSAGES[payload.receiver_name])
+        MOCK_MESSAGES[payload.receiver_name] = [];
+      MOCK_MESSAGES[payload.receiver_name].push(saved);
+      return saved;
+    }
+  }
+  // fetch current user (leave axios import as-is at top of file)
+  async function fetchCurrentUser() {
+    try {
+      const res = await apiClient.get("/user/current-user");
+      return res.data;
+    } catch (err) {
+      console.error("Error fetching current user:", err);
+      toast.error("Error fetching current user:", err);
+      return null;
+    }
+  }
+
   useEffect(() => {
+    if (!token) return;
     fetchCurrentUser().then((user) => {
       if (user) setCurrentUser(user);
     });
-  }, []);
+  }, [token]);
 
-  async function markReadApi(contactName) {
+  useEffect(() => {
+    if (!currentUser?.id) return;
+
+    console.log("Setting up WebSocket for user:", currentUser.id);
+
+    const channelName = `messages.${currentUser.id}`;
+
     try {
-      await apiClient.post("/messages/mark-read", {
-        contact_name: contactName,
+      const channel = echo.channel(channelName);
+
+      channel.listen(".message.sent", (e) => {
+        console.log("Received message via WebSocket:", e);
+        const senderId = e.message.sender_id;
+        setContacts((prevContacts) => {
+          return prevContacts.map((c) => {
+            if (c.id === senderId) {
+              const unreadCount =
+                active?.id === senderId ? 0 : (c.unread || 0) + 1;
+              return {
+                ...c,
+                unread: unreadCount,
+                last_message: e.message.body,
+              };
+            }
+            return c;
+          });
+        });
+
+        if (active?.id === senderId) {
+          setMessages((prev) => [...prev, e.message]);
+          markReadApi(senderId);
+        }
+      });
+
+      // معالج الأخطاء للقناة
+      channel.error((error) => {
+        console.error("Channel error:", error);
+        toast.error("Connection error. Reconnecting...");
+      });
+
+      return () => {
+        console.log("Cleaning up WebSocket listener");
+        channel.stopListening(".message.sent");
+        echo.leave(channelName);
+      };
+    } catch (error) {
+      console.error("Failed to set up WebSocket:", error);
+      toast.error("Real-time messaging unavailable");
+    }
+  }, [currentUser?.id, active?.id]);
+
+  async function markReadApi(contactId) {
+    try {
+      await apiClient.post("/user/messages/mark-read", {
+        contact_id: contactId,
       });
 
       setContacts((prev) =>
-        prev.map((c) => (c.name === contactName ? { ...c, unread: 0 } : c))
+        prev.map((c) => (c.id === contactId ? { ...c, unread: 0 } : c))
       );
     } catch (err) {
-      toast.error(`Failed to mark messages from "${contactName}" as read.`);
+      console.error(err);
+      const contact = contacts.find((c) => c.id === contactId);
+      toast.error(
+        `Failed to mark messages from "${contact?.name ?? contactId}" as read.`
+      );
     }
   }
 
@@ -202,16 +283,25 @@ export default function InternalMessage() {
 
   /* fetch contacts once on mount */
   useEffect(() => {
+    if (!token) return;
     let mounted = true;
     (async () => {
       const result = await fetchContactsApi();
       if (!mounted) return;
-      setContacts(Array.isArray(result) ? result : []);
+
+      const contactsWithColor = (Array.isArray(result) ? result : []).map(
+        (c) => ({
+          ...c,
+          avatarColor: roleColors[c.role] || "#888888",
+        })
+      );
+      setContacts(contactsWithColor);
+      setLoadingContact(false);
     })();
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [token, contacts]);
 
   /* fetch messages for active contact */
   useEffect(() => {
@@ -222,12 +312,12 @@ export default function InternalMessage() {
     let mounted = true;
     setLoading(true);
     (async () => {
-      const msgs = await fetchMessagesApi(active.name);
+      const msgs = await fetchMessagesApi(active.id, active.name);
       if (!mounted) return;
       setMessages(Array.isArray(msgs) ? msgs : []);
       setLoading(false);
       // Optionally mark read here by calling an endpoint
-      setTimeout(() => scrollToBottom(), 100);
+      setTimeout(() => scrollToBottom(), 300);
     })();
     return () => {
       mounted = false;
@@ -235,11 +325,19 @@ export default function InternalMessage() {
   }, [active]);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({
-      behavior: "smooth",
-      block: "end",
-    });
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+        inline: "start",
+      });
+    }
   };
+
+  useEffect(() => {
+    // السكرول التلقائي عند تغيير الرسائل
+    scrollToBottom();
+  }, [messages]);
 
   /* send message (optimistic) */
   const handleSend = async (e) => {
@@ -263,6 +361,8 @@ export default function InternalMessage() {
     const payload = {
       subject: subject || null,
       body: text,
+      receiver_id: active.id,
+      sender_id: currentUser?.id,
       receiver_name: active.name,
       sender_name: currentUser?.name ?? "Manager",
     };
@@ -271,19 +371,24 @@ export default function InternalMessage() {
     const optimistic = {
       ...payload,
       id: tempId,
+      receiver_name: active.name,
+      sender_name: currentUser?.name ?? "Manager",
       sent_at: new Date().toISOString(),
       read_at: null,
     };
     setMessages((prev) => [...prev, optimistic]);
     setText("");
     setShowEmoji(false);
-    scrollToBottom();
+    // الانتظار قليلاً ثم السكرول للأسفل
+    setTimeout(() => {
+      scrollToBottom();
+    }, 50);
 
     try {
       const saved = await postMessageApi(payload);
       setMessages((prev) => prev.map((m) => (m.id === tempId ? saved : m)));
     } catch (err) {
-      // postMessageApi already handles toast and fallback, but in case:
+      console.error(err);
       setMessages((prev) => prev.filter((m) => m.id !== tempId));
       toast.error("Sending failed unexpectedly. Please try again.");
     }
@@ -307,6 +412,21 @@ export default function InternalMessage() {
     const q = query.toLowerCase();
     return name.includes(q) || role.includes(q);
   });
+
+  function formatRole(role) {
+    if (!role) return "";
+    const parts = role.split("_");
+    const first = parts[0];
+    return first.charAt(0).toUpperCase() + first.slice(1).toLowerCase();
+  }
+
+  function capitalizeName(name) {
+    if (!name) return "";
+    return name
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(" ");
+  }
 
   return (
     <>
@@ -347,8 +467,12 @@ export default function InternalMessage() {
             </div>
 
             <div className={styles.contactList} role="list">
-              {filtered.length === 0 && (
-                <div className={styles.emptyList}>No contacts found</div>
+              {loadingContact ? (
+                <div className={styles.emptyList}>Loading contact...</div>
+              ) : (
+                filtered.length === 0 && (
+                  <div className={styles.emptyList}>No contacts found</div>
+                )
               )}
 
               {filtered.map((c) => (
@@ -359,7 +483,7 @@ export default function InternalMessage() {
                   }`}
                   onClick={() => {
                     setActive(c);
-                    markReadApi(c.name);
+                    markReadApi(c.id);
                   }}
                   whileHover={{ scale: 1.02 }}
                   role="listitem"
@@ -378,11 +502,17 @@ export default function InternalMessage() {
 
                   <div className={styles.meta}>
                     <div className={styles.nameRow}>
-                      <div className={styles.name}>{c.name}</div>
-                      <div className={styles.role}>{c.role}</div>
+                      <div className={styles.name}>
+                        {capitalizeName(c.name)}
+                      </div>
+                      <div className={styles.role}>{formatRole(c.role)}</div>
                     </div>
                     <div className={styles.preview}>
-                      Last message preview...
+                      {c.last_message
+                        ? c.last_message.length > 40
+                          ? c.last_message.substring(0, 40) + "..."
+                          : c.last_message
+                        : "No messages yet"}
                     </div>
                   </div>
 
@@ -440,8 +570,12 @@ export default function InternalMessage() {
                         .toUpperCase()}
                     </div>
                     <div className={styles.headerInfo}>
-                      <div className={styles.headerName}>{active.name}</div>
-                      <div className={styles.headerRole}>{active.role}</div>
+                      <div className={styles.headerName}>
+                        {capitalizeName(active.name)}
+                      </div>
+                      <div className={styles.headerRole}>
+                        {active.role.split("_").join(" ")}
+                      </div>
                     </div>
                   </div>
 

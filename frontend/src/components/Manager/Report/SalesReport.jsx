@@ -11,7 +11,7 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from "recharts";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FiCalendar, FiClock, FiTrendingUp } from "react-icons/fi";
 import { HiOutlineArrowSmDown } from "react-icons/hi";
@@ -176,7 +176,6 @@ export default function SalesReport() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <ToastContainer position="top-right" autoClose={4000} />
 
       {/* Header + controls */}
       <div className={styles.header}>

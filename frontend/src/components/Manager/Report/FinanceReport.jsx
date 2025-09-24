@@ -12,7 +12,7 @@ import {
   CartesianGrid,
   Legend,
 } from "recharts";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import {
   FiCalendar,
@@ -196,7 +196,6 @@ export default function FinanceReport() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.45 }}
     >
-      <ToastContainer position="top-right" autoClose={3500} />
 
       {/* Header */}
       <div className={styles.header}>

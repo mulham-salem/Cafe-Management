@@ -8,7 +8,7 @@ import {
   faPlus,
   faMap,
 } from "@fortawesome/free-solid-svg-icons";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import { EmpSearchContext } from "./EmployeeHome";
@@ -403,7 +403,6 @@ const TableManagement = () => {
 
   return (
     <div className={styles.container}>
-      <ToastContainer />
       {loading ? (
         <div className={styles.loadingOverlay}>
           <p className={styles.emptyText}>⏳ Loading...</p>

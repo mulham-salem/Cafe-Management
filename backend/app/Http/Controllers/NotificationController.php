@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\NewNotificationEvent;
 use App\Models\Notification;
 use App\UserRole;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class NotificationManagementController extends Controller
+class NotificationController extends Controller
 {
     //    ....................................................manager notification.......................................................................
 
@@ -195,7 +196,7 @@ class NotificationManagementController extends Controller
 
         $supplyRequest->save();
 
-        Notification::create([
+        $notification = Notification::create([
             'manager_id' => $supplyRequest->manager_id,
             'user_id' => $supplier->id,
             'supply_request_id' => $supplyRequest->id,
@@ -206,6 +207,7 @@ class NotificationManagementController extends Controller
             'createdAt' => now(),
             'seen' => false,
         ]);
+        event(new NewNotificationEvent($notification));
 
         return response()->json([
             'message' => 'Response submitted successfully.',
@@ -263,5 +265,29 @@ class NotificationManagementController extends Controller
         $notification->save();
 
         return response()->json(['message' => 'Notification marked as seen']);
+    }
+
+    public function unreadCount(): JsonResponse
+    {
+        $manager = Auth::guard('manager')->user();
+        $user = Auth::guard('user')->user();
+
+        if ($manager) {
+            $count = Notification::where('manager_id', $manager->id)
+                ->where('seen', 0)
+                ->count();
+        } elseif ($user) {
+            $count = Notification::where('user_id', $user->id)
+                ->where('seen', 0)
+                ->count();
+        } else {
+            return response()->json([
+                'message' => 'Unauthorized'
+            ], 401);
+        }
+
+        return response()->json([
+            'count' => $count
+        ]);
     }
 }

@@ -598,7 +598,7 @@ const UserOrder = () => {
       setOpen(false);
       setTimeout(() => {
         fetchOrders();
-      }, 1000);
+      }, 3000);
     } catch (error) {
       console.error("Re-preparation request failed:", error);
       toast.error("Failed to send request. Please try again.");

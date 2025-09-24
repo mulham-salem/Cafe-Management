@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, createContext } from "react";
+import { useState, useEffect, useMemo, createContext, useRef } from "react";
 import styles from "../styles/SupplierHome.module.css";
 import logo from "/logo_1.png";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
@@ -20,12 +20,15 @@ import "react-toastify/dist/ReactToastify.css";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 import SidebarToggle from "../SidebarToggle";
+import echo from "../../../echo";
 export const SupplierSearchContext = createContext({
   searchQuery: "",
   setSearchQuery: () => {},
   searchPlaceholder: "",
   setSearchPlaceholder: () => {},
 });
+import useChattingNotification from "../../hooks/ChattingNotification";
+import useUnreadNotifications from "../../hooks/UnreadNotifications";
 
 const SupplierHome = () => {
   useEffect(() => {
@@ -36,6 +39,13 @@ const SupplierHome = () => {
   const location = useLocation();
   const currentPath = location.pathname;
   const [loading, setLoading] = useState(true);
+  const { unreadCount, loadingCount } = useUnreadNotifications();
+  useChattingNotification();
+
+  const notificationsBuffer = useRef({
+    offerResponses: [],
+    supplyRequests: [],
+  });
 
   const [activeTab, setActiveTab] = useState(() => {
     return localStorage.getItem("supplier_activeTab") || "send";
@@ -228,6 +238,53 @@ const SupplierHome = () => {
     }
   };
 
+  useEffect(() => {
+    echo.channel("notifications").listen(".new-notification", (e) => {
+      const n = e.notification;
+
+      if (n.seen === false && n.purpose === "Supply Offer Response") {
+        notificationsBuffer.current.offerResponses.push(n);
+      }
+
+      if (n.seen === false && n.purpose === "Supply Request") {
+        notificationsBuffer.current.supplyRequests.push(n);
+      }
+    });
+
+    // كل 2 ثانية عرض المجمع
+    const interval = setInterval(() => {
+      const responses = notificationsBuffer.current.offerResponses;
+      const requests = notificationsBuffer.current.supplyRequests;
+
+      setTimeout(() => {
+        if (responses.length > 0) {
+          toastify.info(
+            `You received ${responses.length} response${
+              responses.length > 1 ? "s" : ""
+            } for your supply offer.`
+          );
+          notificationsBuffer.current.offerResponses = [];
+        }
+      }, 2000);
+
+      setTimeout(() => {
+        if (requests.length > 0) {
+          toastify.info(
+            `You received ${requests.length} new supply request${
+              requests.length > 1 ? "s" : ""
+            }.`
+          );
+          notificationsBuffer.current.supplyRequests = [];
+        }
+      }, 2000);
+    }, 2000);
+
+    return () => {
+      clearInterval(interval);
+      echo.leaveChannel("notifications");
+    };
+  }, []);
+
   // useEffect(() => {
   //   const checkNewNotifications = async () => {
   //     try {
@@ -262,11 +319,13 @@ const SupplierHome = () => {
   //       );
 
   //       if (unseenOfferResponses.length > 0) {
-  //         toastify.info(
-  //           `You received ${unseenOfferResponses.length} response${
-  //             unseenOfferResponses.length > 1 ? "s" : ""
-  //           } for your supply offer.`
-  //         );
+  //         setTimeout(() => {
+  //           toastify.info(
+  //             `You received ${unseenOfferResponses.length} response${
+  //               unseenOfferResponses.length > 1 ? "s" : ""
+  //             } for your supply offer.`
+  //           );
+  //         }, 2000);
 
   //         const ids = unseenOfferResponses.map((n) => n.id);
   //         localStorage.setItem(
@@ -276,11 +335,13 @@ const SupplierHome = () => {
   //       }
 
   //       if (unseenRequests.length > 0) {
-  //         toastify.info(
-  //           `You received ${unseenRequests.length} new supply request${
-  //             unseenRequests.length > 1 ? "s" : ""
-  //           }.`
-  //         );
+  //         setTimeout(() => {
+  //           toastify.info(
+  //             `You received ${unseenRequests.length} new supply request${
+  //               unseenRequests.length > 1 ? "s" : ""
+  //             }.`
+  //           );
+  //         }, 2000);
 
   //         const ids = unseenRequests.map((n) => n.id);
   //         localStorage.setItem(
@@ -576,8 +637,15 @@ const SupplierHome = () => {
               </span>
             </div>
           </div>
-          <Link to="supplier-notification" className={styles.navIcon}>
-            <FontAwesomeIcon icon={faBell} title="Notifications" />
+          <Link to="supplier-notification" className={styles.iconWrapper}>
+            <FontAwesomeIcon
+              icon={faBell}
+              className={styles.navIcon}
+              title="Notifications"
+            />
+            {!loadingCount && unreadCount > 0 && (
+              <span className={styles.badge}>{unreadCount}</span>
+            )}
           </Link>
         </div>
       </nav>

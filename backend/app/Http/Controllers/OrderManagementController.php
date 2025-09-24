@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\NewNotificationEvent;
 use App\Models\Bill;
 use App\Models\Complaint;
 use App\Models\Customer;
@@ -39,7 +40,7 @@ class OrderManagementController extends Controller
         $employee = auth('user')->user()->employee ?? null;
         $orderControl = $employee
             ? OrderControl::firstOrCreate(['employee_id' => $employee->id], ['status' => 'open'])
-            : null;
+            : OrderControl::first();
 
         if ($orderControl && $orderControl->status === 'closed') {
             return response()->json([
@@ -234,7 +235,7 @@ class OrderManagementController extends Controller
         $employee = auth('user')->user()->employee ?? null;
         $orderControl = $employee
             ? OrderControl::firstOrCreate(['employee_id' => $employee->id], ['status' => 'open'])
-            : null;
+            : OrderControl::first();
 
         if ($orderControl && $orderControl->status === 'closed') {
             return response()->json([
@@ -588,13 +589,15 @@ class OrderManagementController extends Controller
 
         foreach ($employees as $employee) {
             if ($employee->user) {
-                Notification::create([
+                $notification = Notification::create([
                     'user_id'   => $employee->user->id, // id من جدول users
                     'sent_by'   => 'System',
                     'purpose'   => 'Order Re-Preparation',
                     'message'   => "The customer requested re-preparation for order #{$order->id}.",
                     'createdAt' => now(),
+                    'seen' => false,
                 ]);
+                event(new NewNotificationEvent($notification));
             }
         }
 
@@ -715,13 +718,15 @@ class OrderManagementController extends Controller
                     'createdAt' => now(),
                 ]);
 
-                Notification::create([
+                $notification = Notification::create([
                     'user_id' => $order->customer->id,
                     'sent_by' => 'System',
                     'purpose' => 'Order Ready',
                     'message' => "Your order #{$order->id} is ready now!",
                     'createdAt' => now(),
+                    'seen' => false,
                 ]);
+                event(new NewNotificationEvent($notification));
             }
 
             return response()->json([
@@ -810,24 +815,6 @@ class OrderManagementController extends Controller
             }),
         ]);
     } // 12
-
-    /**
-     * Retrieves a short list of orders for the authenticated customer (ID and status only).
-     */
-    public function getCustomerOrdersShort(): JsonResponse
-    {
-        $user = auth('user')->user();
-
-        if ($user->role !== 'customer') {
-            return response()->json(['error' => 'Only customers can access this data.'], 403);
-        }
-
-        $orders = Order::where('customer_id', $user->id)
-            ->orderByDesc('created_at')
-            ->get(['id', 'status']);
-
-        return response()->json(['orders' => $orders], 200);
-    } // 13
 
     /**
      * Get customer contact info by order ID.
@@ -999,7 +986,7 @@ class OrderManagementController extends Controller
             $control->save();
 
             $formattedTime = Carbon::parse($resumeAt)->format('Y-m-d H:i');
-            Notification::create([
+            $notification = Notification::create([
                 'user_id' => $control->employee_id,
                 'sent_by' => 'System',
                 'purpose' => 'Orders Controls',
@@ -1007,6 +994,7 @@ class OrderManagementController extends Controller
                 'createdAt' => now(),
                 'seen' => false,
             ]);
+            event(new NewNotificationEvent($notification));
         }
     }// 20
 }

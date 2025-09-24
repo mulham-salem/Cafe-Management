@@ -133,7 +133,7 @@ class UserManagementController extends Controller
                 ]);
 
                 // Create loyalty account record
-                DB::table('loyality_account')->insert([
+                DB::table('loyalty_account')->insert([
                     'customer_id' => $user->id,
                     'points_balance' => 0.00,
                     'tier' => 'Bronze',

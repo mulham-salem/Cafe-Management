@@ -15,7 +15,7 @@ class BillManagementController extends Controller
     public function fetchPurchaseBill()
     {
         // جلب كل الفواتير مع المورد والعناصر المرتبطة
-        $bills = PurchaseBill::with(['supplier', 'inventoryItems'])->get();
+        $bills = PurchaseBill::with(['supplier', 'supplyOffer'])->get();
 
         // تركيب الـ JSON حسب المطلوب
         $result = $bills->map(function ($bill) {
@@ -23,7 +23,7 @@ class BillManagementController extends Controller
                 'id' => $bill->id,
                 'date' => $bill->purchase_date,
                 'supplier' => $bill->supplier->user->full_name,
-                'items' => $bill->inventoryItems->map(function ($item) {
+                'items' => $bill->supplyOffer->supplyOfferItems->map(function ($item) {
                     return [
                         'name' => $item->name,
                         'quantity' => $item->quantity,

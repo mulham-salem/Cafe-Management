@@ -3,9 +3,7 @@ import styles from '../styles/SupplierNotification.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBell, faCheckCircle, faClock } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-
+import { toast } from 'react-toastify';
 
 const SupplierNotification = () => {
   const [notifications, setNotifications] = useState([]);
@@ -90,7 +88,6 @@ const SupplierNotification = () => {
 
   return (
     <div className={styles.pageWrapper}>
-      <ToastContainer />
       <h2 className={styles.pageTitle}>
         <FontAwesomeIcon icon={faBell} className={styles.bellIcon} /> Notifications
       </h2>

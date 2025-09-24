@@ -12,16 +12,6 @@ class InternalMessage extends Model
 
     use HasFactory;
 
-    public function userSender(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'sender_id');
-    }
-
-    public function userReceiver(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'receiver_id');
-    }
-
     protected $fillable = [
         'sender_id',
         'receiver_id',
@@ -31,5 +21,6 @@ class InternalMessage extends Model
         'receiver_name',
         'sent_at',
         'read_at',
+        'unread',
     ];
 }

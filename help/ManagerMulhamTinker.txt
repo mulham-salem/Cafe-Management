@@ -50,3 +50,25 @@ $deliverWorker->password = bcrypt('44444444');
 $deliverWorker->manager_id = 1;
 $deliverWorker->remember_token = \Illuminate\Support\Str::random(60);
 $deliverWorker->save();
+
+
+$loyalty1 = new \App\Models\LoyaltyAccount;
+$loyalty1->customer_id = 7;
+$loyalty1->points_balance = 0.00;
+$loyalty1->last_update = now();
+$loyalty1->created_at = now();
+$loyalty1->save();
+
+$loyalty2 = new \App\Models\LoyaltyAccount;
+$loyalty2->customer_id = 8;
+$loyalty2->points_balance = 0.00;
+$loyalty2->last_update = now();
+$loyalty2->created_at = now();
+$loyalty2->save();
+
+$loyalty3 = new \App\Models\LoyaltyAccount;
+$loyalty3->customer_id = 9;
+$loyalty3->points_balance = 0.00;
+$loyalty3->last_update = now();
+$loyalty3->created_at = now();
+$loyalty3->save();

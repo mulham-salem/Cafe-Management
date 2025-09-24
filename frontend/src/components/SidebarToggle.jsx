@@ -19,7 +19,7 @@ import { usePermissions } from "../context/PermissionsContext";
 
 export default function SidebarToggle({
   initialOpen = false,
-  introDurationMs = 4400,
+  introDurationMs = 5000,
   introDelayMs = 2000,
 }) {
   const { permissions, role, loading } = usePermissions();

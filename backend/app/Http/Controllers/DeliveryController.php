@@ -28,8 +28,13 @@ class DeliveryController extends Controller
             ->where('status', '!=', 'delivered')
             // show orders assigned to this worker OR those that are unassigned (available)
             ->where(function ($q) use ($workerId) {
-                $q->where('delivery_worker_id', $workerId)
-                    ->orWhere('status', 'unassigned');
+                $q->where(function ($sub) {
+                    $sub->where('status', 'unassigned')
+                    ->whereHas('order', function ($o) {
+                        $o->where('status', 'ready');
+                    });
+                })
+                ->orWhere('delivery_worker_id', $workerId);
             })
             ->get();
 
@@ -47,7 +52,7 @@ class DeliveryController extends Controller
                 // attempt to read common field names; adapt if your schema differs
                 $quantity = (int)$oi->quantity;
                 // unit price field could be unit_price or price
-                $unitPrice = (float)$oi->price;
+                $unitPrice = (float)$oi->price/(int)$oi->quantity;
                 // name might be on the order_item or via relation (menu_item)
                 $name = $oi->item_name;
 
@@ -71,7 +76,7 @@ class DeliveryController extends Controller
 
             return [
                 // id that frontend uses for actions (we return delivery_order id)
-                'id' => $d->id,
+                'id' => $order->id,
                 'status' => $d->status,
                 'items' => $items,
                 'estimated_time' => $d->estimated_time,
@@ -109,7 +114,7 @@ class DeliveryController extends Controller
         return DB::transaction(function () use ($request, $id) {
             $workerId = Auth::guard('user')->id();
 
-            $deliveryOrder = DeliveryOrder::findOrFail($id);
+            $deliveryOrder = DeliveryOrder::where('order_id', $id)->firstOrFail();
 
             // If worker accepts the order (Assigned) - make sure the record is assigned to them
             if ($request->status === 'assigned') {
@@ -153,7 +158,7 @@ class DeliveryController extends Controller
     public function confirmDelivered($id)
     {
         return DB::transaction(function () use ($id) {
-            $deliveryOrder = DeliveryOrder::with('order')->findOrFail($id);
+            $deliveryOrder = DeliveryOrder::with('order')->where('order_id', $id)->firstOrFail();
 
             // Check if related order is delivered
             if ($deliveryOrder->order->status !== 'delivered') {
@@ -200,7 +205,7 @@ class DeliveryController extends Controller
         $unassignedOrder = DeliveryOrder::where('status', 'unassigned')->first();
 
         if ($unassignedOrder) {
-            $orderId = $unassignedOrder->id;
+            $orderId = $unassignedOrder->order_id;
             $notificationMessage = "A new unassigned delivery order #{$orderId} is available.";
 
             // تحقق إذا فيه إشعار بنفس الرسالة للمستخدم

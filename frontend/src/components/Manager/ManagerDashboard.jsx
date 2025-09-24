@@ -1,4 +1,4 @@
-import React, { useState, useEffect, createContext } from "react";
+import { useState, useEffect, createContext, useRef } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import styles from "../styles/ManagerDashboard.module.css";
 import logo from "/logo_1.png";
@@ -22,17 +22,28 @@ import { toast, Toaster } from "react-hot-toast";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import { useActiveTab } from "../../context/ActiveTabContext";
+import echo from "../../../echo";
 export const SearchContext = createContext({
   searchQuery: "",
   setSearchQuery: () => {},
   searchPlaceholder: "",
   setSearchPlaceholder: () => {},
 });
+import useChattingNotification from "../../hooks/ChattingNotification";
+import useUnreadNotifications from "../../hooks/UnreadNotifications";
 
 const ManagerDashboard = () => {
   const { activeTab } = useActiveTab();
   const location = useLocation();
   const currentPath = location.pathname;
+  const notificationsBuffer = useRef({
+    supplyOffers: [],
+    supplyResponses: [],
+  });
+
+  useChattingNotification();
+
+  const { unreadCount, loadingCount } = useUnreadNotifications();
 
   useEffect(() => {
     document.title = "Cafe Delights - Manager Dashboard";
@@ -59,7 +70,8 @@ const ManagerDashboard = () => {
     if (currentPath.includes("/table-management")) return "Table Management";
     if (currentPath.includes("/inventory-supply")) return "Inventory & Supply";
     if (currentPath.includes("/promotion-management")) return "Promotion";
-    if (currentPath.includes("/manager-notification")) return "Notifications Page";
+    if (currentPath.includes("/manager-notification"))
+      return "Notifications Page";
     if (currentPath.includes("/reports-dashboard")) return "Reports Dashboard";
     if (currentPath.includes("/my-account")) return "Account";
     if (currentPath.includes("/message")) return "Messages";
@@ -97,7 +109,8 @@ const ManagerDashboard = () => {
 
   const handleLogout = async () => {
     const token =
-      sessionStorage.getItem("managerToken") || localStorage.getItem("managerToken");
+      sessionStorage.getItem("managerToken") ||
+      localStorage.getItem("managerToken");
 
     try {
       const response = await axios.post(
@@ -125,7 +138,8 @@ const ManagerDashboard = () => {
 
   const profile = async () => {
     const token =
-      sessionStorage.getItem("managerToken") || localStorage.getItem("managerToken");
+      sessionStorage.getItem("managerToken") ||
+      localStorage.getItem("managerToken");
 
     try {
       const response = await axios.get(
@@ -139,83 +153,68 @@ const ManagerDashboard = () => {
 
       setManagerName(response.data.name || "Manager");
     } catch (error) {
-     toastify.error("Failed to fetch manager name");
+      toastify.error("Failed to fetch manager name");
     }
   };
 
-useEffect(() => {
-  const checkNewNotifications = async () => {
+  useEffect(() => {
     try {
-      const token =
-        localStorage.getItem("managerToken") ||
-        sessionStorage.getItem("managerToken");
+      const channel = echo.channel("notifications");
+      channel.listen(".new-notification", (e) => {
+        console.log("Received notification via WebSocket:", e);
+        const n = e.notification;
 
-      const response = await axios.get(
-        "http://localhost:8000/api/admin/notifications",
-        {
-          headers: { Authorization: `Bearer ${token}` },
+        if (n.seen === false && n.purpose === "Supply Offer") {
+          notificationsBuffer.current.supplyOffers.push(n);
         }
-      );
 
-      const allNotifications = response.data.notifications;
+        if (n.seen === false && n.purpose === "Response For Supply Request") {
+          notificationsBuffer.current.supplyResponses.push(n);
+        }
+      });
+      // كل شوي (مثلاً 2 ثانية) شوف إذا في إشعارات جديدة واجمعهن برسالة وحدة
+      const interval = setInterval(() => {
+        const offers = notificationsBuffer.current.supplyOffers;
+        const responses = notificationsBuffer.current.supplyResponses;
 
-      // جلب الإشعارات المخزنة مسبقاً
-      const shownNotifications =
-        JSON.parse(localStorage.getItem("shownManagerNotifications")) || [];
+        setTimeout(() => {
+          if (offers.length > 0) {
+            toastify.info(
+              `You received ${offers.length} new supply offer${
+                offers.length > 1 ? "s" : ""
+              }.`
+            );
+            notificationsBuffer.current.supplyOffers = [];
+          }
+        }, 2000);
 
-      // تصفية الإشعارات الجديدة غير المعروضة سابقاً
-      const unseenSupplyOffers = allNotifications.filter(
-        (n) =>
-          n.seen === 0 &&
-          n.purpose === "Supply Offer" &&
-          !shownNotifications.includes(n.id)
-      );
+        setTimeout(() => {
+          if (responses.length > 0) {
+            toastify.info(
+              `You received ${responses.length} new response${
+                responses.length > 1 ? "s" : ""
+              } for your supply request.`
+            );
+            notificationsBuffer.current.supplyResponses = [];
+          }
+        }, 2000);
+      }, 2000);
 
-      const unseenSupplyResponses = allNotifications.filter(
-        (n) =>
-          n.seen === 0 &&
-          n.purpose === "Response For Supply Request" &&
-          !shownNotifications.includes(n.id)
-      );
+      // معالج الأخطاء للقناة
+      channel.error((error) => {
+        console.error("Channel error:", error);
+        toast.error("Connection error. Reconnecting...");
+      });
 
-      if (unseenSupplyOffers.length > 0) {
-        toastify.info(
-          `You received ${unseenSupplyOffers.length} new supply offer${
-            unseenSupplyOffers.length > 1 ? "s" : ""
-          }.`
-        );
-
-        // خزّن IDs لتفادي التكرار
-        const ids = unseenSupplyOffers.map((n) => n.id);
-        localStorage.setItem(
-          "shownManagerNotifications",
-          JSON.stringify([...shownNotifications, ...ids])
-        );
-      }
-
-      if (unseenSupplyResponses.length > 0) {
-        toastify.info(
-          `You received ${unseenSupplyResponses.length} new response${
-            unseenSupplyResponses.length > 1 ? "s" : ""
-          } for your supply request.`
-        );
-
-        // خزّن IDs لتفادي التكرار
-        const ids = unseenSupplyResponses.map((n) => n.id);
-        localStorage.setItem(
-          "shownManagerNotifications",
-          JSON.stringify([...shownNotifications, ...ids])
-        );
-      }
-    } catch (err) {
-      console.error("Failed to load notifications: ", err);
+      return () => {
+        clearInterval(interval);
+        echo.leaveChannel("notifications");
+      };
+    } catch (error) {
+      console.error("Failed to set up WebSocket:", error);
+      toast.error("Real-time notifications unavailable");
     }
-  };
-
-  checkNewNotifications();
-  const interval = setInterval(checkNewNotifications, 10000);
-  return () => clearInterval(interval);
-}, []);
+  }, []);
 
   // search state
   const [searchQuery, setSearchQuery] = useState("");
@@ -226,7 +225,12 @@ useEffect(() => {
     if (currentPath.includes("/menu-management")) return true;
     if (currentPath.includes("/promotion-management")) return true;
     if (currentPath.includes("/inventory-supply")) {
-      return activeTab === "inventory" || activeTab === "offers" || activeTab === "purchaseBills" ||  activeTab === "supplyHistory";
+      return (
+        activeTab === "inventory" ||
+        activeTab === "offers" ||
+        activeTab === "purchaseBills" ||
+        activeTab === "supplyHistory"
+      );
     }
     return false;
   };
@@ -250,43 +254,34 @@ useEffect(() => {
           </div>
         </div>
         <div className={styles.headerCenter}>
-            <span className={styles.pageTitle}>{getTitle()}</span>
+          <span className={styles.pageTitle}>{getTitle()}</span>
 
-            {shouldShowSearch() && (
-              <div className={styles.searchContainer}>
-                <FontAwesomeIcon
-                  icon={faSearch}
-                  className={styles.searchIcon}
-                />
-                <input
-                  type="text"
-                  aria-label="Search"
-                  placeholder={searchPlaceholder}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className={styles.searchBox}
-                />
-              </div>
-            )}
+          {shouldShowSearch() && (
+            <div className={styles.searchContainer}>
+              <FontAwesomeIcon icon={faSearch} className={styles.searchIcon} />
+              <input
+                type="text"
+                aria-label="Search"
+                placeholder={searchPlaceholder}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className={styles.searchBox}
+              />
+            </div>
+          )}
         </div>
         <div className={styles.rightSection}>
           <div className={styles.managerName}>
             {managerName}
             <div className={styles.dropdown}>
-              <Link
-                to="my-account"
-                className={styles.dropdownLink}
-              >
+              <Link to="my-account" className={styles.dropdownLink}>
                 <button className={styles.dropdownButton}>
-                  <FontAwesomeIcon icon={faUserAlt}/>
+                  <FontAwesomeIcon icon={faUserAlt} />
                   <span>My Account</span>
                 </button>
               </Link>
 
-              <Link
-                to="message"
-                className={styles.dropdownLink}
-              >
+              <Link to="message" className={styles.dropdownLink}>
                 <button className={styles.dropdownButton}>
                   <FontAwesomeIcon icon={faMessage} />
                   <span>Messages</span>
@@ -307,12 +302,15 @@ useEffect(() => {
               </span>
             </div>
           </div>
-          <Link to="manager-notification">
+          <Link to="manager-notification" className={styles.iconWrapper}>
             <FontAwesomeIcon
               icon={faBell}
               title="Notifications"
               className={styles.notificationIcon}
             />
+            {!loadingCount && unreadCount > 0 && (
+              <span className={styles.badge}>{unreadCount}</span>
+            )}
           </Link>
         </div>
       </header>
@@ -344,7 +342,7 @@ useEffect(() => {
                   ? styles.active
                   : styles.inactive
               }
-            > 
+            >
               <FontAwesomeIcon icon={faUsers} className={styles.icon} />
               User Management
             </Link>
@@ -430,7 +428,14 @@ useEffect(() => {
             </h2>
           </div>
         )}
-        <SearchContext.Provider value={{ searchQuery, setSearchQuery, searchPlaceholder, setSearchPlaceholder }}>
+        <SearchContext.Provider
+          value={{
+            searchQuery,
+            setSearchQuery,
+            searchPlaceholder,
+            setSearchPlaceholder,
+          }}
+        >
           <Outlet />
         </SearchContext.Provider>
       </main>

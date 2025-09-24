@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\CheckPermission;
 use App\Http\Middleware\CheckUserRole;
+use App\Http\Middleware\CorsMiddleware;
 use App\Http\Middleware\IsManager;
 use App\Http\Middleware\RoleMiddleware;
 use Illuminate\Foundation\Application;
@@ -18,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
+            CorsMiddleware::class,
             'isManager' => isManager::class,
             'checkUserRole' => CheckUserRole::class,
             'role' => RoleMiddleware::class,

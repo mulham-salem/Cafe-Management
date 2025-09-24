@@ -11,9 +11,10 @@ import {
   faSearch,
   faMessage,
   faUserAlt,
+  faSignOutAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import styles from "../styles/EmployeeHome.module.css";
-import { toast as toastify } from "react-toastify";
+import { toast as toastify, ToastContainer } from "react-toastify";
 import { toast, Toaster } from "react-hot-toast";
 import "react-toastify/dist/ReactToastify.css";
 import "../styles/toastStyles.css";
@@ -28,6 +29,9 @@ import { motion } from "framer-motion";
 import axios from "axios";
 import SidebarToggle from "../SidebarToggle";
 import { useActiveTab } from "../../context/ActiveTabContext";
+import echo from "../../../echo";
+import useChattingNotification from "../../hooks/ChattingNotification";
+import useUnreadNotifications from "../../hooks/UnreadNotifications";
 
 const cards = [
   {
@@ -78,6 +82,8 @@ const EmployeeHome = () => {
   const location = useLocation();
   const currentPath = location.pathname;
   const { activeTab } = useActiveTab();
+  const { unreadCount, loadingCount } = useUnreadNotifications();
+  useChattingNotification();
 
   const token =
     sessionStorage.getItem("employeeToken") ||
@@ -158,9 +164,46 @@ const EmployeeHome = () => {
     }
   };
 
+  useEffect(() => {
+    try {
+      const channel = echo.channel("notifications");
+      channel.listen(".new-notification", (e) => {
+        console.log("Received notification via WebSocket:", e);
+        const n = e.notification;
+
+        setTimeout(() => {
+          if (n.seen === false && n.purpose === "Order Re-Preparation") {
+            toastify.info(`${n.message}`);
+          }
+        }, 2000);
+
+        setTimeout(() => {
+          if (n.seen === false && n.purpose === "Orders Controls") {
+            toastify.info(`${n.message}`);
+          }
+        }, 2000);
+      });
+      // كل شوي (مثلاً 2 ثانية) شوف إذا في إشعارات جديدة واجمعهن برسالة وحدة
+
+      // معالج الأخطاء للقناة
+      channel.error((error) => {
+        console.error("Channel error:", error);
+        toast.error("Connection error. Reconnecting...");
+      });
+
+      return () => {
+        echo.leaveChannel("notifications");
+      };
+    } catch (error) {
+      console.error("Failed to set up WebSocket:", error);
+      toast.error("Real-time notifications unavailable");
+    }
+  }, []);
+
   return (
     <div className={styles.container}>
       <Toaster />
+      <ToastContainer theme="dark" />
       <nav className={styles.navbar}>
         <div className={styles.leftSection}>
           <img src={logo} alt="Cafe Delights Logo" className={styles.logo} />
@@ -182,10 +225,7 @@ const EmployeeHome = () => {
               <a href="#">Contact Us</a>
             </li>
             <li>
-              <Link onClick={handleLogout} className={styles.activeLink}>
-                {" "}
-                Logout{" "}
-              </Link>
+              <Link className={styles.activeLink}> Complaints </Link>
             </li>
           </ul>
         </div>
@@ -231,10 +271,22 @@ const EmployeeHome = () => {
                   <span>Messages</span>
                 </button>
               </Link>
+              <Link onClick={handleLogout} className={styles.dropdownLink}>
+                <button className={styles.dropdownButton}>
+                  <FontAwesomeIcon
+                    icon={faSignOutAlt}
+                    className={styles.icon}
+                  />
+                  <span>Logout</span>
+                </button>
+              </Link>
             </div>
           </div>
-          <Link to="employee-notification" className={styles.bellIcon}>
-            <FontAwesomeIcon icon={faBell} title="Notifications" />
+          <Link to="employee-notification" className={styles.iconWrapper}>
+            <FontAwesomeIcon icon={faBell} className={styles.bellIcon} title="Notifications" />
+            {!loadingCount && unreadCount > 0 && (
+              <span className={styles.badge}>{unreadCount}</span>
+            )}
           </Link>
         </div>
       </nav>
