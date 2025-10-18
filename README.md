@@ -10,25 +10,23 @@ A **comprehensive café management system** built with:
 
 ## 👥 System Actors
 
----
-
-🧑‍💼 Customer
+Customer
 
 ---
 
-👨‍🍳 Employee
+Employee
 
 ---
 
-🧑‍💼 Manager
+Manager
 
 ---
 
-🚚 Supplier
+Supplier
 
 ---
 
-🛵 Delivery Worker
+Delivery Worker
 
 ---
 
