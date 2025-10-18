@@ -32,8 +32,6 @@ Delivery Worker
 
 ---
 
----
-
 ## ✨ System Features
 
 | # | Feature | Category |
