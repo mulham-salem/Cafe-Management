@@ -7,6 +7,7 @@ A **comprehensive café management system** built with:
 **Front-End:** React 
 
 **Database:** MySQL 
+
 ---
 
 ## 👥 System Actors
