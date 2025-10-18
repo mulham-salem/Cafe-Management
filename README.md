@@ -2,10 +2,11 @@
 
 A **comprehensive café management system** built with:
 
-**Back-End:** Laravel ⚙️
+**Back-End:** Laravel 
 
-**Front-End:** React ⚛️
+**Front-End:** React 
 
+**Database:** MySQL 
 ---
 
 ## 👥 System Actors
